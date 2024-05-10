@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>로그인</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+
+    <script type="text/javascript">
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+            let f = document.getElementById("f"); // form 태그
+
+            // 회원가입
+            $("#btnUserReg").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                location.href = "/user/userRegForm";
+            })
+
+            // 아이디 찾기
+            $("#btnSearchUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                location.href = "/user/searchUserId";
+            })
+
+            // 비밀번호 찾기
+            $("#btnSearchPassword").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                location.href = "/user/searchPassword";
+            })
+
+            $("#btnLogin").on("click", function () {
+                doLogin(f);
+            })
+        })
+
+        function doLogin(f) {
+
+            if (f.userId.value === "") {
+                alert("아이디를 입력하세요.");
+                f.userId.focus();
+                return;
+            }
+
+            if (f.password.value === "") {
+                alert("비밀번호를 입력하세요.");
+                f.password.focus();
+                return;
+            }
+
+            // Ajax 호출해서 로그인하기
+            $.ajax({
+                url: "/user/loginProc",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 상태로 변경하기
+                success: function (json) { // /notice/noticeUpdate 호출이 성공했다면
+
+                    if (json.result === 1) { // 로그인 성공
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/main/main"; // 로그인 성공 페이지로 이동
+
+                    } else { // 로그인 실패
+                        alert(json.msg); // 메시지 띄우기
+                        $("#userId").focus(); // 아이디 입력 항목으로 커서 이동
+                    }
+                }
+            })
+        }
+
+    </script>
+</head>
+
+<body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+
+                    <li>
+                        <a href="/notice/noticeList"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/notice/noticeList">정보센터</a></li>
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/center/center"><span>커뮤니티</span></a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a></li>
+                        </ul>
+                    </li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="/online/calendar">예약</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_NAME == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_NAME != null}">
+
+                <a href="/user/logout">로그아웃</a>
+            </div>
+
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop">
+                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <ul>
+
+                    <li class="has-sub">
+                        <a href="/center/center">정보센터</a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a>
+                            </li>
+                            <li></a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/notice/noticeList">커뮤니티</a>
+                        <ul>
+                            <li><a href="/notice/noticeList">커뮤니티</a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">예약</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--<li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="#">고객센터</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </li>-->
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/user/userRegForm" title="회원가입">회원가입</a>
+                            </li>
+                            <li>
+                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
+                            </li>
+                            <li>
+                                <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <div class="large">회원</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">로그인</span>
+                            <ul>
+                                <li>
+                                    <a href="/user/userRegForm" title="회원가입">회원가입</a>
+                                </li>
+                                <li>
+                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
+                                </li>
+                                <li>
+                                    <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">로그인</h1>
+            <div class="sContent">
+                <div id="cms_member_article">
+                    <div class="loginTit">
+                        <p class="txt">펫밀리에 오신것을 환영합니다.<br>서비스를 이용하기 위해서는 로그인이 필요합니다.<br>로그인 후 서비스를 이용해 주세요.</p>
+                    </div>
+                    <div class="loginCon">
+                        <form id="f" action="/user/loginProc" name="fn_loginForm" method="post">
+                            <div class="con">
+                                <input type="text" id="userId" name="userId" class="inputTxt  logTxt" maxlength="50"
+                                       value="" placeholder="아이디">
+                                <input type="password" id="password" name="password" autocomplete="off" class="logTxt"
+                                       maxlength="30" placeholder="비밀번호">
+                                <input type="submit" id="btnLogin" class="btn" value="로그인">
+                                <ul>
+                                    <li><a href="/user/searchUserId">아이디 찾기</a></li>
+                                    <li><a href="/user/searchPassword">비밀번호 찾기</a></li>
+                                    <li><a href="/user/userRegForm">회원가입</a></li>
+                                </ul>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
+</body>
+
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>로그인</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+
+    <script type="text/javascript">
+        // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
+        let userIdCheck = "Y";
+
+        // 이메일 중복체크 인증번호 발송 값
+        let emailAuthNumber = "";
+
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+
+            let f = document.getElementById("f"); // form 태그
+
+            // 아이디 중복체크
+            $("#btnUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                userIdExists(f)
+            })
+
+            // 이메일 중복체크
+            $("#btnEmail").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                emailExists(f)
+            })
+
+            $("#btnAuth").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                authConfirm(f)
+            })
+
+            // 우편번호 찾기
+            $("#btnAddr").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                kakaoPost(f);
+            })
+
+            $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                doSubmit(f);
+            })
+        })
+
+        // 회원아이디 중복 체크
+        function userIdExists(f) {
+
+            if (f.userId.value === "") {
+                alert("아이디를 입력하세요.");
+                f.userId.focus();
+                return;
+            }
+
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                url: "/user/getUserIdExists",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
+                    if (json.existsYn === "Y") {
+                        alert("이미 가입된 아이디가 존재합니다.");
+                        f.userId.focus();
+
+                    } else {
+                        alert("가입 가능한 아이디입니다.");
+                        userIdCheck = "N";
+                    }
+
+                }
+            })
+        }
+
+        // 이메일 중복 체크
+        function emailExists(f) {
+            if (f.email.value === "") {
+                alert("이메일을 입력하세요.");
+                f.email.focus();
+                return;
+            }
+
+            $.ajax({
+                url: "/user/getEmailExists",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
+                    if (json.existsYn === "Y") {
+                        alert("이미 가입된 이메일 주소가 존재합니다.");
+                        f.email.focus();
+
+                    } else {
+                        alert("가입 가능한 이메일 주소입니다.");
+                        emailAuthNumber = json.authNumber;
+
+                    }
+
+                }
+            })
+        }
+
+        function authConfirm(f) {
+
+            if (f.authNumber.value === "") {
+                alert("이메일 인증번호를 입력하세요.");
+                f.authNumber.focus();
+                return;
+            }
+
+            if (f.authNumber.value !== emailAuthNumber.toString()) {
+                alert("이메일 인증번호가 일치하지 않습니다.");
+                f.authNumber.focus();
+            } else {
+                alert("이메일 인증번호가 일치합니다.")
+                f.authNumber.focus();
+            }
+        }
+
+        //회원가입 정보의 유효성 체크하기
+        function doSubmit(f) {
+
+            if (f.userId.value === "") {
+                alert("아이디를 입력하세요.");
+                f.userId.focus();
+                return;
+            }
+
+            if (userIdCheck !== "N") {
+                alert("아이디 중복 체크 및 중복되지 않은 아이디로 가입 바랍니다.");
+                f.userId.focus();
+                return;
+            }
+
+            if (f.userName.value === "") {
+                alert("이름을 입력하세요.");
+                f.userName.focus();
+                return;
+            }
+
+            if (f.password.value === "") {
+                alert("비밀번호를 입력하세요.");
+                f.password.focus();
+                return;
+            }
+
+            if (f.password2.value === "") {
+                alert("비밀번호확인을 입력하세요.");
+                f.password2.focus();
+                return;
+            }
+
+            if (f.password.value !== f.password2.value) {
+                alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+                f.password.focus();
+                return;
+            }
+
+            if (f.email.value === "") {
+                alert("이메일을 입력하세요.");
+                f.email.focus();
+                return;
+            }
+
+            // if (f.authNumber.value === "") {
+            //     alert("이메일 인증번호를 입력하세요.");
+            //     f.authNumber.focus();
+            //     return;
+            // }
+            //
+            // if (f.authNumber.value !== emailAuthNumber.toString()) {
+            //     alert("이메일 인증번호가 일치하지 않습니다.");
+            //     f.authNumber.focus();
+            //     return;
+            // }
+
+            // if (f.addr1.value === "") {
+            //     alert("주소를 입력하세요.");
+            //     f.addr1.focus();
+            //     return;
+            // }
+            //
+            // if (f.addr2.value === "") {
+            //     alert("상세주소를 입력하세요.");
+            //     f.addr2.focus();
+            //     return;
+            // }
+
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                url: "/user/insertUserInfo",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // /user/insertUserInfo 호출이 성공했다면..
+
+                    if (json.result === 1) { // 회원가입 성공
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/user/login"; // 로그인 페이지 이동
+
+                    } else { // 회원가입 실패
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/user/userRegForm"
+                    }
+                }
+            })
+        }
+
+    </script>
+</head>
+
+<body>
+<div id="wrapper">
+    <!-- 네비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+
+                    <li>
+                        <a href="/notice/noticeList"><span>커뮤니티</span></a>
+                        <ul>
+                            <li><a href="/notice/noticeList">커뮤니티</a></li>
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/center/center"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a></li>
+
+
+                        </ul>
+                    </li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+
+                            <li><a href="/online/calendar">예약</a></li>
+
+                        </ul>
+                    </li>
+                    <!--<li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="#">고객센터</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </li>-->
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_NAME == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_NAME != null}">
+
+                <a href="/user/logout">로그아웃</a>
+            </div>
+
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop">
+                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <ul>
+
+                    <li class="has-sub">
+                        <a href="/notice/noticeList">커뮤니티</a>
+                        <ul>
+                            <li><a href="/notice/noticeList">커뮤니티</a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/center/center">정보센터</a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a>
+                            </li>
+                            <li></a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">예약</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--<li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="#">고객센터</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </li>-->
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 네비게이션 바 -->
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/user/login" title="로그인">로그인</a>
+                            </li>
+                            <li>
+                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
+                            </li>
+                            <li>
+                                <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <div class="large">회원</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">로그인</span>
+                            <ul>
+                                <li>
+                                    <a href="/user/login" title="로그인">로그인</a>
+                                </li>
+                                <li>
+                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
+                                </li>
+                                <li>
+                                    <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">회원가입</h1>
+            <div class="sContent">
+                <div id="cms_member_article">
+                    <form id="f" action="/user/insertUserInfo" name="memberInputForm" method="post"
+                          onsubmit="doSubmit(this)">
+                        <table class="writeTypeA mt10">
+                            <caption>회원가입 글쓰기 서식</caption>
+                            <colgroup>
+                                <col style="width:18%">
+                                <col>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th scope="row"><label for="mbrId" id="fn_name_mbrId"
+                                                       class="required"><span>아이디</span></label></th>
+                                <td>
+                                    <input type="text" name="userId" id="mbrId" class="inpA" style="ime-mode:disabled;"
+                                           required="required" value="">
+                                    <span class="btnBc small green"><button id="btnUserId"
+                                                                            type="button">아이디 중복확인</button></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th><label for="mbrName"><span>이름</span></label></th>
+                                <td>
+                                    <input type="text" name="userName" id="mbrName" class="inpA" style="" maxlength="15"
+                                           required="required" value="">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="mbrPwd" class="required"><span>비밀번호</span></label></th>
+                                <td>
+                                    <input type="password" name="password" id="mbrPwd" autocomplete="off" class="inpA"
+                                           style="" maxlength="15" required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="mbrPwd_reconfirm"
+                                                       class="required"><span>비밀번호 확인</span></label>
+                                </th>
+                                <td>
+                                    <input type="password" name="password2" id="mbrPwd_reconfirm" autocomplete="off"
+                                           class="inpA" style="" maxlength="15" required="required">
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label for="mbrEmail" class="required"><span>이메일</span></label></th>
+                                <td>
+                                    <div class="input-email" style="float:left;">
+                                        <input type="text" id="mbrEmail" name="email" title="이메일" class="inputTxt"
+                                               style="ime-mode:disabled;width:50%" required="required" value="">
+                                        <span class="btnBc small green"><button id="btnEmail" type="button"
+                                                                                class="m_dup_btn">이메일 중복 확인</button></span>
+                                    </div>
+                                </td>
+                            </tr>
+<!--                            <tr>-->
+<!--                                <th><label for="ahCode" class="required"><span>인증번호</span></label></th>-->
+<!--                                <td>-->
+<!--                                    <div class="input-email" style="float:left;">-->
+<!--                                        <input type="text" id="ahCode" name="authNumber" title="인증번호" class="inputTxt"-->
+<!--                                               style="ime-mode:disabled;width:50%" required="required" value=""-->
+<!--                                               maxlength="6">-->
+<!--                                        <span class="btnBc small green"><button id="btnAuth" type="button"-->
+<!--                                                                                class="m_dup_btn">인증번호 확인</button></span>-->
+<!--                                    </div>-->
+<!--                                </td>-->
+<!--                            </tr>-->
+                            </tbody>
+                        </table>
+
+                        <!-- btnset -->
+                        <div class="btnWrap">
+                            <span class="btnBc green w"><input type="submit" value="회원가입"></span>
+                            <span class="btnBc black w"><button type="reset" title="취소">취소</button></span>
+                        </div>
+                        <!-- //btnset -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
+</body>
+</html>

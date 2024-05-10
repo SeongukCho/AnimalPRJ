@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>redirect</title>
+</head>
+<body>
+<script th:inline="javascript">
+    window.onload = function () {
+        let msg = [[${msg}]];
+        let url = [[${url}]];
+        alert(msg);
+        location.href = url;
+    }
+</script>
+<meta charset="UTF-8">
+<section id="footer">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="copyright">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="designer">
+                    </div>
+                </div>
+            </div>
+            <!--End of row-->
+        </div>
+        <!--End of container-->
+    </section></body>
+</html>

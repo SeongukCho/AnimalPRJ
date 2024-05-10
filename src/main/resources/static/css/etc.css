@@ -1,0 +1,10 @@
+.tabMenuCon2 ul.li5 li{width:20%}
+
+.tabMenuCon3{margin-bottom:20px}
+.tabMenuCon3 ul::after{display:block;clear:both;content:''}
+.tabMenuCon3 ul li{position:relative;float:left;text-align:center;}
+.tabMenuCon3 ul li a{position:relative;display:block;margin:0 -1px -1px 0;height:60px;font-size:16px;color:#252525;line-height:58px;font-weight:400;background:#fff;border:1px solid #e1e1e1;transition:all 0.2s ease;-webkit-transition:all 0.2s ease;z-index:1}
+.tabMenuCon3 ul li a span{display:inline-block;line-height:1.1;vertical-align:middle;}
+.tabMenuCon3 ul li.on a{color:#fff;background:#f26522;border:1px solid #f26522;z-index:2}
+
+.tabMenuCon3 ul.li2 li{width:50%}

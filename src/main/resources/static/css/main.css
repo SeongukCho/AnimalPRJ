@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Myeongjo:wght@700&display=swap');
+
+.hd_login {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.hd_login span {
+    margin-left: 10px;
+    /* 각 링크 사이의 간격 조절 */
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.hd_login span:hover {
+    background-color: #f0f0f0;
+    /* 호버 시 배경색 변경 */
+}
+
+.login,
+.signup,
+.sitemap,
+.english {
+    background-color: #3498db;
+    /* 각 링크의 배경색 지정 */
+    color: #fff;
+    /* 텍스트 색상 지정 */
+}
+
+.separator {
+    margin-left: 0;
+    border: none;
+    /* 구분 기호에는 테두리 없애기 */
+}
+
+/* 링크 사이의 여백 제거 */
+.hd_login span+span {
+    margin-left: 5px;
+}
+
+/* 첫 번째 링크에 왼쪽 여백 추가 */
+.hd_login span:first-child {
+    margin-left: 0;
+}
+
+/* 두 번째 링크 이후의 링크에 왼쪽 여백 및 테두리 없애기 */
+.hd_login span:not(:first-child) {
+    border-left: none;
+}
+
+.main-nav-font ul {
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 1.5em;
+}
+
+.item.active {
+    text-align: center;
+    height: 60vh;
+    /* 뷰포트 높이에 따라 조절하세요 */
+}
+
+.slider_overlay {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.slider_overlay img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+button[type="submit"] {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.box-mini {
+    width: calc(30% - 22px); /* (40% - (2 * (1% margin + 1px border + 10px padding))) */
+    margin: 1%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.box{
+    margin: 1%;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.containermapts {
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    flex-wrap: wrap;
+}
+.searchBox {
+    display: flex;
+    justify-content: space-between; /* 좌우 정렬을 위해 사용 */
+    align-items: center; /* 세로 중앙 정렬 */
+}
+
+.searchBox ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.searchBox li {
+    margin-right: 10px;
+}
+
+div.minimalistBlack {
+    border: 3px solid #000000;
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+}
+.divTable.minimalistBlack .divTableCell, .divTable.minimalistBlack .divTableHead {
+    border: 1px solid #000000;
+    padding: 5px 4px;
+}
+.divTable.minimalistBlack .divTableBody .divTableCell {
+    font-size: 13px;
+}
+.divTable.minimalistBlack .divTableHeading {
+    background:#a4dad1;
+
+    border-bottom: 3px solid #000000;
+}
+.divTable.minimalistBlack .divTableHeading .divTableHead {
+    font-size: 15px;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+}
+.minimalistBlack .tableFootStyle {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000000;
+    border-top: 3px solid #000000;
+}
+.minimalistBlack .tableFootStyle {
+    font-size: 14px;
+}
+/* DivTable.com */
+.divTable{ display: table; }
+.divTableRow { display: table-row; }
+.divTableHeading { display: table-header-group;}
+.divTableCell, .divTableHead { display: table-cell;}
+.divTableHeading { display: table-header-group;}
+.divTableFoot { display: table-footer-group;}
+.divTableBody { display: table-row-group;}
