@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>상세보기</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <link rel="stylesheet" href="/css/comment.css">
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const session_user_id = [[${session.SS_USER_ID}]]; // Controller에서 받은 세션에 저장된 값
+        const userId = [[${rDTO.userId}]]; // 게시판 게시글 작성자 아이디
+        const nSeq = [[${rDTO.noticeSeq}]]; // 현재 글번호, 자바에서 받을 변수들은 자바스크립트 변수로 저장하면 편함
+
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            $("#btnEdit").on("click", function () {
+                doEdit(); // 게시판 수정하기 실행
+            })
+
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            $("#btnDelete").on("click", function () {
+                doDelete(); // 게시판 수정하기 실행
+            })
+
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            $("#btnList").on("click", function () {
+                location.href = "/notice/noticeList"; // 게시판 리스트 이동
+            })
+
+            $("#btnCInst").on("click", function () {
+                doCInsert();
+            })
+        })
+
+        function calBytes(str) {
+            let tcount = 0;
+            let tmpStr = String(str);
+            let strCnt = tmpStr.length;
+            let onechar;
+            for (let i = 0; i < strCnt; i++) {
+                onechar = tmpStr.charAt(i);
+                if (escape(onechar).length > 4) {
+                    tcount += 2;
+                } else {
+                    tcount += 1;
+                }
+            }
+            return tcount;
+        }
+
+        //수정하기
+        function doEdit() {
+            if (session_user_id === userId) {
+                location.href = "/notice/noticeEditInfo?nSeq=" + nSeq;
+
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+
+            } else {
+                alert("본인이 작성한 글만 수정 가능합니다.");
+
+            }
+        }
+
+        //삭제하기
+        function doDelete() {
+            if (session_user_id === userId) {
+                if (confirm("작성한 글을 삭제하시겠습니까?")) {
+
+                    // Ajax 호출해서 글 삭제하기
+                    $.ajax({
+                            url: "/notice/noticeDelete",
+                            type: "post", // 전송방식은 Post
+                            dataType: "JSON", // 전송 결과는 JSON으로 받기
+                            data: {"nSeq": nSeq}, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                            success:
+                                function (json) { // /notice/noticeDelete 호출이 성공했다면..
+                                    alert(json.msg); // 메시지 띄우기
+                                    location.href = "/notice/noticeList"; // 게시판 리스트 이동
+                                }
+                        }
+                    )
+                }
+
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+
+            } else {
+                alert("본인이 작성한 글만 삭제 가능합니다.");
+
+            }
+        }
+
+        function doCInsert() {
+
+            let content = $('textarea[name="content"]').val();
+
+            if (content === "") {
+                alert("댓글 내용을 입력하세요.");
+                cContent.focus();
+                return;
+            }
+
+            if (calBytes(content) > 150) {
+                alert("최대 150Bytes까지 입력 가능합니다.");
+                cContent.focus();
+                return;
+            }
+
+            let noticeSeq = document.querySelector('span[name="noticeSeq"]').innerText;
+
+            console.log("content : " + content)
+            console.log("noticeSeq : " + noticeSeq)
+
+            if (session_user_id) {
+
+                // Ajax 호출해서 글 삭제하기
+                $.ajax({
+                        url: "/comment/commentInsert",
+                        type: "post", // 전송방식은 Post
+                        dataType: "JSON", // 전송 결과는 JSON으로 받기
+                        data: {
+                            "content": content,
+                            "noticeSeq": noticeSeq
+                        }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                        success:
+                            function (json) { // /notice/noticeDelete 호출이 성공했다면..
+                                alert(json.msg); // 메시지 띄우기
+                                location.reload(); // 게시판 리스트 이동
+                            }
+                    }
+                )
+
+            } else if (session_user_id === "") {
+
+                alert("로그인 하시길 바랍니다.");
+                location.href = "/user/login";
+
+            } else {
+
+                alert("알 수 없는 오류가 발생했습니다.")
+                location.href = "/html/index";
+
+            }
+        }
+
+
+        //삭제하기
+        function doCDel(f) {
+
+            // 게시글 번호
+            let noticeSeq = nSeq;
+
+            // commentSeq(f)에 따른 div값들 조회
+            let commentBox = document.getElementById('comment' + f);
+
+            // commentBox 내부에서 name이 "cUserId"인 요소 선택 및 값 가져오기
+            let cUserId = commentBox.querySelector('.comment-name[name="cUserId"]').innerText;
+
+
+            console.log("cUserId : " + cUserId)
+            console.log("commentSeq : " + f)
+            console.log("noticeSeq : " + nSeq)
+
+            if (session_user_id === cUserId) {
+                if (confirm("작성한 댓글을 삭제하시겠습니까?")) {
+
+                    // Ajax 호출해서 글 삭제하기
+                    $.ajax({
+                            url: "/comment/commentDelete",
+                            type: "post", // 전송방식은 Post
+                            dataType: "JSON", // 전송 결과는 JSON으로 받기
+                            data: {
+                                "commentSeq": f,
+                                "noticeSeq": noticeSeq
+                            }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                            success:
+                                function (json) { // /comment/commentDelete 호출이 성공했다면..
+                                    alert(json.msg); // 메시지 띄우기
+                                    location.reload(); // 화면 새로고침
+                                }
+                        }
+                    )
+                }
+
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+
+            } else {
+                alert("본인이 작성한 댓글만 수정 가능합니다.");
+            }
+        }
+
+        function doCEdit(commentSeq) {
+            // 해당 댓글의 commentSeq 값을 가져옵니다.
+
+            let editButtonId = 'comment_edit' + commentSeq;
+            let delButtonId = 'comment-del' + commentSeq;
+
+            // 수정 버튼을 "수정하기"로 변경합니다.
+            document.getElementById(editButtonId).innerText = '수정하기';
+            document.getElementById(editButtonId).setAttribute('onclick', 'doCUpdate(' + commentSeq + ')');
+
+            // 삭제 버튼을 "취소"로 변경합니다.
+            document.getElementById(delButtonId).innerText = '취소';
+            document.getElementById(delButtonId).setAttribute('onclick', 'doCancel()');
+
+            // 댓글 내용(id="'commentContent' +${dto.commentSeq()}")을 textarea로 변경합니다.
+            let commentContentId = 'commentContent' + commentSeq;
+            let commentContentElement = document.getElementById(commentContentId);
+            let commentText = commentContentElement.textContent; // 이전에 있는 텍스트 가져오기
+            let textareaElement = document.createElement('textarea'); // 새로운 textarea 요소 생성
+            textareaElement.value = commentText; // textarea에 이전 텍스트를 설정
+            textareaElement.setAttribute('id', commentContentId); // textarea에 id 설정
+            textareaElement.setAttribute('name', 'commentContent'); // textarea에 name 설정
+            textareaElement.style.width = '100%'; // textarea에 width: 100% 스타일 설정
+            commentContentElement.parentNode.replaceChild(textareaElement, commentContentElement); // 기존 댓글 내용 요소를 textarea로 교체
+
+        }
+
+        function doCUpdate(commentSeq) {
+
+            let noticeSeq = nSeq;
+            // commentSeq(f)에 따른 div값들 조회
+            let commentBox = document.getElementById('comment' + commentSeq);
+
+            // commentBox 내부에서 name이 "cUserId"인 요소 선택 및 값 가져오기
+            let cUserId = commentBox.querySelector('.comment-name[name="cUserId"]').innerText;
+
+            let commentContentId = 'commentContent' + commentSeq;
+            let commentContentElement = document.getElementById(commentContentId);
+            let commentContents = commentContentElement.value; // 현재 텍스트 가져오기
+
+            if (commentContents === "") {
+                alert("댓글 내용을 입력하세요.");
+                commentContentElement.focus();
+                return;
+            }
+
+            if (calBytes(commentContents) > 150) {
+                alert("최대 150Bytes까지 입력 가능합니다.");
+                commentContentElement.focus();
+                return;
+            }
+
+            console.log("cUserId : " + cUserId)
+            console.log("commentSeq : " + commentSeq)
+            console.log("commentContents : " + commentContents)
+
+            if (session_user_id === cUserId) {
+                if (confirm("작성한 댓글을 수정하시겠습니까?")) {
+
+                    // Ajax 호출해서 글 삭제하기
+                    $.ajax({
+                            url: "/comment/commentUpdate",
+                            type: "post", // 전송방식은 Post
+                            dataType: "JSON", // 전송 결과는 JSON으로 받기
+                            data: {
+                                "commentSeq": commentSeq,
+                                "noticeSeq": noticeSeq,
+                                "commentContents": commentContents
+                            }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                            success:
+                                function (json) { // /comment/commentDelete 호출이 성공했다면..
+                                    alert(json.msg); // 메시지 띄우기
+                                    location.reload(); // 화면 새로고침
+                                }
+                        }
+                    )
+                }
+
+            } else if (session_user_id === "") {
+                alert("로그인 하시길 바랍니다.");
+
+            } else {
+                alert("본인이 작성한 댓글만 수정 가능합니다.");
+            }
+
+        }
+
+        function doCancel(commentSeq) {
+            location.reload();
+        }
+
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+
+                    <li>
+                        <a href="/center/center"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/notice/noticeList">게시판</a></li>
+
+                        </ul>
+                    </li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+
+                            <li><a href="">고객센터</a></li>
+
+                        </ul>
+                    </li>
+
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="/user/logout">로그아웃</a>
+            </div>
+
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop">
+                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <ul>
+
+                    <li class="has-sub">
+                        <a href="/notice/noticeList">게시판</a>
+                        <ul>
+                            <li><a href="/notice/noticeList">게시판</a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/center/center">상담센터</a>
+                        <ul>
+                            <li><a href="/center/center">상담센터</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">온라인 상담</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">예약</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <!--<li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="#">고객센터</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </li>-->
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <div class="large">회원</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">게시판</span>
+                            <ul>
+                                <li>
+                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">상세보기</h1>
+            <div id="cms_board_article">
+                <div class="viewTypeB">
+                    <div class="info-header">
+                        <span class="item item-seq">글번호</span>
+                        <span class="item item-title">제목</span>
+                        <span class="item item-user">작성자</span>
+                        <span class="item item-date">작성일</span>
+                        <span class="item item-read">조회수</span>
+                    </div>
+                    <div class="info-content">
+                        <span class="item item-seq" name="noticeSeq">[[${rDTO.noticeSeq}]]</span>
+                        <span class="item item-title">[[${rDTO.title}]]</span>
+                        <span class="item item-user">[[${rDTO.userId}]]</span>
+                        <span class="item item-date">[[${rDTO.regDt}]]</span>
+                        <span class="item item-read">[[${rDTO.readCnt}]]</span>
+                    </div>
+                    <div class="contents">
+                        <p>[[${rDTO.contents}]]</p>
+                    </div>
+                </div>
+                <ul id="comments-list" class="comments-list">
+                    <li th:each="dto : ${cList}">
+                        <div class="comment-box" th:id="'comment'+${dto.commentSeq()}">
+                            <div class="comment-head">
+                                <h6 class="comment-name by-user" name="cUserId" th:text="${dto.userId()}"></h6>
+                                <div class="commentSeq-invisible" name="commentSeq" th:text="${dto.commentSeq()}"></div>
+                                <div class="comment-right">
+                                    <span class="func-inline" name="ChgDt" th:text="${dto.commentChgDt()}"></span>
+                                    <div class="func-inline" th:if="${session.SS_USER_ID}==${dto.userId()}">
+                                <span class="comment_edit" th:id="'comment_edit'+${dto.commentSeq()}"
+                                      th:onclick="doCEdit(${dto.commentSeq()})">수정</span>
+                                        <span class="comment-del" th:id="'comment-del' +${dto.commentSeq()}"
+                                              th:onclick="doCDel(${dto.commentSeq()})">삭제</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment-content" th:id="'commentContent' +${dto.commentSeq()}"
+                                 name="commentContent" th:text="${dto.commentContents()}"></div>
+                        </div>
+                    </li>
+                </ul>
+                <hr>
+                <div class="comment" th:if="${session.SS_USER_ID}">
+                    <label class="commentLabel block mt-4 text-sm">
+                <textarea class="block" id="cContent" name="content" style="height: 60px; width : 750px" rows="3" placeholder="댓글 내용을 입력해주세요."></textarea>
+                        <button id="btnCInst" class="commentButton" style="width: 100px;" type="button">
+                            댓글 작성
+                        </button>
+                    </label>
+                </div>
+                <div class="btnWrapA" th:if="${session.SS_USER_ID}==${rDTO.userId()}">
+                    <button id="btnEdit" type="button">수정</button>
+                    <button id="btnDelete" type="button">삭제</button>
+                </div>
+                <div class="btnWrapB">
+                    <span class="btnBc"><a href="/notice/noticeList" title="목록" class="fn_btn_list">목록</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
+</body>
+</html>

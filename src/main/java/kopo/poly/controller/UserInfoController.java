@@ -10,6 +10,7 @@ import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,22 +25,13 @@ import java.util.Optional;
 public class UserInfoController {
 
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
+
     private final IUserInfoService userInfoService;
 
-    //    로그인 화면
-    @GetMapping(value = "login")
-    public String login() {
 
-        log.info(this.getClass().getName() + ".user/login Start!");
-
-        log.info(this.getClass().getName() + ".user/login End!");
-
-        return "user/login";
-    }
-
-    //    회원가입 화면
     @GetMapping(value = "userRegForm")
     public String userRegForm() {
+
         log.info(this.getClass().getName() + ".user/userRegForm Start!");
 
         log.info(this.getClass().getName() + ".user/userRegForm End!");
@@ -47,20 +39,138 @@ public class UserInfoController {
         return "user/userRegForm";
     }
 
-//     회원 가입 할때 아이디 중복체크하기(Ajax를 통해 입력한 아이디 정보 받음)
+    @GetMapping(value = "searchUserId")
+    public String searchUserId() {
+
+        log.info(this.getClass().getName() + ".user/searchUserId Start!");
+
+        log.info(this.getClass().getName() + ".user/searchUserId End!");
+
+        return "user/searchUserId";
+    }
+
+    @GetMapping(value = "searchPassword")
+    public String searchPassword() {
+
+        log.info(this.getClass().getName() + ".user/searchPassword Start!");
+
+        log.info(this.getClass().getName() + ".user/searchPassword End!");
+
+        return "user/searchPassword";
+    }
+
+    @GetMapping(value = "newPasswordResult")
+    public String newPasswordResult() {
+
+        log.info(this.getClass().getName() + ".user/newPasswordResult Start!");
+
+        log.info(this.getClass().getName() + ".user/newPasswordResult End!");
+
+        return "user/newPasswordResult";
+    }
+
+    @PostMapping(value = "newPassword")
+    public String searchPasswordProc(HttpServletRequest request, HttpSession session) throws Exception {
+        log.info(this.getClass().getName() + ".user/newPassword Start!");
+
+        String userId = CmmUtil.nvl((request.getParameter("userId"))); // 아이디
+        String userName = CmmUtil.nvl((request.getParameter("userName"))); // 이름
+        String email = CmmUtil.nvl((request.getParameter("email"))); // 이메일
+
+        log.info("userId : " + userId);
+        log.info("userName : " + userName);
+        log.info("email : " + email);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .userName(userName)
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
+
+        // 비밀번호 찾기 가능한지 확인하기
+        int res = userInfoService.searchUserIdOrPasswordPro(pDTO);
+
+        // 비밀번호 재생성 화면은 보안을 위해 반드시 NEW_PASSWORD 세션이 존재해야 접속 가능하도록 구현
+        // userId 값을 넣은 이유는 비밀번호 재설정하는 newPasswordProc 함수에서 사용하기 위함
+
+        if (res > 0) {
+
+            session.setAttribute("NEW_PASSWORD", userId);
+
+            log.info(this.getClass().getName() + ".user/newPassword End!");
+
+            return "user/newPassword";
+        }
+
+        else {
+
+            session.setAttribute("NEW_PASSWORD", "");
+
+            log.info(this.getClass().getName() + ".user/newPassword End!");
+
+            return "user/newPassword";
+        }
+    }
+
+    @PostMapping(value = "updatePassword")
+    public String newPasswordProc(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".user/updatePassword Start!");
+
+        String msg = ""; // 웹에 보여줄 메세지
+
+        // 정상적인 접근인지 체크
+        String newPassword = CmmUtil.nvl((String) session.getAttribute("NEW_PASSWORD"));
+
+        if(newPassword.length() > 0) { //정상접근
+            String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
+
+            log.info("password : " + password);
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(newPassword)
+                    .password(EncryptUtil.encHashSHA256(password))
+                    .build();
+
+            int res = userInfoService.updatePassword(pDTO);
+
+            // 비밀번호 재생성 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
+            session.setAttribute("NEW_PASSWORD", "");
+            session.removeAttribute("NEW_PASSWORD");
+
+            if(res > 0) {
+                msg = "비밀번호가 재설정되었습니다.";
+            } else {
+                msg = "비밀번호 변경에 문제가 생겼습니다. 다시 시도해주세요.";
+            }
+
+        } else { //비정상 접근
+            msg = "비정상 접근입니다.";
+        }
+
+        session.setAttribute("MSG", msg);
+
+        log.info("msg : " + msg);
+
+        log.info(this.getClass().getName() + ".user/updatePassword End!");
+
+        return "/user/newPasswordResult";
+    }
+
+
+
     @ResponseBody
-    @PostMapping(value = "getUserIdExists")
+    @PostMapping(value="getUserIdExists")
     public UserInfoDTO getUserExists(HttpServletRequest request) throws Exception {
 
         log.info(this.getClass().getName() + ".getUserIdExists Start!");
 
-        String userId = CmmUtil.nvl(request.getParameter("userId")); // 회원아이디
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
 
         log.info("userId : " + userId);
 
         UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
 
-        // 회원아이디를 통해 중복된 아이디인지 조회
         UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO))
                 .orElseGet(() -> UserInfoDTO.builder().build());
 
@@ -69,19 +179,190 @@ public class UserInfoController {
         return rDTO;
     }
 
+
     @ResponseBody
-    @PostMapping(value = "getEmailExists")
-    public UserInfoDTO getEmailExists(HttpServletRequest request) throws Exception {
+    @PostMapping(value = "sendEmailAuth")
+    public UserInfoDTO SendEmailAuth(HttpServletRequest request) throws Exception {
+        log.info(this.getClass().getName() + ".sendEmailAuth Start!");
 
-        log.info(this.getClass().getName() + ".getEmailExists Start!");
-
-        // 회원 이메일
-        String email = CmmUtil.nvl(request.getParameter("email"));
+        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
 
         log.info("email : " + email);
 
-        UserInfoDTO pDTO = UserInfoDTO.builder().email(email).build();
+        UserInfoDTO pDTO =  UserInfoDTO.builder()
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
 
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.sendEmailAuth(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
+
+        log.info(this.getClass().getName() + ".sendEmailAuth End!");
+
+        return rDTO;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "insertUserInfo")
+    public MsgDTO inserUserInfo(HttpServletRequest request) throws Exception {
+
+        log.info(this.getClass().getName() + ".insertUserInfo Start!");
+
+        String msg;
+
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String password = CmmUtil.nvl(request.getParameter("password"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+        String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
+        String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
+
+        log.info("userId : " + userId);
+        log.info("userName : " + userName);
+        log.info("password : " + password);
+        log.info("email : " + email);
+        log.info("addr1 : " + addr1);
+        log.info("addr2 : " + addr2);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .userName(userName)
+                .password(EncryptUtil.encHashSHA256(password))
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
+
+        int res = userInfoService.insertUserInfo(pDTO);
+
+        log.info("회원가입 결과(res) : " + res);
+
+        if (res == 1) {
+            msg = "회원가입되었습니다.";
+
+        } else if (res == 2) {
+            msg = "이미 가입된 아이디입니다.";
+        } else {
+            msg = "오류로 인해 회원가입이 실패했습니다.";
+        }
+
+        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
+
+        log.info(this.getClass().getName() + ".insertUserInfo End!");
+
+        return dto;
+    }
+
+    @GetMapping(value = "login")
+    public String login() {
+
+        log.info(this.getClass().getName() + ".user/login Start!");
+
+        log.info(this.getClass().getName() + ".user/login End!");
+
+        return  "user/login";
+    }
+
+    /**
+     * 비밀번호 변경 고유 세션 삭제 후 이동
+     */
+    @GetMapping(value = "passProc")
+    public String passProc(HttpSession session) {
+
+        log.info(this.getClass().getName() + ".user/passProc Start!");
+
+        // 비밀번호 재생성 화면은 보안을 위해 생성한 NEW_PASSWORD 세션 삭제
+        session.setAttribute("NEW_PASSWORD", "");
+        session.removeAttribute("NEW_PASSWORD");
+
+        log.info(this.getClass().getName() + ".user/passProc End!");
+
+        return  "redirect:/user/login";
+    }
+
+    @ResponseBody
+    @PostMapping(value = "loginProc")
+    public MsgDTO loginProc(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".loginProc Start!");
+
+        String msg;
+
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
+        String password = CmmUtil.nvl(request.getParameter("password"));
+
+        log.info("userId : " +  userId);
+        log.info("password : " +  password);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .password(EncryptUtil.encHashSHA256(password)).build();
+
+        int res = userInfoService.getUserLogin(pDTO);
+
+        log.info("res : " +res);
+
+        if (res == 1) {
+
+            msg = "로그인이 성공했습니다.";
+            session.setAttribute("SS_USER_ID", userId);
+
+        } else {
+            msg = "아이디와 비밀번호가 올바르지 않습니다.";
+        }
+
+        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
+        log.info(this.getClass().getName() + ".loginProc End!");
+
+        return dto;
+    }
+
+    @GetMapping(value = "loginSuccess")
+    public String loginSuccess() {
+        log.info(this.getClass().getName() + ".user/loginSuccess Start!");
+
+        log.info(this.getClass().getName() + ".user/loginSuccess End!");
+
+        return "user/loginSuccess";
+
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        log.info(this.getClass().getName() + ".logout Start!");
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate(); // 세션 무효화
+        }
+
+        log.info(this.getClass().getName() + ".logout End!");
+
+        return "main/main"; // 로그아웃 후 이동할 URL 설정
+    }
+
+    /**
+     * ###########################################################################
+     *
+     *  이메일 있는지 체크
+     *
+     * ###########################################################################
+     */
+
+    /**
+     * 회원 가입 전 이메일 중복체크하기(Ajax를 통해 입력한 아이디 정보 받음)
+     * 유효한 이메일인지 확인하기 위해 입력된 이메일에 인증번호 포함하여 메일 발송
+     */
+    @ResponseBody
+    @PostMapping(value = "getEmailExists")
+    public UserInfoDTO getEmailExists(HttpServletRequest request) throws Exception {
+        log.info(this.getClass().getName() + ".getEmailExists Start!");
+
+        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
+
+        log.info("email : " + email);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
+
+        //이메일을 통해 중복된 이메일인지 조회
         UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getEmailExists(pDTO))
                 .orElseGet(() -> UserInfoDTO.builder().build());
 
@@ -90,180 +371,311 @@ public class UserInfoController {
         return rDTO;
     }
 
-//    회원가입 버튼 클릭
     @ResponseBody
-    @PostMapping(value = "insertUserInfo")
-    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
+    @PostMapping(value = "signUpEmailExists")
+    public UserInfoDTO signUpEmailExists(HttpServletRequest request) throws Exception {
+        log.info(this.getClass().getName() + ".signUpEmailExists Start!");
 
-        log.info(this.getClass().getName() + ".insertUserInfo start!");
-
-        String msg; // 회원가입 결과에 대한 메시지를 전달할 변수
-
-        /*
-         * ###################################################################
-         *          웹(회원정보 입력화면)에서 받는 정보를 String 변수에 저장 시작!
-         *
-         *      무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
-         * ###################################################################
-         */
-        String userId = CmmUtil.nvl(request.getParameter("userId")); // 아이디
-        String userName = CmmUtil.nvl(request.getParameter("userName")); // 이름
-        String password = CmmUtil.nvl(request.getParameter("password")); // 비밀번호
         String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
-        String addr1 = CmmUtil.nvl(request.getParameter("addr1")); // 주소
-        String addr2 = CmmUtil.nvl(request.getParameter("addr2")); // 상세주소
-        /*
-         * ###################################################################
-         *          웹(회원정보 입력화면)에서 받는 정보를 String 변수에 저장 끝!
-         *
-         *      무조건 웹으로 받은 정보는 DTO에 저장하기 위해 임시로 String 변수에 저장함
-         * ###################################################################
-         */
 
-        /*
-         * ###################################################################
-         *          반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제댜로 들어오는지 파악해야함
-         *                              반드시 작성할것
-         * ###################################################################
-         */
-        log.info("userId : " + userId);
-        log.info("userName : " + userName);
-        log.info("password : " + password);
         log.info("email : " + email);
-        log.info("addr1 : " + addr1);
-        log.info("addr2 : " + addr2);
 
-        /*
-         * ###################################################################
-         *          웹(회원정보 입력화면)에서 받는 정보를 DTO에 저장하기
-         *
-         *      무조건 웹으로 받은 정보는 DTO에 저장해야 한다고 이해하길 권함
-         * ###################################################################
-         */
-        // 웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
         UserInfoDTO pDTO = UserInfoDTO.builder()
-                .userId(userId)
-                .userName(userName)
-                .password(EncryptUtil.encHashSHA256(password))
                 .email(EncryptUtil.encAES128CBC(email))
-                .addr1(addr1)
-                .addr2(addr2)
-                .regId(userId)
-                .chgId(userId)
                 .build();
 
-        // 회원가입 서비스 호출하여 결과 받기
-        int res = userInfoService.insertUserInfo(pDTO);
+        //이메일을 통해 중복된 이메일인지 조회
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getEmailExists(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
 
-        log.info("회원가입 결과(res) : " + res);
+        String existsYn = rDTO.existsYn();
 
-        if (res == 1) {
-            msg = "회원가입되었습니다.";
+        log.info("existsYn : " + existsYn);
 
-            // 추후 회원가입 입력화면에서 ajax를 활용해서 아이디 중복, 이메일 중복을 체크하길 바람
-        } else if (res == 2) {
-            msg = "이미 가입된 아이디입니다.";
-        } else {
-            msg = "오류로 인해 회원가입이 실패하였습니다.";
+        if (existsYn == "N") {
+
+            //이메일을 통해 중복된 이메일인지 조회
+            rDTO = Optional.ofNullable(userInfoService.sendSignUpEmailAuth(pDTO))
+                    .orElseGet(() -> UserInfoDTO.builder().build());
+
         }
 
-        // 결과 메시지 전달하기
-        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
+        log.info(this.getClass().getName() + ".signUpEmailExists End!");
 
-        log.info(this.getClass().getName() + ".insertUserInfo End!");
-
-        return dto;
-    }
-
-//    로그인 처리 및 결과 알려주는 화면으로 이동
-    @ResponseBody
-    @PostMapping(value = "loginProc")
-    public MsgDTO loginProc(HttpServletRequest request, HttpSession session) throws Exception {
-
-        log.info(this.getClass().getName() + ".loginProc Start!");
-
-        String msg; // 로그인 결과에 대한 메시지를 전달할 변수
-
-        String user_id = CmmUtil.nvl(request.getParameter("userId")); // 아이디
-        String password = CmmUtil.nvl(request.getParameter("password")); // 비밀번호
-
-        log.info("userId : " + user_id);
-        log.info("password : " + password);
-
-        // 웹(회원정보 입력화면)에서 받는 정보를 저장할 변수를 메모리에 올리기
-        UserInfoDTO pDTO = UserInfoDTO.builder()
-                .userId(user_id)
-                .password(EncryptUtil.encHashSHA256(password)).build();
-
-        // 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기 위한 userInfoService 호출하기
-        int res = userInfoService.getUserLogin(pDTO);
-
-        log.info("res : " + res);
-
-        /**
-         * 로그인을 성공했다면, 회원아이디 정보를 session에 저장함
-         *
-         * 세션은 톰캣(was)의 메모리에 존재하며, 웹사이트에 접속한 사람(연결된 객체)마다 메모리에 값을 올린다.
-         *
-         * 예) 톰캣에 100명의 사용자가 로그인했다면, 사용자 각각 회원아이디를 메모리에 저장하며,
-         *     메모리에 저장된 객체의 수는 100개이다.
-         *     따라서 과도한 세션은 톰캣의 메모리 부하를 발생시켜 서버가 다운되는 현상이 있을 수 있기 때문에,
-         *     최소한으로 사용하는 것을 권장한다.
-         *
-         *     스프링에서 세션을 사용하기 위해서는 함수명의 파라미터에 HttpSession session이 존재해야 한다.
-         *     세션은 톰캣의 메모리에 저장되기 때문에 url마다 전달하는게 필요하지 않고,
-         *     그냥 메모리에서 부르면 되기 때문에, jsp, controller에서 쉽게 불러서 쓸 수 있다.
-         * */
-        if (res == 1) { // 로그인 성공
-
-            /**
-             * 세션에 회원아이디 저장하기, 추후 로그인여부를 체크하기 위해 세션에 값이 존재하는지 체크한다.
-             * 일반적으로 세션에 저장되는 키는 대문자로 입력하며, 앞에 SS를 붙인다.
-             *
-             * Session 단어에서 SS를 가져온 것이다.
-             * */
-            msg = "로그인에 성공했습니다.";
-            session.setAttribute("SS_USER_NAME", user_id);
-
-        } else {
-            msg = "아이디와 비밀번호가 올바르지 않습니다.";
-        }
-
-        // 결과 메시지 전달하기
-        MsgDTO dto = MsgDTO.builder()
-                .result(res)
-                .msg(msg).build();
-
-        log.info(this.getClass().getName() + ".loginProc End!");
-
-        return dto;
+        return rDTO;
     }
 
     /**
-     * 로그인 성공 페이지로 이동
+     *
+     * ##################################################################################
+     *
+     *                                      MyPage
+     *
+     * ##################################################################################
      */
-    @GetMapping(value = "loginSuccess")
-    public String loginSuccess() {
-        log.info(this.getClass().getName() + ".user/loginSuccess Start!");
 
-        log.info(this.getClass().getName() + ".user/loginSuccess End!");
+    @GetMapping(value = "myPage")
+    public String myPage(HttpSession session, ModelMap model) throws Exception {
 
-        return "main/main";
-    }
+        log.info(this.getClass().getName() + ".user/myPage Start!");
 
-    @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        log.info("userId : " + userId);
 
-        log.info(this.getClass().getName() + ".logout Start!");
 
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate(); // 세션 무효화
+        if (userId.length() > 0) {
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .build();
+
+            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(pDTO))
+                    .orElseGet(() -> UserInfoDTO.builder().build());
+
+            model.addAttribute("rDTO", rDTO);
+
+        } else {
+
+            return "/user/login";
+
         }
 
-        log.info(this.getClass().getName() + ".logout End!");
+        log.info(this.getClass().getName() + ".user/myPage End!");
 
-        return "/main/main"; // 로그아웃 후 이동할 URL 설정
+        return  "user/myPage";
+
+    }
+
+
+
+    // 유저 정보 수정 페이지 이동
+
+    @GetMapping(value = "myPageEdit")
+    public String myPageEdit(HttpSession session, ModelMap model) throws Exception {
+
+        log.info(this.getClass().getName() + ".user/myPageEdit Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+        log.info("userId : " + userId);
+
+
+        if (userId.length() > 0) {
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .build();
+
+            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(pDTO))
+                    .orElseGet(() -> UserInfoDTO.builder().build());
+
+            model.addAttribute("rDTO", rDTO);
+
+        } else {
+
+            return "/user/login";
+
+        }
+
+        log.info(this.getClass().getName() + ".user/myPageEdit End!");
+
+        return  "user/myPageEdit";
+
+    }
+
+    // 비밀 번호 변경 (MyPage) 페이지 이동
+    @GetMapping(value = "myNewPassword")
+    public String myNewPassword(HttpSession session) {
+
+        log.info(this.getClass().getName() + ".user/myNewPassword Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        if (userId.length() > 0) {
+
+        } else {
+
+
+            return "user/login";
+
+        }
+
+        return "user/myNewPassword";
+
+    }
+
+
+    @ResponseBody
+    @PostMapping(value = "myUpdatePassword")
+    public MsgDTO myUpdatePassword(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".user/myUpdatePassword Start!");
+
+        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+
+        String msg = ""; // 웹에 보여줄 메세지
+        int result = 0;
+
+        if(userId.length() > 0) { //정상접근
+
+            String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
+
+            log.info("password : " + password);
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .password(EncryptUtil.encHashSHA256(password))
+                    .build();
+
+            int res = userInfoService.updatePassword(pDTO);
+
+
+            if(res > 0) {
+
+                msg = "비밀번호가 재설정되었습니다.";
+                result = 0;
+
+            } else {
+
+                msg = "비밀번호 변경에 문제가 생겼습니다. 다시 시도해주세요.";
+
+                result = 1;
+
+            }
+
+        } else { //비정상 접근
+
+            msg = "비정상 접근입니다.";
+            result = 2;
+
+        }
+
+        MsgDTO mDTO = MsgDTO.builder()
+                .msg(msg)
+                .result(result)
+                .build();
+
+        log.info("msg : " + msg);
+
+        log.info(this.getClass().getName() + ".user/myUpdatePassword End!");
+
+        return mDTO;
+    }
+
+
+    // 유저 정보 수정
+    @ResponseBody
+    @PostMapping(value = "updateUserInfo")
+    public MsgDTO userInfoUpdate(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".updateUserInfo Start!");
+
+        String msg;
+
+        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
+        String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
+        String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
+
+        log.info("userId : " + userId);
+        log.info("userName : " + userName);
+        log.info("email : " + (email));
+        log.info("addr1 : " + addr1);
+        log.info("addr2 : " + addr2);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .userName(userName)
+                .email(email)
+                .build();
+
+        int res = userInfoService.updateUserInfo(pDTO);
+
+        log.info("회원 정보 수정 결과(res) : " + res);
+
+        if (res == 1) {
+            msg = "회원 정보 수정되었습니다..";
+
+        } else {
+
+            msg = "오류로 인해 회원 정보 수정에 실패했습니다.";
+
+        }
+
+        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
+
+        log.info(this.getClass().getName() + ".updateUserInfo End!");
+
+        return dto;
+    }
+
+
+    // 회원 탈퇴 페이지
+    @GetMapping(value = "withdrawal")
+    public String deleteUserInfo(HttpSession session) {
+
+        log.info(this.getClass().getName() + ".user/withdrawal Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        if(userId.length()>0){
+
+        } else {
+            return "user/login";
+        }
+
+        log.info(this.getClass().getName() + ".user/withdrawal End!");
+
+        return "user/withdrawal";
+    }
+
+
+    /**
+     * 유저 정보 삭제
+     */
+    @ResponseBody
+    @PostMapping(value = "deleteUserInfo")
+    public MsgDTO noticeDelete(HttpSession session) {
+
+        log.info(this.getClass().getName() + ".deleteUserInfo Start!");
+
+        String msg = ""; // 메시지 내용
+        MsgDTO dto = null; // 결과 메시지 구조
+
+        try {
+            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 글번호(PK)
+
+            log.info("userId : " + userId);
+
+            /*
+             * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
+             */
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .build();
+
+            // 게시글 삭제하기 DB
+            userInfoService.deleteUserInfo(pDTO);
+
+            session.invalidate();
+
+            msg = "탈퇴하였습니다.";
+
+        } catch (Exception e) {
+            msg = "실패하였습니다. : " + e.getMessage();
+            log.info(e.toString());
+            e.printStackTrace();
+
+        } finally {
+
+            // 결과 메시지 전달하기
+            dto = MsgDTO.builder().msg(msg).build();
+
+            log.info(this.getClass().getName() + ".deleteUserInfo End!");
+
+        }
+
+        return dto;
     }
 
 }

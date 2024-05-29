@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
-    <title>아이디 찾기 결과</title>
-    <meta charset="utf-8">
+    <title>글쓰기</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
@@ -21,16 +21,75 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
-    <style>
-        .con {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+
+    <script type="text/javascript">
+
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            $("#btnSend").on("click", function () {
+                doSubmit(); // 게시판 등록하기 실행
+            })
+        })
+
+        //글자 길이 바이트 단위로 체크하기(바이트값 전달)
+        function calBytes(str) {
+            let tcount = 0;
+            let tmpStr = String(str);
+            let strCnt = tmpStr.length;
+            let onechar;
+            for (let i = 0; i < strCnt; i++) {
+                onechar = tmpStr.charAt(i);
+                if (escape(onechar).length > 4) {
+                    tcount += 2;
+                } else {
+                    tcount += 1;
+                }
+            }
+            return tcount;
         }
-    </style>
 
+        // 게시판 저장하기
+        function doSubmit() {
 
+            let f = document.getElementById("f"); // form 태그
+
+            if (f.title.value === "") {
+                alert("제목을 입력하시기 바랍니다.");
+                f.title.focus();
+                return;
+            }
+            if (calBytes(f.title.value) > 200) {
+                alert("최대 200Bytes까지 입력 가능합니다.");
+                f.title.focus();
+                return;
+            }
+            if (f.contents.value === "") {
+                alert("내용을 입력하시기 바랍니다.");
+                f.contents.focus();
+                return;
+            }
+            if (calBytes(f.contents.value) > 4000) {
+                alert("최대 4000Bytes까지 입력 가능합니다.");
+                f.contents.focus();
+                return;
+            }
+
+            // Ajax 호출해서 글 등록하기
+            $.ajax({
+                    url: "/notice/noticeInsert",
+                    type: "post", // 전송방식은 Post
+                    // contentType: "application/json",
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success: function (json) { // /notice/noticeInsert 호출이 성공했다면..
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/notice/noticeList"; // 게시판 리스트 이동
+                    }
+                }
+            )
+        }
+    </script>
 </head>
 <body>
 <div id="wrapper">
@@ -42,19 +101,16 @@
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-
+                     <li>
+                        <a href="/center/center"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a></li>
+                        </ul>
+                    </li>
                     <li>
                         <a href="/notice/noticeList"><span>게시판</span></a>
                         <ul>
                             <li><a href="/notice/noticeList">게시판</a></li>
-
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/center/center"><span>정보센터</span></a>
-                        <ul>
-                            <li><a href="/center/center">정보센터</a></li>
-
 
                         </ul>
                     </li>
@@ -63,7 +119,7 @@
                         <a href="#"><span>고객센터</span></a>
                         <ul>
 
-                            <li><a href="/online/calendar">예약</a></li>
+                            <li><a href="">고객센터</a></li>
 
                         </ul>
                     </li>
@@ -78,7 +134,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
                 <a href="/user/logout">로그아웃</a>
             </div>
 
@@ -103,23 +159,31 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">상담센터</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">상담센터</a>
                             </li>
 
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="#">온라인 상담</a>
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
                             <li><a href="/online/calendar">예약</a>
                             </li>
-                        </ul>
-                    </li>
 
+                    </li>
+                </ul>
+                </li>
+                <!--<li>
+                    <a href="#"><span>고객센터</span></a>
+                    <ul>
+                        <li><a href="#">고객센터</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </li>-->
                 </ul>
             </nav>
             <div class="fix_bg"></div>
@@ -128,6 +192,7 @@
     <!-- // 내비게이션 바 -->
     <div id="subContainer">
         <div class="subSkin bg"></div>
+
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
@@ -137,19 +202,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                            </li>
-                            <li>
-                                <a href="/user/login" title="로그인">로그인</a>
-                            </li>
-                            <li>
-                                <a href="/user/logout" title="로그아웃">로그아웃</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                <a href="/notice/noticeList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -157,25 +210,13 @@
                         <div class="home">
                             <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
-                        <div class="large">회원</div>
+                        <div class="large">게시판</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">로그인</span>
+                            <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                                </li>
-                                <li>
-                                    <a href="/user/login" title="로그인">로그인</a>
-                                </li>
-                                <li>
-                                    <a href="/user/logout" title="로그아웃">로그아웃</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                    <a href="/notice/noticeList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -184,18 +225,32 @@
             </div>
         </nav>
         <div id="content">
-            <h1 class="title">아이디 찾기 결과</h1>
-            <div class="sContent">
-                <form id="f">
-                    <div class="con">
-                        <div id="result" class="">[[${rDTO.userName}]] 회원님의 아이디는 [[${rDTO.userId}]] 입니다.</div>
-                        <br>
-                        <input type="button" id="btnLogin" class="btn"
-                               style="background-color: #ffcb00; color: white"
-                               value="로그인">
+            <h1 class="title">게시글 작성하기</h1>
+            <form name="f" id="f">
+                <div class="divTable minimalistBlack">
+                    <div class="divTableBody">
+                        <div class="divTableRow">
+                            <div class="divTableCell">제목
+                            </div>
+                            <div class="divTableCell">
+                                <input type="text" name="title" maxlength="100" style="width: 95%"/>
+                            </div>
+                        </div>
+                        <div class="divTableRow">
+                            <div class="divTableCell">내용
+                            </div>
+                            <div class="divTableCell">
+                                <textarea name="contents" style="width: 95%; height: 400px"></textarea>
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <button id="btnSend" type="button">등록</button>
+                    <button type="button"><a href="/notice/noticeList" style="color: white">취소</a></button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -217,25 +272,4 @@
     <!--End of container-->
 </section>
 </body>
-<script type="text/javascript">
-    // HTML로딩이 완료되고, 실행됨
-    $(document).ready(function () {
-        // 로그인 화면 이동
-        $("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            location.href = "/user/login";
-        })
-
-        let msg = '';
-        let userId = [[${rDTO.userId}]];
-        let userName = [[${rDTO.userName}]];
-        if (userId.length > 0) {
-            msg = userName + " 회원님의 아이디는 " + userId + "입니다.";
-        } else {
-            msg = "아이디가 존재하지 않습니다.";
-        }
-
-        const element = document.getElementById('result');
-        element.innerText = msg;
-    })
-</script>
 </html>

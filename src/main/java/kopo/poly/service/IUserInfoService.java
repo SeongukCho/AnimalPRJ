@@ -4,30 +4,25 @@ import kopo.poly.dto.UserInfoDTO;
 
 public interface IUserInfoService {
 
-    /**
-     * 회원 가입하기(회원정보 등록하기)
-     *
-     * @param pDTO 회원 가입을 위한 회원정보
-     * @return 회원가입 결과
-     */
-    int insertUserInfo(UserInfoDTO pDTO) throws Exception;
-
-    /**
-     * 아이디 중복 체크
-     *
-     * @param pDTO 회원 가입을 위한 이이디
-     * @return 아이디 중복 여부 결과
-     */
     UserInfoDTO getUserIdExists(UserInfoDTO pDTO) throws Exception;
-
-    // 이메일 주소 중복체크 및 인증 값
     UserInfoDTO getEmailExists(UserInfoDTO pDTO) throws Exception;
 
-    /**
-     * 로그인을 위해 아이디와 비밀번호가 일치하는지 확인하기
-     *
-     * @param pDTO 로그인을 위한 회원정보
-     * @return 회원가입 결과
-     */
+    // 아이디 정보 가져오기
+    UserInfoDTO getUserInfo(UserInfoDTO pDTO) throws Exception;
+
+    int insertUserInfo(UserInfoDTO pDTO) throws Exception;
+
     int getUserLogin(UserInfoDTO pDTO) throws Exception;
+
+    UserInfoDTO sendEmailAuth(UserInfoDTO pDTO) throws Exception;
+
+    UserInfoDTO sendSignUpEmailAuth(UserInfoDTO pDTO) throws Exception;
+
+    // 아이디, 비밀번호 찾기에 활용
+    int searchUserIdOrPasswordPro(UserInfoDTO pDTO) throws Exception;
+
+    int updatePassword(UserInfoDTO pDTO) throws Exception;
+
+    int updateUserInfo(UserInfoDTO pDTO) throws Exception;
+    void deleteUserInfo (UserInfoDTO pDTO) throws Exception;
 }

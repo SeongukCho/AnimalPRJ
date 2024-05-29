@@ -412,7 +412,7 @@ tbody td .state.st3{background:#707070}
 .viewTypeB .infor2 ul li:last-child::after{display:none}
 .viewTypeB .infor2 ul li span{color:#252525}
 .viewTypeB .infor2 ul li .btn-q{display:inline-block;margin-left:10px;padding:0 10px;font-size:13px;color:#252525;line-height:24px;background:#fff;border:1px solid #e1e1e1;border-radius:12px}
-.viewTypeB .contents{/* padding:40px; */padding:40px 200px;line-height:1.8;border-bottom:1px solid #e1e1e1}
+.viewTypeB .contents{/* padding:40px; */padding:40px;line-height:1.8;border-bottom:1px solid #e1e1e1}
 .viewTypeB .file{margin-top:-1px;padding:25px 40px;background:#f8f8f8;border:1px solid #e1e1e1;}
 .viewTypeB .file.small{margin: 45px 350px 0px 350px;}
 .viewTypeB .file p{margin-bottom:5px;font-size:15px;color:#252525;font-weight:bold;}

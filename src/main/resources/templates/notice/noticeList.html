@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>아이디 찾기 결과</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <title>글 목록</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
@@ -10,6 +10,8 @@
     <script type="text/javascript" src="/js/menu.js"></script>
     <script type="text/javascript" src="/js/common.js"></script>
 
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
@@ -21,16 +23,16 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
-    <style>
-        .con {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+    <link rel="stylesheet" href="/css/paging.css">
+
+    <script type="text/javascript">
+
+        //상세보기 이동
+        function doDetail(seq) {
+            location.href = "/notice/noticeInfo?nSeq=" + seq;
         }
-    </style>
 
-
+    </script>
 </head>
 <body>
 <div id="wrapper">
@@ -43,18 +45,16 @@
             <nav id="gnb">
                 <ul class="gnb">
 
+                     <li>
+                        <a href="/center/center"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/center/center">정보센터</a></li>
+                        </ul>
+                    </li>
                     <li>
                         <a href="/notice/noticeList"><span>게시판</span></a>
                         <ul>
                             <li><a href="/notice/noticeList">게시판</a></li>
-
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="/center/center"><span>정보센터</span></a>
-                        <ul>
-                            <li><a href="/center/center">정보센터</a></li>
-
 
                         </ul>
                     </li>
@@ -63,11 +63,10 @@
                         <a href="#"><span>고객센터</span></a>
                         <ul>
 
-                            <li><a href="/online/calendar">예약</a></li>
+                            <li><a href="">고객센터</a></li>
 
                         </ul>
                     </li>
-
                 </ul>
             </nav>
             <!-- //gnb -->
@@ -78,7 +77,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
                 <a href="/user/logout">로그아웃</a>
             </div>
 
@@ -103,15 +102,15 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">상담센터</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">상담센터</a>
                             </li>
 
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="#">온라인 상담</a>
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
@@ -119,7 +118,15 @@
                             </li>
                         </ul>
                     </li>
-
+                </ul>
+                </li>
+                <!--<li>
+                    <a href="#"><span>고객센터</span></a>
+                    <ul>
+                        <li><a href="#">고객센터</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </li>-->
                 </ul>
             </nav>
             <div class="fix_bg"></div>
@@ -128,6 +135,7 @@
     <!-- // 내비게이션 바 -->
     <div id="subContainer">
         <div class="subSkin bg"></div>
+
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
@@ -137,19 +145,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                            </li>
-                            <li>
-                                <a href="/user/login" title="로그인">로그인</a>
-                            </li>
-                            <li>
-                                <a href="/user/logout" title="로그아웃">로그아웃</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                <a href="/notice/noticeList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -157,25 +153,13 @@
                         <div class="home">
                             <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
-                        <div class="large">회원</div>
+                        <div class="large">게시판</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">로그인</span>
+                            <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                                </li>
-                                <li>
-                                    <a href="/user/login" title="로그인">로그인</a>
-                                </li>
-                                <li>
-                                    <a href="/user/logout" title="로그아웃">로그아웃</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                    <a href="/notice/noticeList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -183,22 +167,65 @@
                 </div>
             </div>
         </nav>
+
         <div id="content">
-            <h1 class="title">아이디 찾기 결과</h1>
-            <div class="sContent">
-                <form id="f">
-                    <div class="con">
-                        <div id="result" class="">[[${rDTO.userName}]] 회원님의 아이디는 [[${rDTO.userId}]] 입니다.</div>
-                        <br>
-                        <input type="button" id="btnLogin" class="btn"
-                               style="background-color: #ffcb00; color: white"
-                               value="로그인">
-                    </div>
-                </form>
+            <h1 class="title">게시판</h1>
+            <div id="cms_board_article">
+                <table class="listTypeA">
+                    <caption>게시판</caption>
+                    <colgroup>
+                        <col width="30px" class="mbNone">
+                        <col width="120px">
+                        <col width="60px">
+                        <col width="60px" class="mbNone">
+                        <col width="30px" class="mbNone">
+                    </colgroup>
+                    <thead>
+                    <tr>
+                        <th scope="col" class="mbNone" style="background-color: #90d9d5">번호</th>
+                        <th scope="col" style="background-color: #90d9d5">제목</th>
+                        <th scope="col" style="background-color: #90d9d5">작성자</th>
+                        <th scope="col" class="mbNone" style="background-color: #90d9d5">작성일</th>
+                        <th scope="col" class="end mbNone" style="background-color: #90d9d5">조회수</th>
+                        <!-- 마지막 th에 class="end" -->
+                    </tr>
+                    </thead>
+                    <tbody class="alignC">
+                    <tr th:each="dto : ${rList}">
+                        <td class="mbNone" th:text="${dto.noticeSeq}"></td>
+                        <td class="subject" th:attr="onclick='doDetail(\'' + ${dto.noticeSeq} + '\')'"
+                            th:text="${dto.title}"></td>
+                        <td th:text="${dto.userId}"></td>
+                        <td class="mbNone" th:text="${dto.regDt}"></td>
+                        <td class="mbNone" th:text="${dto.readCnt}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="topGlob">
+                    <span class="btnBc" style="float: right"><a href="/notice/noticeReg" title="글쓰기"
+                                                                class="fn_btn_list">글쓰기</a></span>
+                </div>
+                <!-- 페이징 네비게이션 -->
+                <div class="pagination">
+                    <ul>
+                        <li th:if="${currentPage > 0}">
+                            <a th:href="@{noticeList(page=${currentPage - 1}, size=${size})}">Previous</a>
+                        </li>
+                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a th:href="@{noticeList(page=${i}, size=${size})}"
+                               th:classappend="${i} == ${currentPage} ? 'active' : ''"
+                               th:text="${i + 1}"></a>
+                        </li>
+                        <li th:if="${currentPage < totalPages - 1}">
+                            <a th:href="@{noticeList(page=${currentPage + 1}, size=${size})}">Next</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <section id="footer">
     <div class="container">
         <div class="row text-center">
@@ -217,25 +244,4 @@
     <!--End of container-->
 </section>
 </body>
-<script type="text/javascript">
-    // HTML로딩이 완료되고, 실행됨
-    $(document).ready(function () {
-        // 로그인 화면 이동
-        $("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            location.href = "/user/login";
-        })
-
-        let msg = '';
-        let userId = [[${rDTO.userId}]];
-        let userName = [[${rDTO.userName}]];
-        if (userId.length > 0) {
-            msg = userName + " 회원님의 아이디는 " + userId + "입니다.";
-        } else {
-            msg = "아이디가 존재하지 않습니다.";
-        }
-
-        const element = document.getElementById('result');
-        element.innerText = msg;
-    })
-</script>
 </html>

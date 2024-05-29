@@ -7220,4 +7220,82 @@ button.close {
     }
 }
 
+.register-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-group-custom {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.form-group-custom label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.input-group-custom {
+    display: flex;
+    align-items: center;
+}
+
+.input-group-custom .form-control-custom {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.input-group-custom .btn-custom {
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.form-control-custom {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.btn-custom {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-primary-custom {
+    background-color: #007bff;
+    color: white;
+    width: auto;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary-custom {
+    background-color: #6c757d;
+    color: white;
+    width: auto;
+}
+
+.btn-secondary-custom:hover {
+    background-color: #5a6268;
+}
+
 /*# sourceMappingURL=bootstrap.min.css.map */

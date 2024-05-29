@@ -1,0 +1,28 @@
+.pagination ul {
+    display: flex;
+    list-style-type: none;
+    padding: 0;
+}
+
+.pagination ul li {
+    margin: 0 5px;
+}
+
+.pagination ul li a {
+    text-decoration: none;
+    color: #007bff;
+    padding: 5px 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination ul li a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination ul li a.active {
+    background-color: #007bff;
+    color: white;
+}

@@ -26,7 +26,6 @@
 
 <body>
 <div id="wrapper" class="main">
-    <!-- header -->
     <header id="header" class>
         <div class="head_box">
             <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
@@ -59,13 +58,13 @@
                 </ul>
             </nav>
             <!-- //gnb -->
-            <div class="topGlob" th:if="${session.SS_USER_NAME == null}">
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
                 <ul>
                     <li><a href="/user/userRegForm">회원가입</a></li>
                     <li><a href="/user/login">로그인</a></li>
                 </ul>
             </div>
-            <div class="topGlob" th:if="${session.SS_USER_NAME != null}">
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <a href="/user/logout">로그아웃</a>
             </div>
 
@@ -127,180 +126,9 @@
                         </div>
                     </div>
                 </div>
-                <!--End of item With Active-->
-                <!--                <div class="item">-->
-                <!--                    <div class="slider_overlay">-->
-                <!--                        <img src="/img/main_Imag2.jpg" alt="...">-->
-                <!--                        <div class="carousel-caption">-->
-                <!--                            <div class="slider_text">-->
-                <!--                            </div>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-                <!--End of Item-->
             </div>
-            <!--End of Carousel Inner-->
         </div>
     </section>
-    <!--end of slider section-->
-
-<!--    &lt;!&ndash;Start of welcome section&ndash;&gt;-->
-<!--    <section id="welcome">-->
-<!--        <div class="container">-->
-<!--&lt;!&ndash;            <div class="row">&ndash;&gt;-->
-
-<!--&lt;!&ndash;                <div class="col-md-12">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="wel_header">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <h2>지원 센터 바로가기</h2>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;            </div>&ndash;&gt;-->
-<!--&lt;!&ndash;            &lt;!&ndash;End of row&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;            <div class="row">&ndash;&gt;-->
-<!--&lt;!&ndash;                <div class="col-md-2"></div>&ndash;&gt;-->
-<!--&lt;!&ndash;                <div class="col-md-3">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="item" id="center">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <div class="single_item">&ndash;&gt;-->
-<!--&lt;!&ndash;                            <div class="item_list">&ndash;&gt;-->
-<!--&lt;!&ndash;                                <div class="welcome_icon">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <i class="fa fa-leaf"></i>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <h4>상담센터</h4>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <p>지역 전체 상담센터</p>&ndash;&gt;-->
-<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                &lt;!&ndash;End of col-md-3&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;                <div class="col-md-3">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="item" id="HelpCenter">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <div class="single_item">&ndash;&gt;-->
-<!--&lt;!&ndash;                            <div class="item_list">&ndash;&gt;-->
-<!--&lt;!&ndash;                                <div class="welcome_icon">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <i class="fa fa-refresh"></i>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <h4>경기교권 보호<br>지원센터</h4>&ndash;&gt;-->
-
-<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                &lt;!&ndash;End of col-md-3&ndash;&gt;&ndash;&gt;-->
-<!--&lt;!&ndash;                <div class="col-md-3">&ndash;&gt;-->
-<!--&lt;!&ndash;                    <div class="item" id="cureCenter">&ndash;&gt;-->
-<!--&lt;!&ndash;                        <div class="single_item">&ndash;&gt;-->
-<!--&lt;!&ndash;                            <div class="item_list">&ndash;&gt;-->
-<!--&lt;!&ndash;                                <div class="welcome_icon">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <i class="fa fa-tint"></i>&ndash;&gt;-->
-<!--&lt;!&ndash;                                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <h4>교원 치유<br>지원센터</h4>&ndash;&gt;-->
-<!--&lt;!&ndash;                                <p></p>&ndash;&gt;-->
-<!--&lt;!&ndash;                            </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                        </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                </div>&ndash;&gt;-->
-<!--&lt;!&ndash;                &lt;!&ndash;End of col-md-3&ndash;&gt;&ndash;&gt;-->
-
-<!--&lt;!&ndash;            </div>&ndash;&gt;-->
-<!--            &lt;!&ndash;End of row&ndash;&gt;-->
-
-
-<!--            <br>-->
-<!--            <br>-->
-<!--            <br>-->
-<!--            <hr>-->
-<!--            <br>-->
-<!--            <br>-->
-<!--            <br>-->
-<!--            <div class="row">-->
-<!--                <div class="col-md-12">-->
-<!--                    <div class="wel_header">-->
-<!--                        <h2>자가진단 바로가기</h2>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-
-
-<!--            &lt;!&ndash;End of row&ndash;&gt;-->
-<!--            <div class="row">-->
-<!--                <div class="col-md-2"></div>-->
-<!--                <div class="col-md-3">-->
-<!--                    <div class="item">-->
-<!--                        <div class="single_item">-->
-<!--                            <div class="item_list">-->
-<!--                                <a href="https://www.mentalhealth.go.kr/portal/mdexmn/selectMdexmnList.do?mdexmnId=100"-->
-<!--                                   style="display: inline-block; line-height: 100px; vertical-align: middle;">-->
-<!--                                    <img src="/img/%EA%B5%AD%EA%B0%80%EC%A0%95%EC%8B%A0%EA%B1%B4%EA%B0%95%EC%A0%95%EB%B3%B4%ED%8F%AC%ED%84%B8_%EB%A1%9C%EA%B3%A0.jpg"-->
-<!--                                         alt="정신건강복지센터" style="vertical-align: middle;">-->
-<!--                                </a>-->
-<!--                                <h4>정신건강복지센터</h4>-->
-<!--                                <p>내 지역 <b>정신건강복지센터</b></p>-->
-<!--                                <p>누리집 자가검진시스템</p>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                &lt;!&ndash;End of col-md-3&ndash;&gt;-->
-<!--                <div class="col-md-3">-->
-<!--                    <div class="item">-->
-<!--                        <div class="single_item">-->
-<!--                            <div class="item_list">-->
-<!--                                <a href="https://nct.go.kr/distMental/rating/rating02_2.do"-->
-<!--                                   style="display: inline-block; line-height: 100px; vertical-align: middle;">-->
-<!--                                    <img src="/img/%EA%B5%AD%EB%AF%BC%EA%B3%81%EC%97%90%20%EB%A7%88%EC%9D%8C%ED%97%88%EA%B7%B8_%EB%A1%9C%EA%B3%A0.jpg"-->
-<!--                                         alt="국민곁에 마음허그" style="vertical-align: middle;">-->
-<!--                                </a>-->
-<!--                                <h4>국민곁에 마음허그</h4>-->
-<!--                                <p><b>국가트라우마센터</b> 누리집</p>-->
-<!--                                <p>자가진단시스템</p>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                &lt;!&ndash;End of col-md-3&ndash;&gt;-->
-<!--                <div class="col-md-3">-->
-<!--                    <div class="item">-->
-<!--                        <div class="single_item">-->
-<!--                            <div class="item_list">-->
-<!--                                <a href="https://forteacher.kedi.re.kr/web/contents/view.do?mId=41"-->
-<!--                                   style="display: inline-block; line-height: 100px; vertical-align: middle;">-->
-<!--                                    <img src="/img/%EA%B5%90%EC%9B%90%EC%B9%98%EC%9C%A0%EC%A7%80%EC%9B%90%EC%84%BC%ED%84%B0_%EB%A1%9C%EA%B3%A0.jpg"-->
-<!--                                         alt="교원치유지원센터" style="vertical-align: middle;">-->
-<!--                                </a>-->
-<!--                                <h4>교원치유<br>지원센터</h4>-->
-<!--                                <p><b>교원치유지원센터</b> 누리집</p>-->
-<!--                                <p>교사웰빙 진단</p>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                &lt;!&ndash;End of col-md-3&ndash;&gt;-->
-
-<!--            </div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash;End of container&ndash;&gt;-->
-<!--    </section>-->
-<!--    &lt;!&ndash;end of welcome section&ndash;&gt;-->
-
-<!--    &lt;!&ndash;Start of footer&ndash;&gt;-->
-<!--    <section id="footer">-->
-<!--        <div class="container">-->
-<!--            <div class="row text-center">-->
-<!--                <div class="col-md-6">-->
-<!--                    <div class="copyright">-->
-<!--                        <p>마음을 나누는 교실<span><a href="">&#9798;</a></span></p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="col-md-6">-->
-<!--                    <div class="designer">-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            &lt;!&ndash;End of row&ndash;&gt;-->
-<!--        </div>-->
-<!--        &lt;!&ndash;End of container&ndash;&gt;-->
-<!--    </section>-->
-<!--    &lt;!&ndash;End of footer&ndash;&gt;-->
 </div>
 <!--Scroll to top-->
 <a href="#" id="back-to-top" title="Back to top">&uarr;</a>

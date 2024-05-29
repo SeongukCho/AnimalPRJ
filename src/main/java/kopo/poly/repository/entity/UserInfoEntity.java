@@ -23,7 +23,7 @@ public class UserInfoEntity implements Serializable {
     private String userId;
 
     @NonNull
-    @Column(name = "user_name", length = 500, nullable = false)
+    @Column(name = "user_name", length = 100, nullable = false)
     private String userName;
 
     @NonNull
@@ -31,24 +31,13 @@ public class UserInfoEntity implements Serializable {
     private String password;
 
     @NonNull
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", length = 100,nullable = false)
     private String email;
 
-    @Column(name = "addr1")
-    private String addr1;
-
-    @Column(name = "addr2")
-    private String addr2;
-
-    @Column(name = "reg_id", updatable = false)
-    private String regId;
+//    @Column(name = "pet_yn")
+//    private String petYn;
 
     @Column(name = "reg_dt", updatable = false)
     private String regDt;
 
-    @Column(name = "chg_id")
-    private String chgId;
-
-    @Column(name = "chg_dt")
-    private String chgDt;
 }

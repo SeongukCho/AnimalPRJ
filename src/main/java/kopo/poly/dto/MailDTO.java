@@ -10,5 +10,6 @@ public record MailDTO(
         String title,      // 보내는 메일 제목
         String contents,    // 보내는 메일 내용
         String mailSeq,
-        String sendTime) {
+        String sendTime
+) {
 }

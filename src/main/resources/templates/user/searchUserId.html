@@ -35,12 +35,24 @@
                     alert("이메일을 입력하세요.");
                     f.email.focus();
                     return;
+                } else {
+                    $.ajax({
+                        url: "/user/getEmailExists",
+                        type: "post",
+                        dataType: "JSON",
+                        data: $("#f").serialize(),
+                        success: function (json) {
+                            if (json.existsYn === "N") {
+                                alert("입력하신 정보가 다르거나 가입하신 이메일이 없습니다.");
+                                f.email.focus();
+                            } else {
+                                alert("아이디는 " + json.userId + " 입니다.");
+                                location.href = "/user/login";
+
+                            }
+                        }
+                    })
                 }
-
-                f.method = "post"; // 아이디 찾기 정보 전송 방식
-                f.action = "/user/searchUserIdProc" // 아이디 찾기 URL
-
-                f.submit(); // 아이디 찾기 정보 전송하기
             })
         })
     </script>
@@ -57,9 +69,9 @@
                 <ul class="gnb">
 
                     <li>
-                        <a href="/notice/noticeList"><span>커뮤니티</span></a>
+                        <a href="/notice/noticeList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">커뮤니티</a></li>
+                            <li><a href="/notice/noticeList">게시판</a></li>
 
                         </ul>
                     </li>
@@ -80,23 +92,17 @@
 
                         </ul>
                     </li>
-                    <!--<li>
-                        <a href="#"><span>고객센터</span></a>
-                        <ul>
-                            <li><a href="#">고객센터</a></li>
-                            <li><a href="#">FAQ</a></li>
-                        </ul>
-                    </li>-->
+
                 </ul>
             </nav>
             <!-- //gnb -->
-            <div class="topGlob" th:if="${session.SS_USER_NAME == null}">
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
                 <ul>
                     <li><a href="/user/userRegForm">회원가입</a></li>
                     <li><a href="/user/login">로그인</a></li>
                 </ul>
             </div>
-            <div class="topGlob" th:if="${session.SS_USER_NAME != null}">
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
 
                 <a href="/user/logout">로그아웃</a>
             </div>
@@ -113,9 +119,9 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">커뮤니티</a>
+                        <a href="/notice/noticeList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">커뮤니티</a>
+                            <li><a href="/notice/noticeList">게시판</a>
                             </li>
                             <li>
                             </li>
@@ -126,10 +132,7 @@
                         <ul>
                             <li><a href="/center/center">정보센터</a>
                             </li>
-                            <li></a>
-                            </li>
-                            <li>
-                            </li>
+
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -139,17 +142,9 @@
                             </li>
                             <li><a href="/online/calendar">예약</a>
                             </li>
-
-                            </li>
                         </ul>
                     </li>
-                    <!--<li>
-                        <a href="#"><span>고객센터</span></a>
-                        <ul>
-                            <li><a href="#">고객센터</a></li>
-                            <li><a href="#">FAQ</a></li>
-                        </ul>
-                    </li>-->
+
                 </ul>
             </nav>
             <div class="fix_bg"></div>
@@ -173,7 +168,7 @@
                                 <a href="/user/login" title="로그인">로그인</a>
                             </li>
                             <li>
-                                <a href="#" title="로그아웃">로그아웃</a>
+                                <a href="/user/logout" title="로그아웃">로그아웃</a>
                             </li>
                             <li>
                                 <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
@@ -199,7 +194,7 @@
                                     <a href="/user/login" title="로그인">로그인</a>
                                 </li>
                                 <li>
-                                    <a href="#" title="로그아웃">로그아웃</a>
+                                    <a href="/user/logout" title="로그아웃">로그아웃</a>
                                 </li>
                                 <li>
                                     <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
@@ -217,54 +212,26 @@
             <h1 class="title">아이디 찾기</h1>
             <div class="sContent">
                 <div id="cms_member_article">
-                    <form id="f">
-                        <table class="writeTypeA mt10">
-                            <caption>아이디 찾기</caption>
-                            <colgroup>
-                                <col style="width:18%">
-                                <col>
-                            </colgroup>
-                            <tbody>
-<!--                            <tr>-->
-<!--                                <th scope="row"><label class="required"><span>아이디</span></label></th>-->
-<!--                                <td>-->
-<!--                                    <input type="text" name="userId" id="userId" class="inputTxt  w30"-->
-<!--                                           style="ime-mode:disabled;"-->
-<!--                                           required="required" value="">-->
-<!--                                </td>-->
-<!--                            </tr>-->
-                            <tr>
-                                <th scope="row"><label class="required"><span>이름</span></label></th>
-                                <td>
-                                    <input type="text" name="userName" id="userName" class="inputTxt  w30"
-                                           style="ime-mode:disabled;"
-                                           required="required" value="">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th scope="row"><label class="required"><span>이메일</span></label></th>
-                                <td>
-                                    <input type="text" name="email" id="email" class="inputTxt  w30"
-                                           style="ime-mode:disabled;"
-                                           required="required" value="">
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        <!-- btnset -->
-                        <div class="btnWrap">
-                            <span class="btnBc green w"><button class="btn1" id="btnSearchUserId"
-                                                                type="button">아이디 찾기</button></span>
-                            <span class="btnBc black w"><button type="button" id="btnLogin"
-                                                                title="취소">취소</button></span>
+                    <form id="f" method="post" onsubmit="return false;">
+                        <div class="form-group">
+                            <label for="userName" class="required">이름</label>
+                            <input type="text" name="userName" id="userName" class="inputTxt" required="required">
                         </div>
-                        <!-- //btnset -->
+                        <div class="form-group">
+                            <label for="email" class="required">이메일</label>
+                            <input type="text" name="email" id="email" class="inputTxt" required="required">
+                        </div>
+                        <div class="btnWrap">
+                            <button class="btn btn-green" id="btnSearchUserId" type="button">아이디 찾기</button>
+                            <button class="btn btn-black" type="button" id="btnLogin" title="취소">취소</button>
+                        </div>
                     </form>
                 </div>
             </div>
-
         </div>
+
     </div>
+</div>
 </div>
 <section id="footer">
     <div class="container">

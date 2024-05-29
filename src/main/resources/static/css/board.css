@@ -2059,7 +2059,6 @@ tbody td .state.st3 {
     margin-bottom: 30px;
     font-size: 16px;
     color: #636363;
-    text-align: center;
     line-height: 1;
     border-bottom: 1px solid #e2e2e2;
     padding-bottom: 28px;
@@ -2099,6 +2098,56 @@ tbody td .state.st3 {
     height: 12px;
     content: '';
     background: #d7d7d7
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between; /* 각 요소 사이의 공간을 균등하게 분배 */
+    align-items: center;
+    padding: 10px;
+    background-color: #ccf1ff;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-content {
+    display: flex;
+    justify-content: space-between; /* 각 요소 사이의 공간을 균등하게 분배 */
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.item {
+    white-space: nowrap;
+    font-size: 16px;
+    color: #495057;
+    text-align: center;
+    flex-basis: 0;
+}
+
+.item-seq {
+    text-align: left;
+    flex-grow: 1; /* 글번호는 크기를 고정 */
+}
+
+.item-title {
+    text-align: left;
+    flex-grow: 2; /* 제목은 넓게 설정 */
+}
+
+.item-user {
+    text-align: center;
+    flex-grow: 1; /* 작성자는 중간 정도 */
+}
+
+.item-date {
+    text-align: right;
+    flex-grow: 2; /* 작성일은 넓게 설정 */
+}
+
+.item-read {
+    text-align: right;
+    flex-grow: 1; /* 조회수는 크기를 고정 */
 }
 
 .viewTypeB .infor2 {
@@ -2148,7 +2197,7 @@ tbody td .state.st3 {
 }
 
 .viewTypeB .contents { /* padding:40px; */
-    padding: 40px 200px;
+    padding: 40px;
     line-height: 1.8;
     border-bottom: 1px solid #e1e1e1
 }
