@@ -74,16 +74,16 @@ public class UserInfoController {
         log.info(this.getClass().getName() + ".user/newPassword Start!");
 
         String userId = CmmUtil.nvl((request.getParameter("userId"))); // 아이디
-        String userName = CmmUtil.nvl((request.getParameter("userName"))); // 이름
+//        String userName = CmmUtil.nvl((request.getParameter("userName"))); // 이름
         String email = CmmUtil.nvl((request.getParameter("email"))); // 이메일
 
         log.info("userId : " + userId);
-        log.info("userName : " + userName);
+//        log.info("userName : " + userName);
         log.info("email : " + email);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
-                .userName(userName)
+//                .userName(userName)
                 .email(EncryptUtil.encAES128CBC(email))
                 .build();
 
@@ -97,7 +97,7 @@ public class UserInfoController {
 
             session.setAttribute("NEW_PASSWORD", userId);
 
-            log.info(this.getClass().getName() + ".user/newPassword End!");
+            log.info(this.getClass().getName() + ".user/newPassword success End!");
 
             return "user/newPassword";
         }
@@ -106,7 +106,7 @@ public class UserInfoController {
 
             session.setAttribute("NEW_PASSWORD", "");
 
-            log.info(this.getClass().getName() + ".user/newPassword End!");
+            log.info(this.getClass().getName() + ".user/newPassword fail End!");
 
             return "user/newPassword";
         }
@@ -179,31 +179,9 @@ public class UserInfoController {
         return rDTO;
     }
 
-
-    @ResponseBody
-    @PostMapping(value = "sendEmailAuth")
-    public UserInfoDTO SendEmailAuth(HttpServletRequest request) throws Exception {
-        log.info(this.getClass().getName() + ".sendEmailAuth Start!");
-
-        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
-
-        log.info("email : " + email);
-
-        UserInfoDTO pDTO =  UserInfoDTO.builder()
-                .email(EncryptUtil.encAES128CBC(email))
-                .build();
-
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.sendEmailAuth(pDTO))
-                .orElseGet(() -> UserInfoDTO.builder().build());
-
-        log.info(this.getClass().getName() + ".sendEmailAuth End!");
-
-        return rDTO;
-    }
-
     @ResponseBody
     @PostMapping(value = "insertUserInfo")
-    public MsgDTO inserUserInfo(HttpServletRequest request) throws Exception {
+    public MsgDTO insertUserInfo(HttpServletRequest request) throws Exception {
 
         log.info(this.getClass().getName() + ".insertUserInfo Start!");
 
@@ -213,15 +191,11 @@ public class UserInfoController {
         String userName = CmmUtil.nvl(request.getParameter("userName"));
         String password = CmmUtil.nvl(request.getParameter("password"));
         String email = CmmUtil.nvl(request.getParameter("email"));
-        String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
-        String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
 
         log.info("userId : " + userId);
         log.info("userName : " + userName);
         log.info("password : " + password);
         log.info("email : " + email);
-        log.info("addr1 : " + addr1);
-        log.info("addr2 : " + addr2);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
@@ -301,7 +275,7 @@ public class UserInfoController {
 
         if (res == 1) {
 
-            msg = "로그인이 성공했습니다.";
+            msg = "로그인 성공!";
             session.setAttribute("SS_USER_ID", userId);
 
         } else {
@@ -372,47 +346,62 @@ public class UserInfoController {
     }
 
     @ResponseBody
-    @PostMapping(value = "signUpEmailExists")
-    public UserInfoDTO signUpEmailExists(HttpServletRequest request) throws Exception {
-        log.info(this.getClass().getName() + ".signUpEmailExists Start!");
+    @PostMapping(value = "sendEmailAuth")
+    public UserInfoDTO SendEmailAuth(HttpServletRequest request) throws Exception {
+        log.info(this.getClass().getName() + ".sendEmailAuth Start!");
 
         String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
 
         log.info("email : " + email);
 
-        UserInfoDTO pDTO = UserInfoDTO.builder()
+        UserInfoDTO pDTO =  UserInfoDTO.builder()
                 .email(EncryptUtil.encAES128CBC(email))
                 .build();
 
-        //이메일을 통해 중복된 이메일인지 조회
-        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getEmailExists(pDTO))
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.sendEmailAuth(pDTO))
                 .orElseGet(() -> UserInfoDTO.builder().build());
+        log.info("rDTO : " + rDTO);
 
-        String existsYn = rDTO.existsYn();
-
-        log.info("existsYn : " + existsYn);
-
-        if (existsYn == "N") {
-
-            //이메일을 통해 중복된 이메일인지 조회
-            rDTO = Optional.ofNullable(userInfoService.sendSignUpEmailAuth(pDTO))
-                    .orElseGet(() -> UserInfoDTO.builder().build());
-
-        }
-
-        log.info(this.getClass().getName() + ".signUpEmailExists End!");
+        log.info(this.getClass().getName() + ".sendEmailAuth End!");
 
         return rDTO;
     }
 
-    /**
-     *
-     * ##################################################################################
-     *
-     *                                      MyPage
-     *
-     * ##################################################################################
-     */
+//    @ResponseBody
+//    @PostMapping(value = "signUpEmailExists")
+//    public UserInfoDTO signUpEmailExists(HttpServletRequest request) throws Exception {
+//        log.info(this.getClass().getName() + ".signUpEmailExists Start!");
+//
+//        String email = CmmUtil.nvl(request.getParameter("email")); // 이메일
+//
+//        log.info("email : " + email);
+//
+//        UserInfoDTO pDTO = UserInfoDTO.builder()
+//                .email(EncryptUtil.encAES128CBC(email))
+//                .build();
+//
+//        //이메일을 통해 중복된 이메일인지 조회
+//        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getEmailExists(pDTO))
+//                .orElseGet(() -> UserInfoDTO.builder().build());
+//
+//        String existsYn = rDTO.existsYn();
+//
+//        log.info("existsYn : " + existsYn);
+//
+//        if (existsYn == "N") {
+//
+//            //이메일을 통해 중복된 이메일인지 조회
+//            rDTO = Optional.ofNullable(userInfoService.sendSignUpEmailAuth(pDTO))
+//                    .orElseGet(() -> UserInfoDTO.builder().build());
+//
+//        }
+//
+//        log.info(this.getClass().getName() + ".signUpEmailExists End!");
+//
+//        return rDTO;
+//    }
+
+    // myPage
 
     @GetMapping(value = "myPage")
     public String myPage(HttpSession session, ModelMap model) throws Exception {
@@ -574,14 +563,10 @@ public class UserInfoController {
         String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
         String userName = CmmUtil.nvl(request.getParameter("userName"));
         String email = CmmUtil.nvl(request.getParameter("email"));
-        String addr1 = CmmUtil.nvl(request.getParameter("addr1"));
-        String addr2 = CmmUtil.nvl(request.getParameter("addr2"));
 
         log.info("userId : " + userId);
         log.info("userName : " + userName);
         log.info("email : " + (email));
-        log.info("addr1 : " + addr1);
-        log.info("addr2 : " + addr2);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
@@ -591,7 +576,7 @@ public class UserInfoController {
 
         int res = userInfoService.updateUserInfo(pDTO);
 
-        log.info("회원 정보 수정 결과(res) : " + res);
+        log.info("호윈 정보 수정 결과(res) : " + res);
 
         if (res == 1) {
             msg = "회원 정보 수정되었습니다..";
@@ -610,24 +595,24 @@ public class UserInfoController {
     }
 
 
-    // 회원 탈퇴 페이지
-    @GetMapping(value = "withdrawal")
-    public String deleteUserInfo(HttpSession session) {
-
-        log.info(this.getClass().getName() + ".user/withdrawal Start!");
-
-        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-
-        if(userId.length()>0){
-
-        } else {
-            return "user/login";
-        }
-
-        log.info(this.getClass().getName() + ".user/withdrawal End!");
-
-        return "user/withdrawal";
-    }
+//    // 회원 탈퇴 페이지
+//    @GetMapping(value = "withdrawal")
+//    public String Withdrawal(HttpSession session) {
+//
+//        log.info(this.getClass().getName() + ".user/withdrawal Start!");
+//
+//        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+//
+//        if(userId != null){
+//
+//        } else {
+//            return "user/login";
+//        }
+//
+//        log.info(this.getClass().getName() + ".user/withdrawal End!");
+//
+//        return "user/withdrawal";
+//    }
 
 
     /**
@@ -635,7 +620,7 @@ public class UserInfoController {
      */
     @ResponseBody
     @PostMapping(value = "deleteUserInfo")
-    public MsgDTO noticeDelete(HttpSession session) {
+    public MsgDTO DeleteUserInfo(HttpSession session) {
 
         log.info(this.getClass().getName() + ".deleteUserInfo Start!");
 

@@ -4,7 +4,11 @@
     margin: 1px;
     vertical-align: middle;
 }
+.btnAA {
+    width: 120px;
+    height: 40px;
 
+}
 .btnBc a,
 .btnBc button,
 .btnBc input {

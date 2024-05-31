@@ -1,5 +1,6 @@
 package kopo.poly.repository;
 
+import kopo.poly.dto.NoticeDTO;
 import kopo.poly.repository.entity.NoticeEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

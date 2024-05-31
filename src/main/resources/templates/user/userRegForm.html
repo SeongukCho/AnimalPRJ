@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>로그인</title>
+    <title>회원가입</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -24,62 +24,115 @@
     <link rel="stylesheet" href="/css/ui_content.css">
 
     <script type="text/javascript">
-
+        // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
         let userIdCheck = "Y";
 
+        // 이메일 중복체크 인증번호 발송 값
+        let emailAuthNumber = "";
+
+        // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
 
-            let f = document.getElementById("f");
+            let f = document.getElementById("f"); // form 태그
 
-            $("#btnUserId").on("click", function () {
+            // 아이디 중복체크
+            $("#btnUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
                 userIdExists(f)
             })
 
-            $("#btnAddr").on("click", function () {
-                kakaoPost(f);
+            // 이메일 중복체크
+            $("#btnEmail").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                emailExists(f)
             })
 
-            $("#btnSend").on("click", function () {
+            $("#btnAuth").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                authConfirm(f)
+            })
+
+            $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
                 doSubmit(f);
             })
         })
 
+        // 회원아이디 중복 체크
         function userIdExists(f) {
+
             if (f.userId.value === "") {
                 alert("아이디를 입력하세요.");
                 f.userId.focus();
                 return;
             }
 
+            // Ajax 호출해서 회원가입하기
             $.ajax({
                 url: "/user/getUserIdExists",
-                type: "post",
-                dataType: "JSON",
-                data: $("#f").serialize(),
-                success: function (json) {
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
                     if (json.existsYn === "Y") {
                         alert("이미 가입된 아이디가 존재합니다.");
                         f.userId.focus();
+
                     } else {
                         alert("가입 가능한 아이디입니다.");
                         userIdCheck = "N";
                     }
+
                 }
             })
         }
 
-        function kakaoPost(f) {
+        // 이메일 중복 체크
+        function emailExists(f) {
+            if (f.email.value === "") {
+                alert("이메일을 입력하세요.");
+                f.email.focus();
+                return;
+            }
 
-            new daum.Postcode({
-                oncomplete: function (data) {
-                    let address = data.address;
-                    let zonecode = data.zonecode;
-                    f.addr1.value = "(" + zonecode + ")" + address
+            $.ajax({
+                url: "/user/getEmailExists",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
+                    if (json.existsYn === "Y") {
+                        alert("이미 가입된 이메일 주소가 존재합니다.");
+                        f.email.focus();
+
+                    } else {
+                        alert("이메일로 인증번호가 발송되었습니다. \n받은 메일의 인증번호를 입력하기 바랍니다.");
+                        emailAuthNumber = json.authNumber;
+
+                    }
+
                 }
-            }).open();
+            })
         }
 
+        function authConfirm(f) {
+
+            if (f.authNumber.value === "") {
+                alert("이메일 인증번호를 입력하세요.");
+                f.authNumber.focus();
+                return;
+            }
+
+            if (f.authNumber.value !== emailAuthNumber.toString()) {
+                alert("이메일 인증번호가 일치하지 않습니다.");
+                f.authNumber.focus();
+            } else {
+                alert("이메일 인증번호가 일치합니다.")
+                f.authNumber.focus();
+            }
+        }
+
+        //회원가입 정보의 유효성 체크하기
         function doSubmit(f) {
+
             if (f.userId.value === "") {
                 alert("아이디를 입력하세요.");
                 f.userId.focus();
@@ -105,7 +158,7 @@
             }
 
             if (f.password2.value === "") {
-                alert("비밀번호를 입력하세요.");
+                alert("비밀번호확인을 입력하세요.");
                 f.password2.focus();
                 return;
             }
@@ -122,21 +175,38 @@
                 return;
             }
 
+            if (f.authNumber.value === "") {
+                alert("이메일 인증번호를 입력하세요.");
+                f.authNumber.focus();
+                return;
+            }
+
+            if (f.authNumber.value !== emailAuthNumber.toString()) {
+                alert("이메일 인증번호가 일치하지 않습니다.");
+                f.authNumber.focus();
+                return;
+            }
+
+            // Ajax 호출해서 회원가입하기
             $.ajax({
                 url: "/user/insertUserInfo",
-                type: "post",
-                dataType: "JSON",
-                data: $("#f").serialize(),
-                success: function (json) {
-                    if (json.result === 1) {
-                        alert(json.msg);
-                        location.href = "/user/login";
-                    } else {
-                        alert(json.msg);
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // /user/insertUserInfo 호출이 성공했다면..
+
+                    if (json.result === 1) { // 회원가입 성공
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/user/login"; // 로그인 페이지 이동
+
+                    } else { // 회원가입 실패
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/user/userRegForm"
                     }
                 }
             })
         }
+
     </script>
 </head>
 
@@ -161,7 +231,7 @@
                     <li>
                         <a href="/center/center"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a></li>
+                            <li><a href="/center/center">보호소 찾기</a></li>
 
 
                         </ul>
@@ -171,7 +241,7 @@
                         <a href="#"><span>고객센터</span></a>
                         <ul>
 
-                            <li><a href="/online/calendar">예약</a></li>
+                            <li><a href="/online/calendar">채팅</a></li>
 
                         </ul>
                     </li>
@@ -211,9 +281,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">보호소 찾기</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">보호소 찾기</a>
                             </li>
 
                         </ul>
@@ -223,7 +293,7 @@
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
-                            <li><a href="/online/calendar">예약</a>
+                            <li><a href="/online/calendar">채팅</a>
                             </li>
                         </ul>
                     </li>
@@ -282,35 +352,115 @@
     </div>
 </div>
 <div class="container">
-    <h1 class="register-title">회원가입</h1>
-    <form id="f">
-        <div class="form-group">
-            <label for="userId">* 아이디</label>
-            <div class="form-floating mb-3">
-                <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디">
-                <button id="btnUserId" type="button" class="btn-custom btn-secondary-custom">아이디 중복체크</button>
-            </div>
-            <div class="form-floating mb-3">
-                <label for="userName">* 이름</label>
-                <input type="text" id="userName" name="userName" class="form-control" placeholder="이름">
-            </div>
-            <div class="form-floating mb-3">
-                <label for="password">* 비밀번호</label>
-                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호">
-            </div>
-            <div class="form-floating mb-3">
-                <label for="password2">* 비밀번호 확인</label>
-                <input type="password" id="password2" name="password2" class="form-control" placeholder="비밀번호 확인">
-            </div>
-            <div class="form-floating mb-3">
-                <label for="email">* 이메일</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="이메일">
-            </div>
-            <div class="form-floating mb-3">
-                <button id="btnSend" type="button" class="btn-custom btn-primary-custom">회원가입</button>
-            </div>
+    <!--    <h1 class="register-title">회원가입</h1>-->
+    <!--    <form id="f">-->
+    <!--        <div class="form-group">-->
+    <!--            <label for="userId">아이디</label>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디">-->
+    <!--                <button id="btnUserId" type="button" class="btn-custom btn-secondary-custom">아이디 중복체크</button>-->
+    <!--            </div>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <label for="userName">닉네임</label>-->
+    <!--                <input type="text" id="userName" name="userName" class="form-control" placeholder="이름">-->
+    <!--            </div>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <label for="password">비밀번호</label>-->
+    <!--                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호">-->
+    <!--            </div>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <label for="password2">비밀번호 확인</label>-->
+    <!--                <input type="password" id="password2" name="password2" class="form-control" placeholder="비밀번호 확인">-->
+    <!--            </div>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <label for="email">이메일</label>-->
+    <!--                <input type="email" id="email" name="email" class="form-control" placeholder="이메일">-->
+    <!--            </div>-->
+    <!--            <div class="form-floating mb-3">-->
+    <!--                <button id="btnSend" type="button" class="btn-custom btn-primary-custom">회원가입</button>-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </form>-->
+    <h1 class="title">회원가입</h1>
+    <div class="sContent">
+        <div id="cms_member_article">
+            <form id="f" action="/user/insertUserInfo" name="memberInputForm" method="post"
+                  onsubmit="doSubmit(this)">
+                <table class="writeTypeA mt10">
+                    <caption>회원가입 글쓰기 서식</caption>
+                    <colgroup>
+                        <col style="width:18%">
+                        <col>
+                    </colgroup>
+                    <tbody>
+                    <tr>
+                        <th scope="row"><label for="mbrId" id="fn_name_mbrId"
+                                               class="required"><span>아이디</span></label></th>
+                        <td>
+                            <input type="text" name="userId" id="mbrId" class="inpA" style="ime-mode:disabled;"
+                                   required="required" value="">
+                            <span class="btnBc small green"><button id="btnUserId"
+                                                                    type="button">아이디 중복확인</button></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="mbrName"><span>이름</span></label></th>
+                        <td>
+                            <input type="text" name="userName" id="mbrName" class="inpA" style="" maxlength="15"
+                                   required="required" value="">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="mbrPwd" class="required"><span>비밀번호</span></label></th>
+                        <td>
+                            <input type="password" name="password" id="mbrPwd" autocomplete="off" class="inpA"
+                                   style="" maxlength="15" required="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="mbrPwd_reconfirm"
+                                               class="required"><span>비밀번호 확인</span></label>
+                        </th>
+                        <td>
+                            <input type="password" name="password2" id="mbrPwd_reconfirm" autocomplete="off"
+                                   class="inpA" style="" maxlength="15" required="required">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="mbrEmail" class="required"><span>이메일</span></label></th>
+                        <td>
+                            <div class="input-email" style="float:left;">
+                                <input type="text" id="mbrEmail" name="email" title="이메일" class="inputTxt"
+                                       style="ime-mode:disabled;width:50%" required="required" value="">
+                                <span class="btnBc small green"><button id="btnEmail" type="button"
+                                                                        class="m_dup_btn">인증번호 발송</button></span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label for="ahCode" class="required"><span>인증번호</span></label></th>
+                        <td>
+                            <div class="input-email" style="float:left;">
+                                <input type="text" id="ahCode" name="authNumber" title="인증번호" class="inputTxt"
+                                       style="ime-mode:disabled;width:50%" required="required" value=""
+                                       maxlength="6">
+                                <span class="btnBc small green"><button id="btnAuth" type="button"
+                                                                        class="m_dup_btn">인증번호 확인</button></span>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- btnset -->
+                <div class="btnWrap">
+                    <button id="btnSend" type="button" class="btnAA" style="background-color: #ffcb00">회원가입</button>
+                    <button type="reset" title="취소" class="btnAA" style="background-color: #000000">취소</button>
+                </div>
+                <!-- //btnset -->
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 <section id="footer">
     <div class="container">

@@ -95,25 +95,23 @@
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-
                     <li>
-                        <a href="/notice/noticeList"><span>정보센터</span></a>
+                        <a href="/center/center"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">정보센터</a></li>
-
+                            <li><a href="/center/center">보호소 찾기</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/center/center"><span>게시판</span></a>
+                        <a href="/notice/noticeList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a></li>
+                            <li><a href="/notice/noticeList">게시판</a></li>
                         </ul>
                     </li>
                     <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     <li>
                         <a href="#"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="/online/calendar">예약</a></li>
+                            <li><a href="/online/calendar">채팅</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -126,7 +124,6 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-
                 <a href="/user/logout">로그아웃</a>
             </div>
             <!-- 모바일 환경에서 네비게이션바 -->
@@ -142,9 +139,9 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">보호소 찾기</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">보호소 찾기</a>
                             </li>
 
                         </ul>
@@ -164,7 +161,7 @@
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
-                            <li><a href="/online/calendar">예약</a>
+                            <li><a href="/online/calendar">채팅</a>
                             </li>
                         </ul>
                     </li>
@@ -229,39 +226,19 @@
                         <p class="txt">펫밀리에 오신것을 환영합니다.<br>서비스를 이용하기 위해서는 로그인이 필요합니다.<br>로그인 후 서비스를 이용해 주세요.</p>
                     </div>
                     <div class="loginCon">
-<!--                        <form id="f" action="/user/loginProc" name="fn_loginForm" method="post">-->
-<!--                            <div class="con">-->
-<!--                                <input type="text" id="userId" name="userId" class="inputTxt  logTxt" maxlength="50"-->
-<!--                                       value="" placeholder="아이디">-->
-<!--                                <input type="password" id="password" name="password" autocomplete="off" class="logTxt"-->
-<!--                                       maxlength="30" placeholder="비밀번호">-->
-<!--                                <input type="submit" id="btnLogin" class="btn" value="로그인">-->
-<!--                                <ul>-->
-<!--                                    <li><a href="/user/searchUserId">아이디 찾기</a></li>-->
-<!--                                    <li><a href="/user/searchPassword">비밀번호 찾기</a></li>-->
-<!--                                    <li><a href="/user/userRegForm">회원가입</a></li>-->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!--                        </form>-->
                         <form id="f" method="post" onsubmit="return false;">
-                            <div class="form-element form-stack">
-                                <label for="idLogin" class="form-label">아이디</label>
-                                <input id="idLogin" type="text" name="userId">
+                            <div class="con">
+                                <input type="text" id="userId" name="userId" class="inputTxt  logTxt" maxlength="50"
+                                       value="" placeholder="아이디">
+                                <input type="password" id="password" name="password" autocomplete="off" class="logTxt"
+                                       maxlength="30" placeholder="비밀번호">
+                                <input type="submit" id="btnLogin" class="btn" value="로그인">
+                                <ul>
+                                    <li><a href="/user/searchUserId">아이디 찾기</a></li>
+                                    <li><a href="/user/searchPassword">비밀번호 찾기</a></li>
+                                    <li><a href="/user/userRegForm">회원가입</a></li>
+                                </ul>
                             </div>
-                            <div class="form-element form-stack">
-                                <label for="passwordLogin" class="form-label">비밀번호</label>
-                                <input id="passwordLogin" type="password" name="password">
-                            </div>
-                            <div class="form-element form-submit">
-                                <button id="btnLogin" class="login">Log In</button>
-                                <button id="goRight" class="login off" name="signup">Sign Up</button>
-                                <button id="btnMain" class="login off" name="signup">Main</button>
-                            </div>
-                            <ul>
-                                <li><a href="/user/searchUserId">아이디 찾기</a></li>
-                                <li><a href="/user/searchPassword">비밀번호 찾기</a></li>
-                                <li><a href="/user/userRegForm">회원가입</a></li>
-                            </ul>
                         </form>
                     </div>
                 </div>

@@ -317,7 +317,7 @@
                     <li>
                         <a href="/center/center"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a></li>
+                            <li><a href="/center/center">보호소 찾기</a></li>
                         </ul>
                     </li>
                     <li>
@@ -372,9 +372,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/center/center">상담센터</a>
+                        <a href="/center/center">보호소 찾기</a>
                         <ul>
-                            <li><a href="/center/center">상담센터</a>
+                            <li><a href="/center/center">보호소 찾기</a>
                             </li>
 
                         </ul>
@@ -384,7 +384,7 @@
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
-                            <li><a href="/online/calendar">예약</a>
+                            <li><a href="/online/calendar">채팅</a>
                             </li>
                         </ul>
                     </li>
@@ -452,7 +452,7 @@
                         <span class="item item-date">[[${rDTO.regDt}]]</span>
                         <span class="item item-read">[[${rDTO.readCnt}]]</span>
                     </div>
-                    <div class="contents">
+                    <div class="contents" style="white-space: pre-wrap;">
                         <p>[[${rDTO.contents}]]</p>
                     </div>
                 </div>
@@ -465,10 +465,10 @@
                                 <div class="comment-right">
                                     <span class="func-inline" name="ChgDt" th:text="${dto.commentChgDt()}"></span>
                                     <div class="func-inline" th:if="${session.SS_USER_ID}==${dto.userId()}">
-                                <span class="comment_edit" th:id="'comment_edit'+${dto.commentSeq()}"
-                                      th:onclick="doCEdit(${dto.commentSeq()})">수정</span>
-                                        <span class="comment-del" th:id="'comment-del' +${dto.commentSeq()}"
-                                              th:onclick="doCDel(${dto.commentSeq()})">삭제</span>
+                                <span class="comment_edit" th:id="'comment_edit' + ${dto.commentSeq()}"
+                                      th:attr="onclick='doCEdit(' + ${dto.commentSeq()} + ')'">수정</span>
+                                        <span class="comment-del" th:id="'comment-del' + ${dto.commentSeq()}"
+                                              th:attr="onclick='doCDel(' + ${dto.commentSeq()} + ')'">삭제</span>
                                     </div>
                                 </div>
                             </div>
@@ -480,7 +480,8 @@
                 <hr>
                 <div class="comment" th:if="${session.SS_USER_ID}">
                     <label class="commentLabel block mt-4 text-sm">
-                <textarea class="block" id="cContent" name="content" style="height: 60px; width : 750px" rows="3" placeholder="댓글 내용을 입력해주세요."></textarea>
+                        <textarea class="block" id="cContent" name="content" style="height: 60px; width : 750px"
+                                  rows="3" placeholder="댓글 내용을 입력해주세요."></textarea>
                         <button id="btnCInst" class="commentButton" style="width: 100px;" type="button">
                             댓글 작성
                         </button>

@@ -78,7 +78,7 @@
                     <li>
                         <a href="/center/center"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a></li>
+                            <li><a href="/center/center">보호소 찾기</a></li>
 
 
                         </ul>
@@ -88,7 +88,7 @@
                         <a href="#"><span>고객센터</span></a>
                         <ul>
 
-                            <li><a href="/online/calendar">예약</a></li>
+                            <li><a href="/online/calendar">채팅</a></li>
 
                         </ul>
                     </li>
@@ -102,11 +102,6 @@
                     <li><a href="/user/login">로그인</a></li>
                 </ul>
             </div>
-            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-
-                <a href="/user/logout">로그아웃</a>
-            </div>
-
             <nav id="mGnb">
                 <button type="button" class="btnClose"><span>닫기</span></button>
                 <div class="mbTop">
@@ -128,9 +123,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">보호소 찾기</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">보호소 찾기</a>
                             </li>
 
                         </ul>
@@ -140,7 +135,7 @@
                         <ul>
                             <li><a href="#">이용방법 </a>
                             </li>
-                            <li><a href="/online/calendar">예약</a>
+                            <li><a href="/online/calendar">채팅</a>
                             </li>
                         </ul>
                     </li>
@@ -168,9 +163,6 @@
                                 <a href="/user/login" title="로그인">로그인</a>
                             </li>
                             <li>
-                                <a href="/user/logout" title="로그아웃">로그아웃</a>
-                            </li>
-                            <li>
                                 <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
                             </li>
                             <li>
@@ -192,9 +184,6 @@
                                 </li>
                                 <li>
                                     <a href="/user/login" title="로그인">로그인</a>
-                                </li>
-                                <li>
-                                    <a href="/user/logout" title="로그아웃">로그아웃</a>
                                 </li>
                                 <li>
                                     <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>

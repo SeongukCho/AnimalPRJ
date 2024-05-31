@@ -36,7 +36,7 @@
                     <li>
                         <a href="/center/center"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a></li>
+                            <li><a href="/center/center">보호소 찾기</a></li>
                         </ul>
                     </li>
                     <li>
@@ -64,7 +64,8 @@
                     <li><a href="/user/login">로그인</a></li>
                 </ul>
             </div>
-            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+            <div class="topGlob" th:if="${session.SS_USER_ID}">
+                <a href="/user/myPage">마이페이지</a>
                 <a href="/user/logout">로그아웃</a>
             </div>
 
@@ -79,9 +80,9 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/center/center">정보센터</a>
+                        <a href="/center/center">보호소 찾기</a>
                         <ul>
-                            <li><a href="/center/center">정보센터</a>
+                            <li><a href="/center/center">보호소 찾기</a>
                             </li>
                         </ul>
                     </li>

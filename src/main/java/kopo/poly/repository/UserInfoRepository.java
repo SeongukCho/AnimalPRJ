@@ -20,7 +20,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfoEntity, String
     // 로그인 (아이디, 비밀번호 확인)
     Optional<UserInfoEntity> findByUserIdAndPassword(String userId, String password);
     // 아이디, 이름, 이메일로 찾기
-    Optional<UserInfoEntity> findByUserIdAndUserNameAndEmail(String userId, String userName, String email);
+    Optional<UserInfoEntity> findByUserIdAndEmail(String userId, String email);
 
     /**
      * 유저 정보 업데이트

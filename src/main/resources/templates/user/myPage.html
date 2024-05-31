@@ -1,10 +1,185 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>마이페이지</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <script>
+    </script>
 </head>
+
 <body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+
+                    <li>
+                        <a href="/center/center"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/center/center">보호소 찾기</a></li>
+
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/notice/noticeList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="/online/calendar">채팅</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <!-- 모바일 환경에서 네비게이션바 -->
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop">
+                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <ul>
+
+                    <li class="has-sub">
+                        <a href="/center/center">보호소 찾기</a>
+                        <ul>
+                            <li><a href="/center/center">보호소 찾기</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/notice/noticeList">게시판</a>
+                        <ul>
+                            <li><a href="/notice/noticeList">게시판</a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">채팅</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">마이 페이지</h1>
+            <div class="sContent">
+                <div id="cms_member_article">
+                        <table class="writeTypeA mt10">
+                            <colgroup>
+                                <col style="width:18%">
+                                <col>
+                            </colgroup>
+                            <tbody>
+                            <tr>
+                                <th scope="row"><label class="required"><span>아이디</span></label></th>
+                                <td>[[${rDTO.userId}]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label class="required"><span>닉네임</span></label></th>
+                                <td>[[${rDTO.userName}]]
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><label class="required"><span>이메일</span></label></th>
+                                <td>[[${rDTO.email}]]
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+<!--                    <form name="form" method="post" action="http://localhost:11000/user/myPage" enctype="multipart/form-data">-->
+<!--                        <input name="user" value="Pyo"/>-->
+<!--                        <input name="content" value="Content"/>-->
+<!--                        <input type="file" name="files" multiple="multiple"/>-->
+<!--                        <input type="submit" id="submit" value="전송"/>-->
+<!--                    </form>-->
+                        <!-- btnset -->
+<!--                        <div class="btnWrap">-->
+<!--&lt;!&ndash;                            <span class="btnBc red w" style="float: right"><button class="btn1" type="button">회원 탈퇴</button></span>&ndash;&gt;-->
+<!--                            <span class="btnBc yellow w"><button type="button" id="btnLogin"-->
+<!--                                                                title="취소">회원정보 수정</button></span>-->
+<!--                        </div>-->
+                        <!-- //btnset -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

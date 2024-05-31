@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MainController {
 
     @GetMapping(value = "/main")
-    public String main() {
+    public String Main() {
         log.info(this.getClass().getName() + ".main Start!!!");
         return "/main/main";
     }
