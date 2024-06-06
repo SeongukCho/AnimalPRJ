@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="ko">
-
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>펫 밀리</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <title>보호소 찾기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
     <script type="text/javascript" src="/js/common.js"></script>
+    <style>
+    </style>
 
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
@@ -22,10 +25,20 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
-</head>
+    <link rel="stylesheet" href="/css/paging.css">
 
+    <script type="text/javascript">
+
+        //상세보기 이동
+        function doDetail(seq) {
+            location.href = "/notice/noticeInfo?nSeq=" + seq;
+        }
+
+    </script>
+</head>
 <body>
-<div id="wrapper" class="main">
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
     <header id="header" class>
         <div class="head_box">
             <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
@@ -64,8 +77,8 @@
                     <li><a href="/user/login">로그인</a></li>
                 </ul>
             </div>
-            <div class="topGlob" th:if="${session.SS_USER_ID}">
-                <a href="/user/myPage">마이페이지</a>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
                 <a href="/user/logout">로그아웃</a>
             </div>
 
@@ -79,25 +92,30 @@
                     </ul>
                 </div>
                 <ul>
-                    <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
-                        <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
-                            </li>
-                        </ul>
-                    </li>
+
                     <li class="has-sub">
                         <a href="/notice/noticeList">게시판</a>
                         <ul>
                             <li><a href="/notice/noticeList">게시판</a>
                             </li>
+                            <li>
+                            </li>
                         </ul>
                     </li>
-
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/animal/shelter">보호소 찾기</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">온라인 상담</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">채팅</a>
                             </li>
                         </ul>
                     </li>
@@ -106,32 +124,61 @@
             <div class="fix_bg"></div>
         </div>
     </header>
-    <!-- //header -->
+    <!-- // 내비게이션 바 -->
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
 
-    <!--Start of slider section-->
-    <section id="slider">
-        <div id="carousel-example-generic" class="" data-ride="carousel"
-             data-interval="3000">
-            <!-- Indicators -->
-            <ol class="">
-                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-                <!--                <li data-target="#carousel-example-generic" data-slide-to="1"></li>-->
-            </ol>
-            <!-- Wrapper for slides -->
-            <div class="" role="listbox">
-                <div class="item active">
-                    <div class="">
-                        <br><br><br><br><br>
-                        <img src="/img/main.jpg" alt="..." class="slider-image">
-                        <div class="carousel-caption">
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <div class="large">게시판</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">게시판</span>
+                            <ul>
+                                <li>
+                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </nav>
+    </div>
 </div>
-<!--Scroll to top-->
-<a href="#" id="back-to-top" title="Back to top">&uarr;</a>
+
+
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
 </body>
 </html>
