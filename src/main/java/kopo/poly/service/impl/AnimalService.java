@@ -67,6 +67,9 @@ public class AnimalService implements IAnimalService {
 
     @Override
     public List<AnimalDTO> fetchShelterData() throws Exception {
+
+        List<AnimalDTO> rDTO = null;
+
         StringBuilder urlBuilder = new StringBuilder("http://apis.data.go.kr/1543061/abandonmentPublicSrvc/shelter");
         urlBuilder.append("?" + URLEncoder.encode("serviceKey", "UTF-8") + "=" + serviceKey);
         urlBuilder.append("&" + URLEncoder.encode("upr_cd", "UTF-8") + "=" + URLEncoder.encode(, "UTF-8"));
@@ -92,6 +95,7 @@ public class AnimalService implements IAnimalService {
         }
         rd.close();
         conn.disconnect();
+
 
         return rDTO;
     }
