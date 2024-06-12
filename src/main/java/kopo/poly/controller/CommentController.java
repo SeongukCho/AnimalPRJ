@@ -45,7 +45,7 @@ public class CommentController {
             // 로그인을 아직 구현하지 않았기에 공지사항 리스트에서 로그인 한 것처럼 Session 값을 저장함
             String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
             String content = CmmUtil.nvl(request.getParameter("content")); // 제목
-            String noticeSeq = CmmUtil.nvl(request.getParameter("noticeSeq")); // 내용
+            String boardSeq = CmmUtil.nvl(request.getParameter("boardSeq")); // 내용
 
             /*
              * ####################################################################################
@@ -54,14 +54,14 @@ public class CommentController {
              */
             log.info("ss_user_id : " + userId);
             log.info("content : " + content);
-            log.info("noticeSeq : " + noticeSeq);
+            log.info("boardSeq : " + boardSeq);
 
             // 데이터 저장하기 위해 DTO에 저장하기
             CommentDTO pDTO = CommentDTO
                     .builder()
                     .userId(userId)
                     .commentContents(content)
-                    .noticeSeq(Long.valueOf(noticeSeq))
+                    .boardSeq(Long.valueOf(boardSeq))
                     .build();
 
             /*
@@ -104,7 +104,7 @@ public class CommentController {
 
         try {
 
-            String noticeSeq = CmmUtil.nvl(request.getParameter("noticeSeq")); // 댓글번호(PK)
+            String boardSeq = CmmUtil.nvl(request.getParameter("boardSeq")); // 댓글번호(PK)
             String commentSeq = CmmUtil.nvl(request.getParameter("commentSeq")); // 댓글번호(PK)
 
             /*
@@ -112,14 +112,14 @@ public class CommentController {
              * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
              * ####################################################################################
              */
-            log.info("noticeSeq : " + noticeSeq);
+            log.info("boardSeq : " + boardSeq);
             log.info("commentSeq : " + commentSeq);
 
             /*
              * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
              */
             CommentDTO pDTO = CommentDTO.builder()
-                    .noticeSeq(Long.parseLong(noticeSeq))
+                    .boardSeq(Long.parseLong(boardSeq))
                     .commentSeq(Long.parseLong(commentSeq))
                     .build();
 
@@ -156,13 +156,13 @@ public class CommentController {
 
         String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
         String commentSeq = CmmUtil.nvl(request.getParameter("commentSeq"));
-        String noticeSeq = CmmUtil.nvl(request.getParameter("noticeSeq"));
+        String boardSeq = CmmUtil.nvl(request.getParameter("boardSeq"));
         String commentContents = CmmUtil.nvl(request.getParameter("commentContents"));
         String chgDt = DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss");
 
         log.info("userId : " + userId);
         log.info("commentSeq : " + commentSeq);
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
         log.info("commentContents : " + commentContents);
         log.info("chgDt : " + chgDt);
 
@@ -171,7 +171,7 @@ public class CommentController {
                 .builder()
                 .userId(userId)
                 .commentSeq(Long.parseLong(commentSeq))
-                .noticeSeq(Long.parseLong(noticeSeq))
+                .boardSeq(Long.parseLong(boardSeq))
                 .commentContents(commentContents)
                 .commentChgId(userId)
                 .commentChgDt(chgDt)

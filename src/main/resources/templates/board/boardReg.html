@@ -1,19 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
+    <title>글쓰기</title>
     <meta charset="UTF-8">
-    <title>보호소 찾기</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
     <script type="text/javascript" src="/js/common.js"></script>
-    <style>
-    </style>
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
@@ -25,15 +21,74 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
-    <link rel="stylesheet" href="/css/paging.css">
 
     <script type="text/javascript">
 
-        //상세보기 이동
-        function doDetail(seq) {
-            location.href = "/notice/noticeInfo?nSeq=" + seq;
+        // HTML로딩이 완료되고, 실행됨
+        $(document).ready(function () {
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+            $("#btnSend").on("click", function () {
+                doSubmit(); // 게시판 등록하기 실행
+            })
+        })
+
+        //글자 길이 바이트 단위로 체크하기(바이트값 전달)
+        function calBytes(str) {
+            let tcount = 0;
+            let tmpStr = String(str);
+            let strCnt = tmpStr.length;
+            let onechar;
+            for (let i = 0; i < strCnt; i++) {
+                onechar = tmpStr.charAt(i);
+                if (escape(onechar).length > 4) {
+                    tcount += 2;
+                } else {
+                    tcount += 1;
+                }
+            }
+            return tcount;
         }
 
+        // 게시판 저장하기
+        function doSubmit() {
+
+            let f = document.getElementById("f"); // form 태그
+
+            if (f.title.value === "") {
+                alert("제목을 입력하시기 바랍니다.");
+                f.title.focus();
+                return;
+            }
+            if (calBytes(f.title.value) > 200) {
+                alert("최대 200Bytes까지 입력 가능합니다.");
+                f.title.focus();
+                return;
+            }
+            if (f.contents.value === "") {
+                alert("내용을 입력하시기 바랍니다.");
+                f.contents.focus();
+                return;
+            }
+            if (calBytes(f.contents.value) > 4000) {
+                alert("최대 4000Bytes까지 입력 가능합니다.");
+                f.contents.focus();
+                return;
+            }
+
+            // Ajax 호출해서 글 등록하기
+            $.ajax({
+                    url: "/board/boardInsert",
+                    type: "post", // 전송방식은 Post
+                    // contentType: "application/json",
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success: function (json) { // /board/boardInsert 호출이 성공했다면..
+                        alert(json.msg); // 메시지 띄우기
+                        location.href = "/board/boardList"; // 게시판 리스트 이동
+                    }
+                }
+            )
+        }
     </script>
 </head>
 <body>
@@ -46,17 +101,16 @@
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-
-                    <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                     <li>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
@@ -69,6 +123,7 @@
 
                         </ul>
                     </li>
+
                 </ul>
             </nav>
             <!-- //gnb -->
@@ -95,18 +150,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -118,8 +173,6 @@
                             </li>
                             <li><a href="/online/calendar">채팅</a>
                             </li>
-                        </ul>
-                    </li>
                 </ul>
                 </li>
                 <!--<li>
@@ -147,7 +200,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                                <a href="/board/boardList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -161,7 +214,7 @@
                             <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -169,23 +222,38 @@
                 </div>
             </div>
         </nav>
-
+        <div id="content">
+            <h1 class="title">게시글 작성하기</h1>
+            <form name="f" id="f">
+                <div class="divTable minimalistBlack">
+                    <div class="divTableBody">
+                        <div class="divTableRow">
+                            <div class="divTableCell">제목
+                            </div>
+                            <div class="divTableCell">
+                                <input type="text" name="title" maxlength="100" style="width: 95%"/>
+                            </div>
+                        </div>
+                        <div class="divTableRow">
+                            <div class="divTableCell">내용
+                            </div>
+                            <div class="divTableCell">
+                                <label>
+                                    <textarea name="contents" cols="120" rows="25"></textarea>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <button id="btnSend" type="button">등록</button>
+                    <button type="button"><a href="/board/boardList" style="color: white">취소</a></button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-<div class="container" style="text-align: -webkit-center;">
-    <div id="map" style="width:500px;height:400px;"></div>
-</div>
-<script type="text/javascript"
-        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=213a1a4befc94c34139ceb8cc96c3f40"></script>
-<script>
-    var container = document.getElementById('map');
-    var options = {
-        center: new kakao.maps.LatLng(33.450701, 126.570667),
-        level: 3
-    };
-
-    var map = new kakao.maps.Map(container, options);
-</script>
 <section id="footer">
     <div class="container">
         <div class="row text-center">

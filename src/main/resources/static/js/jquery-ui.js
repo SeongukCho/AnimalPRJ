@@ -12202,9 +12202,9 @@ $.fn.position = function( options ) {
 			}
 		});
 
-		if ( options.using ) {
+		/*if ( options.using ) {
 			// adds feedback as second argument to using callback, if present
-			using = function( props ) {
+			using=function(props ) {
 				var left = targetOffset.left - position.left,
 					right = left + targetWidth - elemWidth,
 					top = targetOffset.top - position.top,
@@ -12240,7 +12240,7 @@ $.fn.position = function( options ) {
 				}
 				options.using.call( this, props, feedback );
 			};
-		}
+		}*/
 
 		elem.offset( $.extend( position, { using: using } ) );
 	});

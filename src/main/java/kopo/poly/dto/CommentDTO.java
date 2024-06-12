@@ -6,7 +6,7 @@ import lombok.Builder;
 public record CommentDTO(
 
         Long commentSeq,
-        Long noticeSeq,
+        Long boardSeq,
         String userId,
         String commentContents,
         String commentRegId,

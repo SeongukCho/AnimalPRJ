@@ -30,22 +30,22 @@ public interface CommentRepository extends JpaRepository<CommentEntity, CommentP
     /**
      * 댓글 리스트
      *
-     * @param noticeSeq 댓글 FK
+     * @param boardSeq 댓글 FK
      *
-     * @return noticeSeq 일치하는 댓글 데이터 리스트
+     * @return boardSeq 일치하는 댓글 데이터 리스트
      *
      */
-    List<CommentEntity> findByNoticeSeqOrderByCommentSeqAsc(Long noticeSeq);
+    List<CommentEntity> findByBoardSeqOrderByCommentSeqAsc(Long boardSeq);
 
     /**
      * 게시글 댓글 유무 확인
      *
-     * @param noticeSeq 댓글 PK
+     * @param boardSeq 댓글 PK
      */
     @Transactional(readOnly = true)
-    @Query(value = "SELECT COALESCE(MAX(COMMENT_SEQ), 0)+1 FROM BOARD_COMMENTS WHERE NOTICE_SEQ = ?1",
+    @Query(value = "SELECT COALESCE(MAX(COMMENT_SEQ), 0)+1 FROM BOARD_COMMENTS WHERE BOARD_SEQ = ?1",
             nativeQuery = true)
-    Long getMaxCommentsSeq(Long noticeSeq);
+    Long getMaxCommentsSeq(Long boardSeq);
 
 /*
 

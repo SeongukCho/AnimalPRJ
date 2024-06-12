@@ -222,16 +222,16 @@
                 <ul class="gnb">
 
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
 
 
                         </ul>
@@ -272,18 +272,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -330,7 +330,6 @@
                             <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
                         <div class="large">회원</div>
-
                         <div class="small">
                             <span data-mobile-tit="">로그인</span>
                             <ul>
@@ -352,110 +351,69 @@
     </div>
 </div>
 <div class="container">
-    <!--    <h1 class="register-title">회원가입</h1>-->
-    <!--    <form id="f">-->
-    <!--        <div class="form-group">-->
-    <!--            <label for="userId">아이디</label>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <input type="text" id="userId" name="userId" class="form-control" placeholder="아이디">-->
-    <!--                <button id="btnUserId" type="button" class="btn-custom btn-secondary-custom">아이디 중복체크</button>-->
-    <!--            </div>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <label for="userName">닉네임</label>-->
-    <!--                <input type="text" id="userName" name="userName" class="form-control" placeholder="이름">-->
-    <!--            </div>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <label for="password">비밀번호</label>-->
-    <!--                <input type="password" id="password" name="password" class="form-control" placeholder="비밀번호">-->
-    <!--            </div>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <label for="password2">비밀번호 확인</label>-->
-    <!--                <input type="password" id="password2" name="password2" class="form-control" placeholder="비밀번호 확인">-->
-    <!--            </div>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <label for="email">이메일</label>-->
-    <!--                <input type="email" id="email" name="email" class="form-control" placeholder="이메일">-->
-    <!--            </div>-->
-    <!--            <div class="form-floating mb-3">-->
-    <!--                <button id="btnSend" type="button" class="btn-custom btn-primary-custom">회원가입</button>-->
-    <!--            </div>-->
-    <!--        </div>-->
-    <!--    </form>-->
     <h1 class="title">회원가입</h1>
     <div class="sContent">
         <div id="cms_member_article">
             <form id="f" action="/user/insertUserInfo" name="memberInputForm" method="post"
                   onsubmit="doSubmit(this)">
-                <table class="writeTypeA mt10">
-                    <caption>회원가입 글쓰기 서식</caption>
-                    <colgroup>
-                        <col style="width:18%">
-                        <col>
-                    </colgroup>
-                    <tbody>
-                    <tr>
-                        <th scope="row"><label for="mbrId" id="fn_name_mbrId"
-                                               class="required"><span>아이디</span></label></th>
-                        <td>
-                            <input type="text" name="userId" id="mbrId" class="inpA" style="ime-mode:disabled;"
-                                   required="required" value="">
-                            <span class="btnBc small green"><button id="btnUserId"
-                                                                    type="button">아이디 중복확인</button></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="mbrName"><span>이름</span></label></th>
-                        <td>
-                            <input type="text" name="userName" id="mbrName" class="inpA" style="" maxlength="15"
-                                   required="required" value="">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="mbrPwd" class="required"><span>비밀번호</span></label></th>
-                        <td>
-                            <input type="password" name="password" id="mbrPwd" autocomplete="off" class="inpA"
-                                   style="" maxlength="15" required="required">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="mbrPwd_reconfirm"
-                                               class="required"><span>비밀번호 확인</span></label>
-                        </th>
-                        <td>
+                <div class="registration-form margin-top-10">
+                    <div class="form-group">
+                        <label for="mbrId" id="fn_name_mbrId" class="label-text label-required">아이디</label>
+                        <div class="input-wrapper">
+                            <input type="text" name="userId" id="mbrId" class="input-field"
+                                   style="ime-mode:disabled; width: 50%" required>
+                            <button id="btnUserId" type="button" class="action-button button-small">아이디 중복확인</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mbrName" class="label-text">이름</label>
+                        <div class="input-wrapper">
+                            <input type="text" name="userName" id="mbrName" class="input-field" maxlength="15"
+                                   style="ime-mode:disabled; width:50%" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mbrNick" class="label-text">닉네임</label>
+                        <div class="input-wrapper">
+                            <input type="text" name="nickName" id="mbrNick" class="input-field" maxlength="20"
+                                   style="ime-mode:disabled; width:50%" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mbrPwd" class="label-text label-required">비밀번호</label>
+                        <div class="input-wrapper">
+                            <input type="password" name="password" id="mbrPwd" autocomplete="off" class="input-field"
+                                   maxlength="15" style="ime-mode:disabled; width:50%" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mbrPwd_reconfirm" class="label-text label-required">비밀번호 확인</label>
+                        <div class="input-wrapper">
                             <input type="password" name="password2" id="mbrPwd_reconfirm" autocomplete="off"
-                                   class="inpA" style="" maxlength="15" required="required">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><label for="mbrEmail" class="required"><span>이메일</span></label></th>
-                        <td>
-                            <div class="input-email" style="float:left;">
-                                <input type="text" id="mbrEmail" name="email" title="이메일" class="inputTxt"
-                                       style="ime-mode:disabled;width:50%" required="required" value="">
-                                <span class="btnBc small green"><button id="btnEmail" type="button"
-                                                                        class="m_dup_btn">인증번호 발송</button></span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="ahCode" class="required"><span>인증번호</span></label></th>
-                        <td>
-                            <div class="input-email" style="float:left;">
-                                <input type="text" id="ahCode" name="authNumber" title="인증번호" class="inputTxt"
-                                       style="ime-mode:disabled;width:50%" required="required" value=""
-                                       maxlength="6">
-                                <span class="btnBc small green"><button id="btnAuth" type="button"
-                                                                        class="m_dup_btn">인증번호 확인</button></span>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-
+                                   class="input-field" maxlength="15" style="ime-mode:disabled; width:50%" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="mbrEmail" class="label-text label-required">이메일</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="mbrEmail" name="email" title="이메일" class="input-text"
+                                   style="ime-mode:disabled; width:50%" required>
+                            <button id="btnEmail" type="button" class="action-button button-small">인증번호 발송</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="ahCode" class="label-text label-required">인증번호</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="ahCode" name="authNumber" title="인증번호" class="input-text"
+                                   style="ime-mode:disabled; width:50%" required maxlength="6">
+                            <button id="btnAuth" type="button" class="action-button button-small">인증번호 확인</button>
+                        </div>
+                    </div>
+                </div>
                 <!-- btnset -->
                 <div class="btnWrap">
                     <button id="btnSend" type="button" class="btnAA" style="background-color: #ffcb00">회원가입</button>
-                    <button type="reset" title="취소" class="btnAA" style="background-color: #000000">취소</button>
+                    <button type="reset" title="취소" class="btnAA" style="background-color: #6c757d">취소</button>
                 </div>
                 <!-- //btnset -->
             </form>

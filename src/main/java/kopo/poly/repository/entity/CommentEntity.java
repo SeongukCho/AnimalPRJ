@@ -18,8 +18,8 @@ import org.hibernate.annotations.DynamicUpdate;
 public class CommentEntity {
 
     @Id
-    @Column(name = "notice_seq")
-    private Long noticeSeq;
+    @Column(name = "board_seq")
+    private Long boardSeq;
 
 
     @Id

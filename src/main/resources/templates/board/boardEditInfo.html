@@ -64,16 +64,16 @@
                 f.title.focus();
                 return;
             }
-            // let noticeCheck = false; //체크 여부 확인 변수
-            // for (let i = 0; i < f.noticeYn.length; i++) {
-            //     if (f.noticeYn[i].checked) {
-            //         noticeCheck = true;
+            // let boardCheck = false; //체크 여부 확인 변수
+            // for (let i = 0; i < f.boardYn.length; i++) {
+            //     if (f.boardYn[i].checked) {
+            //         boardCheck = true;
             //         break;
             //     }
             // }
-            // if (noticeCheck === false) {
+            // if (boardCheck === false) {
             //     alert("공지글 여부를 선택하시기 바랍니다.");
-            //     f.noticeYn[0].focus();
+            //     f.boardYn[0].focus();
             //     return;
             // }
             if (f.contents.value === "") {
@@ -89,13 +89,13 @@
 
             // Ajax 호출해서 글 등록하기
             $.ajax({
-                    url: "/notice/noticeUpdate",
+                    url: "/board/boardUpdate",
                     type: "post", // 전송방식은 Post
                     dataType: "JSON", // 전송 결과는 JSON으로 받기
                     data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
-                    success: function (json) { // /notice/noticeUpdate 호출이 성공했다면..
+                    success: function (json) { // /board/boardUpdate 호출이 성공했다면..
                         alert(json.msg); // 메시지 띄우기
-                        location.href = "/notice/noticeList"; // 게시판 리스트 이동
+                        location.href = "/board/boardList"; // 게시판 리스트 이동
                     }
                 }
             )
@@ -107,7 +107,7 @@
 <hr/>
 <br/>
 <form name="f" id="f">
-    <input type="hidden" name="nSeq" th:value="${rDTO.noticeSeq}"/>
+    <input type="hidden" name="nSeq" th:value="${rDTO.boardSeq}"/>
     <div class="divTable minimalistBlack">
         <div class="divTableBody">
             <div class="divTableRow">
@@ -120,8 +120,8 @@
 <!--            <div class="divTableRow">-->
 <!--                <div class="divTableCell">공지글 여부</div>-->
 <!--                <div class="divTableCell">-->
-<!--                    예<input type="radio" name="noticeYn" value="Y" th:checked="${rDTO.noticeYn eq 'Y'}"/>-->
-<!--                    아니오<input type="radio" name="noticeYn" value="N" th:checked="${rDTO.noticeYn eq 'N'}"/>-->
+<!--                    예<input type="radio" name="boardYn" value="Y" th:checked="${rDTO.boardYn eq 'Y'}"/>-->
+<!--                    아니오<input type="radio" name="boardYn" value="N" th:checked="${rDTO.boardYn eq 'N'}"/>-->
 <!--                </div>-->
 <!--            </div>-->
             <div class="divTableRow">

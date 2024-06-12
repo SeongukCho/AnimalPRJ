@@ -29,11 +29,11 @@ public class CommentService implements ICommentService {
 
         log.info(this.getClass().getName() + ".getCommentList Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
 
-        List<CommentEntity> rList = commentRepository.findByNoticeSeqOrderByCommentSeqAsc(noticeSeq);
+        List<CommentEntity> rList = commentRepository.findByBoardSeqOrderByCommentSeqAsc(boardSeq);
 
         List<CommentDTO> nList = new ObjectMapper().convertValue(rList,
                 new TypeReference<>() {
@@ -49,11 +49,11 @@ public class CommentService implements ICommentService {
 
         log.info(this.getClass().getName() + ".updateComment Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
         Long commentSeq = pDTO.commentSeq();
 
         CommentPK commentPK = CommentPK.builder()
-                .noticeSeq(noticeSeq)
+                .boardSeq(boardSeq)
                 .commentSeq(commentSeq)
                 .build();
 
@@ -70,7 +70,7 @@ public class CommentService implements ICommentService {
             String regId = rEntity.get().getCommentRegId();
             String regDt = rEntity.get().getCommentRegDt();
 
-            log.info("noticeSeq : " + noticeSeq);
+            log.info("boardSeq : " + boardSeq);
             log.info("commentSeq : " + commentSeq);
             log.info("userId : " + userId);
             log.info("commentContents : " + commentContents);
@@ -80,7 +80,7 @@ public class CommentService implements ICommentService {
             // 게시판 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
             // JPA에 자동 증가 설정을 해놨음
             CommentEntity pEntity = CommentEntity.builder()
-                    .noticeSeq(noticeSeq)
+                    .boardSeq(boardSeq)
                     .commentSeq(commentSeq)
                     .userId(userId)
                     .commentContents(commentContents)
@@ -112,14 +112,14 @@ public class CommentService implements ICommentService {
 
         log.info(this.getClass().getName() + ".deleteComment Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
         Long commentSeq = pDTO.commentSeq();
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
         log.info("commentSeq : " + commentSeq);
 
         CommentPK commentPK = CommentPK.builder()
-                .noticeSeq(noticeSeq)
+                .boardSeq(boardSeq)
                 .commentSeq(commentSeq)
                 .build();
 
@@ -137,18 +137,18 @@ public class CommentService implements ICommentService {
 
         String userId = CmmUtil.nvl(pDTO.userId());
         String contents = CmmUtil.nvl(pDTO.commentContents());
-        Long noticeSeq = pDTO.noticeSeq();
-        Long commentSeq = commentRepository.getMaxCommentsSeq(noticeSeq);
+        Long boardSeq = pDTO.boardSeq();
+        Long commentSeq = commentRepository.getMaxCommentsSeq(boardSeq);
 
         log.info("userId : " + userId);
         log.info("contents : " + contents);
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
         log.info("commentSeq : " + commentSeq);
 
         // 게시판 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
         CommentEntity pEntity = CommentEntity.builder()
-                .noticeSeq(noticeSeq)
+                .boardSeq(boardSeq)
                 .commentSeq(commentSeq)
                 .userId(userId)
                 .commentContents(contents)

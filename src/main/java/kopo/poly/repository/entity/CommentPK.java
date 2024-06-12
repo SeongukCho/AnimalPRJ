@@ -13,12 +13,12 @@ import java.io.Serializable;
 public class CommentPK implements Serializable {
 
     private long commentSeq;
-    private long noticeSeq;
+    private long boardSeq;
 
-    public CommentPK(long commentSeq, long noticeSeq) {
+    public CommentPK(long commentSeq, long boardSeq) {
 
         this.commentSeq = commentSeq;
-        this.noticeSeq = noticeSeq;
+        this.boardSeq = boardSeq;
     }
 
 }

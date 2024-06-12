@@ -27,6 +27,10 @@ public class UserInfoEntity implements Serializable {
     private String userName;
 
     @NonNull
+    @Column(name = "nickname", length = 20, nullable = false)
+    private String nickName;
+
+    @NonNull
     @Column(name = "password", length = 100, nullable = false)
     private String password;
 

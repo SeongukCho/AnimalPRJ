@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>로그인</title>
+    <title>아이디 찾기</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -69,16 +69,16 @@
                 <ul class="gnb">
 
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
 
 
                         </ul>
@@ -114,18 +114,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -163,9 +163,6 @@
                                 <a href="/user/login" title="로그인">로그인</a>
                             </li>
                             <li>
-                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                            </li>
-                            <li>
                                 <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
                             </li>
                         </ul>
@@ -186,9 +183,6 @@
                                     <a href="/user/login" title="로그인">로그인</a>
                                 </li>
                                 <li>
-                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                                </li>
-                                <li>
                                     <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
                                 </li>
                             </ul>
@@ -202,17 +196,19 @@
             <div class="sContent">
                 <div id="cms_member_article">
                     <form id="f" method="post" onsubmit="return false;">
-                        <div class="form-group">
-                            <label for="userName" class="required">이름</label>
-                            <input type="text" name="userName" id="userName" class="inputTxt" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label for="email" class="required">이메일</label>
-                            <input type="text" name="email" id="email" class="inputTxt" required="required">
-                        </div>
-                        <div class="btnWrap">
-                            <button class="btn btn-green" id="btnSearchUserId" type="button">아이디 찾기</button>
-                            <button class="btn btn-black" type="button" id="btnLogin" title="취소">취소</button>
+                        <div class="id-search-form-container">
+                            <div class="id-search-form-row">
+                                <label for="userName" class="id-search-form-label id-search-label-required">이름</label>
+                                <input type="text" name="userName" id="userName" class="id-search-input-field" required="required">
+                            </div>
+                            <div class="id-search-form-row">
+                                <label for="email" class="id-search-form-label id-search-label-required">이메일</label>
+                                <input type="text" name="email" id="email" class="id-search-input-field" required="required">
+                            </div>
+                            <div class="id-search-button-group">
+                                <button class="id-search-primary-button id-search-primary-button-green" id="btnSearchUserId" type="button">아이디 찾기</button>
+                                <button class="id-search-primary-button id-search-primary-button-black" type="button" id="btnCancel" title="취소">취소</button>
+                            </div>
                         </div>
                     </form>
                 </div>

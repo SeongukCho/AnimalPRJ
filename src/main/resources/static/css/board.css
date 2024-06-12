@@ -1,14 +1,146 @@
 /* 일반용 버튼 */
+.writeTypeA {
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.writeTypeA h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    width: 18%;
+    margin-right: 2%;
+    font-weight: bold;
+}
+
+.registration-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.label-text {
+    width: 120px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.input-field,
+.input-text {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.action-button {
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.action-button:hover {
+    background-color: #218838;
+}
+
+.button-wrapper {
+    flex-shrink: 0;
+}
+
+.button-small {
+    font-size: 14px;
+    width: 120px;
+}
+
+.margin-top-10 {
+    margin-top: 10px;
+}
+
+
+
+.input-container {
+    display: flex;
+    align-items: center;
+    width: 80%;
+}
+
+.input-container input {
+    flex: 1;
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.input-container button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btnBc {
+}
+
+.small {
+    font-size: 0.8em;
+}
+
+.green {
+    background-color: #00A651;
+}
+
+.mt10 {
+    margin-top: 10px;
+}
+
 .btnBc {
     display: inline-block;
     margin: 1px;
     vertical-align: middle;
 }
+
 .btnAA {
     width: 120px;
     height: 40px;
 
 }
+
 .btnBc a,
 .btnBc button,
 .btnBc input {
@@ -2113,6 +2245,17 @@ tbody td .state.st3 {
     border-bottom: 1px solid #e9ecef;
 }
 
+.tbody {
+    display: flex;
+    padding: 10px 0;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.info-body {
+    display: flex;
+    flex-direction: column;
+}
+
 .info-content {
     display: flex;
     justify-content: space-between; /* 각 요소 사이의 공간을 균등하게 분배 */
@@ -2121,7 +2264,7 @@ tbody td .state.st3 {
     border-bottom: 1px solid #e9ecef;
 }
 
-.item {
+/*.item {
     white-space: nowrap;
     font-size: 16px;
     color: #495057;
@@ -2131,27 +2274,62 @@ tbody td .state.st3 {
 
 .item-seq {
     text-align: left;
-    flex-grow: 1; /* 글번호는 크기를 고정 */
+    flex-grow: 1; !* 글번호는 크기를 고정 *!
 }
 
 .item-title {
     text-align: left;
-    flex-grow: 2; /* 제목은 넓게 설정 */
+    flex-grow: 2; !* 제목은 넓게 설정 *!
 }
 
 .item-user {
     text-align: center;
-    flex-grow: 1; /* 작성자는 중간 정도 */
+    flex-grow: 1; !* 작성자는 중간 정도 *!
 }
 
 .item-date {
     text-align: right;
-    flex-grow: 2; /* 작성일은 넓게 설정 */
+    flex-grow: 2; !* 작성일은 넓게 설정 *!
 }
 
 .item-read {
     text-align: right;
-    flex-grow: 1; /* 조회수는 크기를 고정 */
+    flex-grow: 1; !* 조회수는 크기를 고정 *!
+}*/
+.item {
+    flex: 1;
+    padding: 0 10px;
+}
+
+.item-seq {
+    flex: 0 0 50px; /* Adjust width as necessary */
+    text-align: center;
+}
+
+.item-title {
+    flex: 2;
+    text-align: left;
+    cursor: pointer;
+}
+
+.item-header {
+    flex: 2;
+    text-align: center;
+}
+
+.item-user {
+    flex: 1;
+    text-align: center;
+}
+
+.item-date {
+    flex: 1;
+    text-align: center;
+}
+
+.item-read {
+    flex: 0 0 50px; /* Adjust width as necessary */
+    text-align: center;
 }
 
 .viewTypeB .infor2 {
@@ -2451,6 +2629,396 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
     color: #636363;
     border: 1px solid #e1e1e1;
     border-radius: 0
+}
+
+.id-search-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.id-search-form-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.id-search-form-label {
+    width: 100px;
+    font-weight: bold;
+    color: #333;
+}
+
+.id-search-input-field {
+    width: calc(100% - 110px);
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.id-search-button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.id-search-primary-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.id-search-primary-button-green {
+    background-color: #ffcb00; /* Adjusted color to match image */
+    width: 120px;
+    color: white;
+}
+
+.id-search-primary-button-green:hover {
+    background-color: #0056b3; /* Darker shade for hover effect */
+}
+
+.id-search-primary-button-black {
+    background-color: #6c757d; /* Adjusted color to match image */
+    color: white;
+}
+
+.id-search-primary-button-black:hover {
+    background-color: #343a40; /* Darker shade for hover effect */
+}
+
+.password-reset-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.password-reset-form-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.password-reset-form-label {
+    width: 100px;
+    font-weight: bold;
+    color: #333;
+}
+
+.password-reset-input-wrapper {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.password-reset-input-field {
+    width: calc(100% - 110px);
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.password-reset-action-button {
+    width: 120px;
+    margin-left: 10px;
+    padding: 8px 12px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.password-reset-action-button:hover {
+    background-color: #333;
+}
+
+.password-reset-button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.password-reset-primary-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.password-reset-primary-button-yellow {
+    background-color: #ffc107;
+    color: white;
+}
+
+.password-reset-primary-button-yellow:hover {
+    background-color: #e0a800;
+}
+
+.password-reset-primary-button-black {
+    background-color: #6c757d;
+    color: white;
+}
+
+.password-reset-primary-button-black:hover {
+    background-color: #343a40;
+}
+
+.password-reset-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.password-reset-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.password-reset-form-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.password-reset-form-label {
+    width: 127px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
+
+.password-reset-input-field {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.password-reset-button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.password-reset-primary-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.password-reset-primary-button-blue {
+    background-color: #007bff;
+    color: white;
+}
+
+.password-reset-primary-button-blue:hover {
+    background-color: #0056b3;
+}
+
+.password-reset-primary-button-gray {
+    background-color: #6c757d;
+    color: white;
+}
+
+.password-reset-primary-button-gray:hover {
+    background-color: #343a40;
+}
+
+.password-new-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    background-color: #fff;
+    text-align: center;
+}
+
+.password-new-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.password-new-row {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-new-label {
+    width: 150px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
+
+.password-new-input {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.password-new-button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.password-new-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.password-new-button-blue {
+    background-color: #ffc107;
+    color: white;
+    width: 150px;
+}
+
+.password-new-button-blue:hover {
+    background-color: #0056b3;
+}
+
+.password-new-button-gray {
+    background-color: #6c757d;
+    color: white;
+    width: 100px;
+}
+
+.password-new-button-gray:hover {
+    background-color: #343a40;
+}
+
+.custom-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    margin-bottom: 20px; /* Adds some space between the text and the button */
+}
+
+.custom-table-body {
+    background-color: #f2f2f2;
+}
+
+.custom-table-row {
+    border-bottom: 1px solid #ddd;
+}
+
+.custom-table-cell {
+    padding: 8px;
+    text-align: center; /* Center-aligns the text */
+}
+
+.custom-button-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.custom-button {
+    background-color: #ffc107;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 80px;
+}
+
+.custom-button:hover {
+    background-color: #0056b3;
+}
+
+.cardContainer {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.animal-card {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.animal-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+.animal-card .card-body {
+    flex-grow: 1;
+    text-align: left;
+}
+.animal-card .card-footer {
+    text-align: left;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+.badge-status {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.badge-year {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.badge-color {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-right: 5px;
+}
+.weight-badge {
+    background-color: #ffc107;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 textarea {

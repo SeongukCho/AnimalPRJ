@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>글 목록</title>
+    <title>유기동물 조회</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
@@ -29,7 +29,7 @@
 
         //상세보기 이동
         function doDetail(seq) {
-            location.href = "/notice/noticeInfo?nSeq=" + seq;
+            location.href = "/animal/animalListInfo?nSeq=" + seq;
         }
 
     </script>
@@ -44,21 +44,19 @@
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-
-                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                    <li>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
-                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     <li>
                         <a href="#"><span>고객센터</span></a>
                         <ul>
@@ -93,18 +91,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -119,15 +117,6 @@
                         </ul>
                     </li>
                 </ul>
-                </li>
-                <!--<li>
-                    <a href="#"><span>고객센터</span></a>
-                    <ul>
-                        <li><a href="#">고객센터</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </li>-->
-                </ul>
             </nav>
             <div class="fix_bg"></div>
         </div>
@@ -135,7 +124,6 @@
     <!-- // 내비게이션 바 -->
     <div id="subContainer">
         <div class="subSkin bg"></div>
-
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
@@ -145,7 +133,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                                <a href="/board/boardList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -159,7 +147,7 @@
                             <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -167,65 +155,37 @@
                 </div>
             </div>
         </nav>
-
-        <div id="content">
-            <h1 class="title">게시판</h1>
-            <div id="cms_board_article">
-                <table class="listTypeA">
-                    <caption>게시판</caption>
-                    <colgroup>
-                        <col width="30px" class="mbNone">
-                        <col width="120px">
-                        <col width="60px">
-                        <col width="60px" class="mbNone">
-                        <col width="30px" class="mbNone">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th scope="col" class="mbNone" style="background-color: #c4e3f3">번호</th>
-                        <th scope="col" style="background-color: #c4e3f3">제목</th>
-                        <th scope="col" style="background-color: #c4e3f3">작성자</th>
-                        <th scope="col" class="mbNone" style="background-color: #c4e3f3">작성일</th>
-                        <th scope="col" class="end mbNone" style="background-color: #c4e3f3">조회수</th>
-                        <!-- 마지막 th에 class="end" -->
-                    </tr>
-                    </thead>
-                    <tbody class="alignC">
-                    <tr th:each="dto : ${rList}">
-                        <td class="mbNone" th:text="${dto.noticeSeq}"></td>
-                        <td class="subject" th:attr="onclick='doDetail(\'' + ${dto.noticeSeq} + '\')'"
-                            th:text="${dto.title}"></td>
-                        <td th:text="${dto.userId}"></td>
-                        <td class="mbNone" th:text="${dto.regDt}"></td>
-                        <td class="mbNone" th:text="${dto.readCnt}"></td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="topGlob">
-                    <span class="btnBc" style="float: right"><a href="/notice/noticeReg" title="글쓰기"
-                                                                class="fn_btn_list">글쓰기</a></span>
-                </div>
-                <!-- 페이징 네비게이션 -->
-                <div class="pagination">
-                    <ul>
-                        <li th:if="${currentPage > 0}">
-                            <a th:href="@{noticeList(page=${currentPage - 1}, size=${size})}">Previous</a>
-                        </li>
-                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a th:href="@{noticeList(page=${i}, size=${size})}"
-                               th:classappend="${i} == ${currentPage} ? 'active' : ''"
-                               th:text="${i + 1}"></a>
-                        </li>
-                        <li th:if="${currentPage < totalPages - 1}">
-                            <a th:href="@{noticeList(page=${currentPage + 1}, size=${size})}">Next</a>
-                        </li>
-                    </ul>
+        <div class="row" style="margin: 50px">
+            <div th:each="animal : ${rList}" class="col-lg-3 col-md-4 col-sm-6 col-12 d-flex">
+                <div class="card animal-card">
+                    <img th:src="@{${animal.popfile}}" class="card-img-top" alt="Animal Image">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${animal.kindCd}">Animal Kind</h5>
+                        <p class="card-text">
+                            <span th:text="${animal.happenPlace}">Location</span><br>
+                            <span th:text="${animal.age}">Age</span>, <span th:text="${animal.weight}">Weight</span><br>
+                            <span th:text="${animal.colorCd}">Color</span><br>
+                            <span th:text="${animal.sexCd}">Sex</span><br>
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <span th:text="${animal.noticeNo}">Notice No</span><br>
+                        <span th:text="${animal.noticeSdt}">Notice Start Date</span> ~ <span th:text="${animal.noticeEdt}">Notice End Date</span><br>
+                        <span th:text="${animal.careNm}">Care Name</span><br>
+                        <span th:text="${animal.careTel}">Care Tel</span><br>
+                        <span th:text="${animal.careAddr}">Care Address</span><br>
+                        <div>
+                            <span class="badge-status" th:text="${animal.state}">Status</span>
+                            <span class="badge-year" th:text="${animal.age}">Year</span>
+                            <span class="badge-color" th:text="${animal.colorCd}">Color</span>
+                            <span class="weight-badge" th:text="${animal.weight}">Weight</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 <section id="footer">
     <div class="container">
         <div class="row text-center">
@@ -243,5 +203,8 @@
     </div>
     <!--End of container-->
 </section>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

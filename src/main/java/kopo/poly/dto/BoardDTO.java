@@ -3,9 +3,9 @@ package kopo.poly.dto;
 import lombok.Builder;
 
 @Builder
-public record NoticeDTO(
-        
-        Long noticeSeq, // 기본키, 순번
+public record BoardDTO(
+
+        Long boardSeq, // 기본키, 순번
         String title, // 제목
         String contents, // 글 내용
         String userId, // 작성자
@@ -16,5 +16,4 @@ public record NoticeDTO(
         String chgDt, // 수정일
         String userName // 등록자명
 ) {
-
 }

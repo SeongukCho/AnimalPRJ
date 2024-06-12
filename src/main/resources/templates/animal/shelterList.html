@@ -2,15 +2,13 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>보호소 찾기</title>
+    <title>유기동물 조회</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
     <script type="text/javascript" src="/js/common.js"></script>
-    <style>
-    </style>
 
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table.css">
@@ -31,7 +29,7 @@
 
         //상세보기 이동
         function doDetail(seq) {
-            location.href = "/notice/noticeInfo?nSeq=" + seq;
+            location.href = "/board/boardInfo?nSeq=" + seq;
         }
 
     </script>
@@ -46,16 +44,17 @@
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
+
                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
@@ -94,18 +93,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -119,6 +118,15 @@
                             </li>
                         </ul>
                     </li>
+                </ul>
+                </li>
+                <!--<li>
+                    <a href="#"><span>고객센터</span></a>
+                    <ul>
+                        <li><a href="#">고객센터</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </li>-->
                 </ul>
             </nav>
             <div class="fix_bg"></div>
@@ -137,7 +145,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                                <a href="/board/boardList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -151,7 +159,7 @@
                             <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -159,10 +167,23 @@
                 </div>
             </div>
         </nav>
+
     </div>
 </div>
+<div class="container" style="text-align: -webkit-center;">
+    <div id="map" style="width:500px;height:400px;"></div>
+</div>
+<script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=213a1a4befc94c34139ceb8cc96c3f40"></script>
+<script>
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3
+    };
 
-
+    var map = new kakao.maps.Map(container, options);
+</script>
 <section id="footer">
     <div class="container">
         <div class="row text-center">

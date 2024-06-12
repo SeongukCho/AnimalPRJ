@@ -512,7 +512,7 @@ footer .footer_box .footer_con .footer_tel p{color:#fff; font-size: 14px;}
 
 .mConBox{margin:0 auto;padding:30px 0 30px 0; max-width:1240px}
 .mConBox::after{display:block;clear:both;content:''}
-.mConBox .mNotice{position:relative;float:left;width:33.33%; padding-right:20px;}
+.mConBox .mBoard{position:relative;float:left;width:33.33%; padding-right:20px;}
 .mConBox .mNotice > ul{padding-right:50px}
 .mConBox .mNotice > ul::after{display:block;clear:both;content:''}
 .mConBox .mNotice > ul > li {float:left;width:33.33%}

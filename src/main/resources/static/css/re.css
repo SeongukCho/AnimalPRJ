@@ -206,7 +206,7 @@
 
  /* TABLET Device */
 @media all and (max-width:1000px){
-	.loginCon{padding-top:200px; }
+	.loginCon{padding-top:50px; }
 	.idpwSearch{padding-top:200px; }
 	.joinStep ol li{width:23.5%}
 	.responseStep ol li{width:25%}

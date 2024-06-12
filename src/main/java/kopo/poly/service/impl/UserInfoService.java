@@ -101,6 +101,7 @@ public class UserInfoService implements IUserInfoService {
 
         String userId = CmmUtil.nvl(pDTO.userId());
         String userName = CmmUtil.nvl(pDTO.userName());
+        String nickName = CmmUtil.nvl(pDTO.nickName());
         String password = CmmUtil.nvl(pDTO.password());
         String email = CmmUtil.nvl(pDTO.email());
 
@@ -113,7 +114,9 @@ public class UserInfoService implements IUserInfoService {
         } else {
 
             UserInfoEntity pEntity = UserInfoEntity.builder()
-                    .userId(userId).userName(userName)
+                    .userId(userId)
+                    .userName(userName)
+                    .nickName(nickName)
                     .password(password)
                     .email(email)
                     .regDt(DateUtil.getDateTime("yyyy-MM-dd hh:mm:ss"))
@@ -343,6 +346,7 @@ public class UserInfoService implements IUserInfoService {
         if(rEntity.isPresent()){
 
             String userName = rEntity.get().getUserName();
+            String nickName = rEntity.get().getNickName();
             String email = rEntity.get().getEmail();
             String regDt = rEntity.get().getRegDt();
 
@@ -354,6 +358,7 @@ public class UserInfoService implements IUserInfoService {
             UserInfoEntity pEntity = UserInfoEntity.builder()
                     .userId(userId)
                     .userName(userName)
+                    .nickName(nickName)
                     .password(password)
                     .email(email)
                     .regDt(regDt)

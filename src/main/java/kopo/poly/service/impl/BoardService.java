@@ -1,11 +1,10 @@
 package kopo.poly.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kopo.poly.dto.NoticeDTO;
-import kopo.poly.repository.NoticeRepository;
-import kopo.poly.repository.entity.NoticeEntity;
-import kopo.poly.service.INoticeService;
+import kopo.poly.dto.BoardDTO;
+import kopo.poly.repository.BoardRepository;
+import kopo.poly.repository.entity.BoardEntity;
+import kopo.poly.service.IBoardService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.DateUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,97 +15,95 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class NoticeService implements INoticeService {
+public class BoardService implements IBoardService {
 
     // RequiredArgsConstructor 어노테이션으로 생성자를 자동 생성함
-    // noticeRepository 변수에 이미 메모리에 올라간 NoticeRepository 객체를 넣어줌
+    // BoardRepository 변수에 이미 메모리에 올라간 BoardRepository 객체를 넣어줌
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
-    private final NoticeRepository noticeRepository;
+    private final BoardRepository boardRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 //    @Override
-//    public List<NoticeDTO> getNoticeList() {
+//    public List<BoardDTO> getBoardList() {
 //
-//        log.info(this.getClass().getName() + ".getNoticeList Start!");
+//        log.info(this.getClass().getName() + ".getBoardList Start!");
 //
 //        // 게시판 전체 리스트 조회하기
-//        List<NoticeEntity> rList = noticeRepository.findAllByOrderByNoticeSeqDesc();
+//        List<BoardEntity> rList = boardRepository.findAllByOrderByBoardSeqDesc();
 //
 //        // 엔티티의 값들을 DTO에 맞게 넣어주기
-//        List<NoticeDTO> nList = new ObjectMapper().convertValue(rList,
+//        List<BoardDTO> nList = new ObjectMapper().convertValue(rList,
 //                new TypeReference<>() {
 //                });
 //
-//        log.info(this.getClass().getName() + ".getNoticeList End!");
+//        log.info(this.getClass().getName() + ".getBoardList End!");
 //
 //        return nList;
 //    }
 
-    public Page<NoticeDTO> getNoticeList(int page, int size) {
-        log.info(this.getClass().getName() + ".getNoticeList with Pagination Start!");
+    public Page<BoardDTO> getBoardList(int page, int size) {
+        log.info(this.getClass().getName() + ".getBoardList with Pagination Start!");
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<NoticeEntity> entityPage = noticeRepository.findAllByOrderByNoticeSeqDesc(pageable);
-        Page<NoticeDTO> dtoPage = entityPage.map(entity -> objectMapper.convertValue(entity, NoticeDTO.class));
+        Page<BoardEntity> entityPage = boardRepository.findAllByOrderByBoardSeqDesc(pageable);
+        Page<BoardDTO> dtoPage = entityPage.map(entity -> objectMapper.convertValue(entity, BoardDTO.class));
 
-        log.info(this.getClass().getName() + ".getNoticeList with Pagination End!");
+        log.info(this.getClass().getName() + ".getBoardList with Pagination End!");
 
         return dtoPage;
     }
 
     @Transactional
     @Override
-    public NoticeDTO getNoticeInfo(NoticeDTO pDTO, boolean type) {
+    public BoardDTO getBoardInfo(BoardDTO pDTO, boolean type) {
 
-        log.info(this.getClass().getName() + ".getNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".getBoardInfo Start!");
 
         if (type) {
             // 조회수 증가하기
-            int res = noticeRepository.updateReadCnt(pDTO.noticeSeq());
+            int res = boardRepository.updateReadCnt(pDTO.boardSeq());
 
             // 조회수 증가 성공여부 체크
             log.info("res : " + res);
         }
 
         // 게시판 상세내역 가져오기
-        NoticeEntity rEntity = noticeRepository.findByNoticeSeq(pDTO.noticeSeq());
+        BoardEntity rEntity = boardRepository.findByBoardSeq(pDTO.boardSeq());
 
         // 엔티티의 값들을 DTO에 맞게 넣어주기
-        NoticeDTO rDTO = new ObjectMapper().convertValue(rEntity, NoticeDTO.class);
+        BoardDTO rDTO = new ObjectMapper().convertValue(rEntity, BoardDTO.class);
 
-        log.info(this.getClass().getName() + ".getNoticeInfo End!");
+        log.info(this.getClass().getName() + ".getBoardInfo End!");
 
         return rDTO;
     }
 
     @Transactional
     @Override
-    public void updateNoticeInfo(NoticeDTO pDTO) {
+    public void updateBoardInfo(BoardDTO pDTO) {
 
-        log.info(this.getClass().getName() + ".updateNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".updateBoardInfo Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
 
         String title = CmmUtil.nvl(pDTO.title());
         String contents = CmmUtil.nvl(pDTO.contents());
         String userId = CmmUtil.nvl(pDTO.userId());
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
         log.info("title : " + title);
         log.info("contents : " + contents);
         log.info("userId : " + userId);
 
         // 현재 게시판 조회수 가져오기
-        NoticeEntity rEntity = noticeRepository.findByNoticeSeq(noticeSeq);
+        BoardEntity rEntity = boardRepository.findByBoardSeq(boardSeq);
 
         // 수정할 값들을 빌더를 통해 엔티티에 저장하기
-        NoticeEntity pEntity = NoticeEntity.builder()
-                .noticeSeq(noticeSeq)
+        BoardEntity pEntity = BoardEntity.builder()
+                .boardSeq(boardSeq)
                 .title(title)
                 .contents(contents)
                 .userId(userId)
@@ -116,32 +113,32 @@ public class NoticeService implements INoticeService {
                 .build();
 
         // 데이터 수정하기
-        noticeRepository.save(pEntity);
+        boardRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".updateNoticeInfo End!");
+        log.info(this.getClass().getName() + ".updateBoardInfo End!");
 
     }
 
     @Override
-    public void deleteNoticeInfo(NoticeDTO pDTO) throws Exception {
+    public void deleteBoardInfo(BoardDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".deleteBoardInfo Start!");
 
-        Long noticeSeq = pDTO.noticeSeq();
+        Long boardSeq = pDTO.boardSeq();
 
-        log.info("noticeSeq : " + noticeSeq);
+        log.info("boardSeq : " + boardSeq);
 
         // 데이터 수정하기
-        noticeRepository.deleteById(noticeSeq);
+        boardRepository.deleteById(boardSeq);
 
 
-        log.info(this.getClass().getName() + ".deleteNoticeInfo End!");
+        log.info(this.getClass().getName() + ".deleteBoardInfo End!");
     }
 
     @Override
-    public void insertNoticeInfo(NoticeDTO pDTO) throws Exception {
+    public void insertBoardInfo(BoardDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo Start!");
+        log.info(this.getClass().getName() + ".InsertBoardInfo Start!");
 
         String title = CmmUtil.nvl(pDTO.title());
         String contents = CmmUtil.nvl(pDTO.contents());
@@ -153,7 +150,7 @@ public class NoticeService implements INoticeService {
 
         // 게시판 저장을 위해서는 PK 값은 빌더에 추가하지 않는다.
         // JPA에 자동 증가 설정을 해놨음
-        NoticeEntity pEntity = NoticeEntity.builder()
+        BoardEntity pEntity = BoardEntity.builder()
                 .title(title)
                 .contents(contents)
                 .userId(userId)
@@ -163,9 +160,9 @@ public class NoticeService implements INoticeService {
                 .build();
 
         // 게시판 저장하기
-        noticeRepository.save(pEntity);
+        boardRepository.save(pEntity);
 
-        log.info(this.getClass().getName() + ".InsertNoticeInfo End!");
+        log.info(this.getClass().getName() + ".InsertBoardInfo End!");
 
     }
 }

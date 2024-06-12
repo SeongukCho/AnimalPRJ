@@ -1,7 +1,7 @@
 package kopo.poly.service;
 
 import kopo.poly.dto.CommentDTO;
-import kopo.poly.dto.NoticeDTO;
+import kopo.poly.dto.BoardDTO;
 
 import java.util.List;
 

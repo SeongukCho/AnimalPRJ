@@ -8,18 +8,18 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "NOTICE")
+@Table(name = "BOARD")
 @DynamicInsert
 @DynamicUpdate
 @Builder
 @Cacheable
 @Entity
-public class NoticeEntity {
+public class BoardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notice_seq")
-    private Long noticeSeq;
+    @Column(name = "board_seq")
+    private Long boardSeq;
 
     @NonNull
     @Column(name = "title", length = 500, nullable = false)

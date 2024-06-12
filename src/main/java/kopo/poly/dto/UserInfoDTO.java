@@ -8,6 +8,7 @@ import lombok.Builder;
 public record UserInfoDTO(
         String userId, // 회원 아이디
         String userName, // 회원 이름
+        String nickName, // 회원 닉네임
         String password, // 비밀번호
         String email, // 이메일
         String regDt, // 등록 일시

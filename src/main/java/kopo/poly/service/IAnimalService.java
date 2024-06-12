@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IAnimalService {
-    List<AnimalDTO> fetchAnimalData(AnimalDTO pDTO) throws Exception;
-    List<ShelterDTO> fetchShelterData(ShelterDTO pDTO) throws Exception;
+    List<AnimalDTO> getAnimalList(AnimalDTO pDTO) throws Exception;
+    List<ShelterDTO> getShelterList(ShelterDTO pDTO) throws Exception;
 }
 

@@ -189,17 +189,20 @@ public class UserInfoController {
 
         String userId = CmmUtil.nvl(request.getParameter("userId"));
         String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String nickName = CmmUtil.nvl(request.getParameter("nickName"));
         String password = CmmUtil.nvl(request.getParameter("password"));
         String email = CmmUtil.nvl(request.getParameter("email"));
 
         log.info("userId : " + userId);
         log.info("userName : " + userName);
+        log.info("nickName : " + nickName);
         log.info("password : " + password);
         log.info("email : " + email);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
                 .userName(userName)
+                .nickName(nickName)
                 .password(EncryptUtil.encHashSHA256(password))
                 .email(EncryptUtil.encAES128CBC(email))
                 .build();

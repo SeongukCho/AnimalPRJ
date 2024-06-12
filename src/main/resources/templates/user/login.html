@@ -68,7 +68,7 @@
                 type: "post", // 전송방식은 Post
                 dataType: "JSON", // 전송 결과는 JSON으로 받기
                 data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 상태로 변경하기
-                success: function (json) { // /notice/noticeUpdate 호출이 성공했다면
+                success: function (json) { // /board/boardUpdate 호출이 성공했다면
 
                     if (json.result === 1) { // 로그인 성공
                         alert(json.msg); // 메시지 띄우기
@@ -96,15 +96,15 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
                         </ul>
                     </li>
                     <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
@@ -139,17 +139,17 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>

@@ -4,15 +4,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.CommentDTO;
 import kopo.poly.dto.MsgDTO;
-import kopo.poly.dto.NoticeDTO;
+import kopo.poly.dto.BoardDTO;
 import kopo.poly.service.ICommentService;
-import kopo.poly.service.INoticeService;
+import kopo.poly.service.IBoardService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,27 +28,27 @@ import java.util.Optional;
  * 스프링 프레임워크는 기본으로 logback을 채택해서 로그 처리함
  * */
 @Slf4j
-@RequestMapping(value = "/notice")
+@RequestMapping(value = "/board")
 @RequiredArgsConstructor
 @Controller
-public class NoticeController {
+public class BoardController {
 
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
-    private final INoticeService noticeService;
+    private final IBoardService boardService;
     private final ICommentService commentService;
 
     /**
      * 게시판 리스트 보여주기
      * <p>
-     * GetMapping(value = "notice/noticeList") =>  GET방식을 통해 접속되는 URL이 notice/noticeList 경우 아래 함수를 실행함
+     * GetMapping(value = "Board/BoardList") =>  GET방식을 통해 접속되는 URL이 Board/BoardList 경우 아래 함수를 실행함
      */
-    @GetMapping(value = "noticeList")
-    public String noticeList(HttpSession session, ModelMap model,
+    @GetMapping(value = "boardList")
+    public String BoardList(HttpSession session, ModelMap model,
                              @RequestParam(defaultValue = "0") int page,
                              @RequestParam(defaultValue = "10") int size) throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".noticeList Start!");
+        log.info(this.getClass().getName() + ".boardList Start!");
 
         // 로그인된 사용자 아이디는 Session에 저장함
         // 교육용으로 아직 로그인을 구현하지 않았기 때문에 Session에 데이터를 저장하지 않았음
@@ -57,7 +56,7 @@ public class NoticeController {
 //        session.setAttribute("SESSION_USER_ID", "USER01");
 
         // 페이징된 게시판 리스트 조회하기
-        Page<NoticeDTO> rList = noticeService.getNoticeList(page, size);
+        Page<BoardDTO> rList = boardService.getBoardList(page, size);
 
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rList", rList.getContent());
@@ -66,11 +65,11 @@ public class NoticeController {
         model.addAttribute("totalItems", rList.getTotalElements());
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
-        log.info(this.getClass().getName() + ".noticeList End!");
+        log.info(this.getClass().getName() + ".boardList End!");
 
         // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        // templates/notice/noticeList.html
-        return "notice/noticeList";
+        // templates/board/boardList.html
+        return "board/boardList";
     }
 
     /**
@@ -78,18 +77,18 @@ public class NoticeController {
      * <p>
      * 이 함수는 게시판 작성 페이지로 접근하기 위해 만듬
      * <p>
-     * GetMapping(value = "notice/noticeReg") =>  GET방식을 통해 접속되는 URL이 notice/noticeReg 경우 아래 함수를 실행함
+     * GetMapping(value = "board/boardReg") =>  GET방식을 통해 접속되는 URL이 board/boardReg 경우 아래 함수를 실행함
      */
-    @GetMapping(value = "noticeReg")
-    public String noticeReg() {
+    @GetMapping(value = "boardReg")
+    public String BoardReg() {
 
-        log.info(this.getClass().getName() + ".noticeReg Start!");
+        log.info(this.getClass().getName() + ".boardReg Start!");
 
-        log.info(this.getClass().getName() + ".noticeReg End!");
+        log.info(this.getClass().getName() + ".boardReg End!");
 
         // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        // templates/notice/noticeReg.html
-        return "notice/noticeReg";
+        // templates/board/boardReg.html
+        return "board/boardReg";
     }
 
     /**
@@ -99,10 +98,10 @@ public class NoticeController {
      * JSON 구조로 결과 메시지를 전송하기 위해 @ResponseBody 어노테이션 추가함
      */
     @ResponseBody
-    @PostMapping(value = "noticeInsert")
-    public MsgDTO noticeInsert(HttpServletRequest request, HttpSession session) {
+    @PostMapping(value = "boardInsert")
+    public MsgDTO boardInsert(HttpServletRequest request, HttpSession session) {
 
-        log.info(this.getClass().getName() + ".noticeInsert Start!");
+        log.info(this.getClass().getName() + ".boardInsert Start!");
 
         String msg = ""; // 메시지 내용
 
@@ -125,7 +124,7 @@ public class NoticeController {
             log.info("contents : " + contents);
 
             // 데이터 저장하기 위해 DTO에 저장하기
-            NoticeDTO pDTO = NoticeDTO.builder()
+            BoardDTO pDTO = BoardDTO.builder()
                     .userId(userId)
                     .title(title)
                     .contents(contents).build();
@@ -133,7 +132,7 @@ public class NoticeController {
             /*
              * 게시글 등록하기위한 비즈니스 로직을 호출
              */
-            noticeService.insertNoticeInfo(pDTO);
+            boardService.insertBoardInfo(pDTO);
 
             // 저장이 완료되면 사용자에게 보여줄 메시지
             msg = "등록되었습니다.";
@@ -149,7 +148,7 @@ public class NoticeController {
             // 결과 메시지 전달하기
             dto = MsgDTO.builder().msg(msg).build();
 
-            log.info(this.getClass().getName() + ".noticeInsert End!");
+            log.info(this.getClass().getName() + ".boardInsert End!");
         }
 
         return dto;
@@ -158,10 +157,10 @@ public class NoticeController {
     /**
      * 게시판 상세보기
      */
-    @GetMapping(value = "noticeInfo")
-    public String noticeInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    @GetMapping(value = "boardInfo")
+    public String boardInfo(HttpServletRequest request, ModelMap model) throws Exception {
 
-        log.info(this.getClass().getName() + ".noticeInfo Start!");
+        log.info(this.getClass().getName() + ".boardInfo Start!");
 
         String nSeq = CmmUtil.nvl(request.getParameter("nSeq"), "0"); // 공지글번호(PK)
 
@@ -175,18 +174,18 @@ public class NoticeController {
         /*
          * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
          */
-        NoticeDTO pDTO = NoticeDTO.builder()
-                .noticeSeq(Long.parseLong(nSeq))
+        BoardDTO pDTO = BoardDTO.builder()
+                .boardSeq(Long.parseLong(nSeq))
                 .build();
 
         CommentDTO cDTO = CommentDTO.builder()
-                .noticeSeq(Long.parseLong(nSeq))
+                .boardSeq(Long.parseLong(nSeq))
                 .build();
 
         // 게시판 상세정보 가져오기
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
-        NoticeDTO rDTO = Optional.ofNullable(noticeService.getNoticeInfo(pDTO, true))
-                .orElseGet(() -> NoticeDTO.builder().build());
+        BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, true))
+                .orElseGet(() -> BoardDTO.builder().build());
 
         List<CommentDTO> cList = Optional.ofNullable(commentService.getCommentList(cDTO))
                 .orElseGet(() -> new ArrayList<>());
@@ -195,19 +194,18 @@ public class NoticeController {
         model.addAttribute("rDTO", rDTO);
         model.addAttribute("cList", cList);
 
+        log.info(this.getClass().getName() + ".boardInfo End!");
 
-        log.info(this.getClass().getName() + ".noticeInfo End!");
-
-        return "notice/noticeInfo";
+        return "board/boardInfo";
     }
 
     /**
      * 게시판 수정 보기
      */
-    @GetMapping(value = "noticeEditInfo")
-    public String noticeEditInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    @GetMapping(value = "boardEditInfo")
+    public String boardEditInfo(HttpServletRequest request, ModelMap model) throws Exception {
 
-        log.info(this.getClass().getName() + ".noticeEditInfo Start!");
+        log.info(this.getClass().getName() + ".boardEditInfo Start!");
 
         String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 공지글번호(PK)
 
@@ -221,28 +219,28 @@ public class NoticeController {
         /*
          * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
          */
-        NoticeDTO pDTO = NoticeDTO.builder().noticeSeq(Long.parseLong(nSeq)).build();
+        BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
 
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
-        NoticeDTO rDTO = Optional.ofNullable(noticeService.getNoticeInfo(pDTO, false))
-                .orElseGet(() -> NoticeDTO.builder().build());
+        BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, false))
+                .orElseGet(() -> BoardDTO.builder().build());
 
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rDTO", rDTO);
 
-        log.info(this.getClass().getName() + ".noticeEditInfo End!");
+        log.info(this.getClass().getName() + ".boardEditInfo End!");
 
-        return "notice/noticeEditInfo";
+        return "board/boardEditInfo";
     }
 
     /**
      * 게시판 글 수정
      */
     @ResponseBody
-    @PostMapping(value = "noticeUpdate")
-    public MsgDTO noticeUpdate(HttpSession session, HttpServletRequest request) {
+    @PostMapping(value = "boardUpdate")
+    public MsgDTO boardUpdate(HttpSession session, HttpServletRequest request) {
 
-        log.info(this.getClass().getName() + ".noticeUpdate Start!");
+        log.info(this.getClass().getName() + ".boardUpdate Start!");
 
         String msg = ""; // 메시지 내용
         MsgDTO dto = null; // 결과 메시지 구조
@@ -266,15 +264,15 @@ public class NoticeController {
             /*
              * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
              */
-            NoticeDTO pDTO = NoticeDTO.builder()
+            BoardDTO pDTO = BoardDTO.builder()
                     .userId(userId)
-                    .noticeSeq(Long.parseLong(nSeq))
+                    .boardSeq(Long.parseLong(nSeq))
                     .title(title)
                     .contents(contents)
                     .build();
 
             // 게시글 수정하기 DB
-            noticeService.updateNoticeInfo(pDTO);
+            boardService.updateBoardInfo(pDTO);
 
             msg = "수정되었습니다.";
 
@@ -288,7 +286,7 @@ public class NoticeController {
             // 결과 메시지 전달하기
             dto = MsgDTO.builder().msg(msg).build();
 
-            log.info(this.getClass().getName() + ".noticeUpdate End!");
+            log.info(this.getClass().getName() + ".boardUpdate End!");
 
         }
 
@@ -299,10 +297,10 @@ public class NoticeController {
      * 게시판 글 삭제
      */
     @ResponseBody
-    @PostMapping(value = "noticeDelete")
-    public MsgDTO noticeDelete(HttpServletRequest request) {
+    @PostMapping(value = "boardDelete")
+    public MsgDTO boardDelete(HttpServletRequest request) {
 
-        log.info(this.getClass().getName() + ".noticeDelete Start!");
+        log.info(this.getClass().getName() + ".boardDelete Start!");
 
         String msg = ""; // 메시지 내용
         MsgDTO dto = null; // 결과 메시지 구조
@@ -320,10 +318,10 @@ public class NoticeController {
             /*
              * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
              */
-            NoticeDTO pDTO = NoticeDTO.builder().noticeSeq(Long.parseLong(nSeq)).build();
+            BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
 
             // 게시글 삭제하기 DB
-            noticeService.deleteNoticeInfo(pDTO);
+            boardService.deleteBoardInfo(pDTO);
 
             msg = "삭제되었습니다.";
 
@@ -337,7 +335,7 @@ public class NoticeController {
             // 결과 메시지 전달하기
             dto = MsgDTO.builder().msg(msg).build();
 
-            log.info(this.getClass().getName() + ".noticeDelete End!");
+            log.info(this.getClass().getName() + ".boardDelete End!");
 
         }
 

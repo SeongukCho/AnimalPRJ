@@ -27,7 +27,7 @@
         /*<![CDATA[*/
         const session_user_id = [[${session.SS_USER_ID}]]; // Controller에서 받은 세션에 저장된 값
         const userId = [[${rDTO.userId}]]; // 게시판 게시글 작성자 아이디
-        const nSeq = [[${rDTO.noticeSeq}]]; // 현재 글번호, 자바에서 받을 변수들은 자바스크립트 변수로 저장하면 편함
+        const nSeq = [[${rDTO.boardSeq}]]; // 현재 글번호, 자바에서 받을 변수들은 자바스크립트 변수로 저장하면 편함
 
         // HTML로딩이 완료되고, 실행됨
         $(document).ready(function () {
@@ -43,7 +43,7 @@
 
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
             $("#btnList").on("click", function () {
-                location.href = "/notice/noticeList"; // 게시판 리스트 이동
+                location.href = "/board/boardList"; // 게시판 리스트 이동
             })
 
             $("#btnCInst").on("click", function () {
@@ -70,7 +70,7 @@
         //수정하기
         function doEdit() {
             if (session_user_id === userId) {
-                location.href = "/notice/noticeEditInfo?nSeq=" + nSeq;
+                location.href = "/board/boardEditInfo?nSeq=" + nSeq;
 
             } else if (session_user_id === "") {
                 alert("로그인 하시길 바랍니다.");
@@ -88,14 +88,14 @@
 
                     // Ajax 호출해서 글 삭제하기
                     $.ajax({
-                            url: "/notice/noticeDelete",
+                            url: "/board/boardDelete",
                             type: "post", // 전송방식은 Post
                             dataType: "JSON", // 전송 결과는 JSON으로 받기
                             data: {"nSeq": nSeq}, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                             success:
-                                function (json) { // /notice/noticeDelete 호출이 성공했다면..
+                                function (json) { // /board/boardDelete 호출이 성공했다면..
                                     alert(json.msg); // 메시지 띄우기
-                                    location.href = "/notice/noticeList"; // 게시판 리스트 이동
+                                    location.href = "/board/boardList"; // 게시판 리스트 이동
                                 }
                         }
                     )
@@ -126,10 +126,10 @@
                 return;
             }
 
-            let noticeSeq = document.querySelector('span[name="noticeSeq"]').innerText;
+            let boardSeq = document.querySelector('span[name="boardSeq"]').innerText;
 
             console.log("content : " + content)
-            console.log("noticeSeq : " + noticeSeq)
+            console.log("boardSeq : " + boardSeq)
 
             if (session_user_id) {
 
@@ -140,10 +140,10 @@
                         dataType: "JSON", // 전송 결과는 JSON으로 받기
                         data: {
                             "content": content,
-                            "noticeSeq": noticeSeq
+                            "boardSeq": boardSeq
                         }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                         success:
-                            function (json) { // /notice/noticeDelete 호출이 성공했다면..
+                            function (json) { // /board/boardDelete 호출이 성공했다면..
                                 alert(json.msg); // 메시지 띄우기
                                 location.reload(); // 게시판 리스트 이동
                             }
@@ -168,7 +168,7 @@
         function doCDel(f) {
 
             // 게시글 번호
-            let noticeSeq = nSeq;
+            let boardSeq = nSeq;
 
             // commentSeq(f)에 따른 div값들 조회
             let commentBox = document.getElementById('comment' + f);
@@ -179,7 +179,7 @@
 
             console.log("cUserId : " + cUserId)
             console.log("commentSeq : " + f)
-            console.log("noticeSeq : " + nSeq)
+            console.log("boardSeq : " + nSeq)
 
             if (session_user_id === cUserId) {
                 if (confirm("작성한 댓글을 삭제하시겠습니까?")) {
@@ -191,7 +191,7 @@
                             dataType: "JSON", // 전송 결과는 JSON으로 받기
                             data: {
                                 "commentSeq": f,
-                                "noticeSeq": noticeSeq
+                                "boardSeq": boardSeq
                             }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                             success:
                                 function (json) { // /comment/commentDelete 호출이 성공했다면..
@@ -239,7 +239,7 @@
 
         function doCUpdate(commentSeq) {
 
-            let noticeSeq = nSeq;
+            let boardSeq = nSeq;
             // commentSeq(f)에 따른 div값들 조회
             let commentBox = document.getElementById('comment' + commentSeq);
 
@@ -276,7 +276,7 @@
                             dataType: "JSON", // 전송 결과는 JSON으로 받기
                             data: {
                                 "commentSeq": commentSeq,
-                                "noticeSeq": noticeSeq,
+                                "boardSeq": boardSeq,
                                 "commentContents": commentContents
                             }, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
                             success:
@@ -315,15 +315,15 @@
                 <ul class="gnb">
 
                     <li>
-                        <a href="/animal/animal"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a></li>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="/notice/noticeList"><span>게시판</span></a>
+                        <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a></li>
+                            <li><a href="/board/boardList">게시판</a></li>
 
                         </ul>
                     </li>
@@ -363,18 +363,18 @@
                 <ul>
 
                     <li class="has-sub">
-                        <a href="/notice/noticeList">게시판</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="/notice/noticeList">게시판</a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
                             <li>
                             </li>
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="/animal/shelter">보호소 찾기</a>
+                        <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
-                            <li><a href="/animal/shelter">보호소 찾기</a>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
 
                         </ul>
@@ -412,7 +412,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/notice/noticeList" title="게시판">게시판</a>
+                                <a href="/board/boardList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -426,7 +426,7 @@
                             <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/notice/noticeList" title="게시판">게시판</a>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -440,13 +440,13 @@
                 <div class="viewTypeB">
                     <div class="info-header">
                         <span class="item item-seq">글번호</span>
-                        <span class="item item-title">제목</span>
+                        <span class="item item-header">제목</span>
                         <span class="item item-user">작성자</span>
                         <span class="item item-date">작성일</span>
                         <span class="item item-read">조회수</span>
                     </div>
                     <div class="info-content">
-                        <span class="item item-seq" name="noticeSeq">[[${rDTO.noticeSeq}]]</span>
+                        <span class="item item-seq" name="boardSeq">[[${rDTO.boardSeq}]]</span>
                         <span class="item item-title">[[${rDTO.title}]]</span>
                         <span class="item item-user">[[${rDTO.userId}]]</span>
                         <span class="item item-date">[[${rDTO.regDt}]]</span>
@@ -492,7 +492,7 @@
                     <button id="btnDelete" type="button">삭제</button>
                 </div>
                 <div class="btnWrapB">
-                    <span class="btnBc"><a href="/notice/noticeList" title="목록" class="fn_btn_list">목록</a></span>
+                    <span class="btnBc"><a href="/board/boardList" title="목록" class="fn_btn_list">목록</a></span>
                 </div>
             </div>
         </div>
