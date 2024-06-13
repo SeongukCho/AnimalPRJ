@@ -8,28 +8,26 @@
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
-    <script type="text/javascript" src="/js/common.js"></script>
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
     <link rel="stylesheet" href="/css/etc.css">
     <link rel="stylesheet" href="/css/font.css">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/carousel.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
     <link rel="stylesheet" href="/css/paging.css">
+    <link rel="stylesheet" href="/css/animal.css">
 
     <script type="text/javascript">
 
         //상세보기 이동
         function doDetail(seq) {
-            location.href = "/animal/animalListInfo?nSeq=" + seq;
+            location.href = "/animal/animalInfo?" + seq;
         }
 
     </script>
@@ -122,18 +120,18 @@
         </div>
     </header>
     <!-- // 내비게이션 바 -->
-    <div id="subContainer">
+    <div id="subContainer" style="margin-left: 150px; margin-right: 150px;">
         <div class="subSkin bg"></div>
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
                     <div class="lnb pc">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main/main"></a>
                         </div>
                         <ul>
                             <li>
-                                <a href="/board/boardList" title="게시판">게시판</a>
+                                <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
                             </li>
                         </ul>
                     </div>
@@ -141,13 +139,13 @@
                         <div class="home">
                             <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
-                        <div class="large">게시판</div>
+                        <div class="large">유기동물 조회</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">게시판</span>
+                            <span data-mobile-tit="">유기동물 조회</span>
                             <ul>
                                 <li>
-                                    <a href="/board/boardList" title="게시판">게시판</a>
+                                    <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
                                 </li>
                             </ul>
                         </div>
@@ -155,30 +153,67 @@
                 </div>
             </div>
         </nav>
-        <div class="row" style="margin: 50px">
-            <div th:each="animal : ${rList}" class="col-lg-3 col-md-4 col-sm-6 col-12 d-flex">
-                <div class="card animal-card">
-                    <img th:src="@{${animal.popfile}}" class="card-img-top" alt="Animal Image">
-                    <div class="card-body">
-                        <h5 class="card-title" th:text="${animal.kindCd}">Animal Kind</h5>
-                        <p class="card-text">
-                            <span th:text="${animal.happenPlace}">Location</span><br>
-                            <span th:text="${animal.age}">Age</span>, <span th:text="${animal.weight}">Weight</span><br>
-                            <span th:text="${animal.colorCd}">Color</span><br>
-                            <span th:text="${animal.sexCd}">Sex</span><br>
-                        </p>
-                    </div>
-                    <div class="card-footer">
-                        <span th:text="${animal.noticeNo}">Notice No</span><br>
-                        <span th:text="${animal.noticeSdt}">Notice Start Date</span> ~ <span th:text="${animal.noticeEdt}">Notice End Date</span><br>
-                        <span th:text="${animal.careNm}">Care Name</span><br>
-                        <span th:text="${animal.careTel}">Care Tel</span><br>
-                        <span th:text="${animal.careAddr}">Care Address</span><br>
-                        <div>
-                            <span class="badge-status" th:text="${animal.state}">Status</span>
-                            <span class="badge-year" th:text="${animal.age}">Year</span>
-                            <span class="badge-color" th:text="${animal.colorCd}">Color</span>
-                            <span class="weight-badge" th:text="${animal.weight}">Weight</span>
+        <div class="flex flex-1 flex-col gap-2 undefined">
+            <div class="openAnimation w-full h-full flex items-center justify-center">
+                <div class="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-3 gap-x-3">
+                    <div th:each="animal : ${rList}" class="col-lg-3 col-md-4 col-sm-6 col-12 d-flex">
+                        <div class="flex flex-col bg-white dark:bg-stone-900 border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+                            <a th:attr="onclick='doDetail(\'' + ${animal.desertionNo} + '\')'">
+                                <div class="max-h-48 overflow-hidden rounded-t-lg relative sm:h-[192px]">
+                                    <div class="h-40 sm:h-48 overflow-hidden relative h-[192px] hover:scale-110 transition-transform">
+                                        <img th:src="@{${animal.popfile}}"
+                                             class="absolute w-full h-full inset-0 object-cover" alt="Animal Image">
+                                    </div>
+                                </div>
+                            </a>
+                            <div class="flex-1 flex flex-col gap-1 p-2">
+                                <div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex flex-1 items-center gap-1 sm:gap-2">
+                                            <h5 class="text-base sm:text-xl font-bold tracking-tight text-gray-900 dark:text-white"
+                                                th:text="${animal.kindCd}">Animal Kind</h5>
+                                            <svg class="h-4 sm:h-5 fill-blue-500 items-center" width="16" height="16"
+                                                 xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                                <path d="M372 64h-79c-10.7 0-16 12.9-8.5 20.5l16.9 16.9-80.7 80.7c-22.2-14-48.5-22.1-76.7-22.1C64.5 160 0 224.5 0 304s64.5 144 144 144 144-64.5 144-144c0-28.2-8.1-54.5-22.1-76.7l80.7-80.7 16.9 16.9c7.6 7.6 20.5 2.2 20.5-8.5V76c0-6.6-5.4-12-12-12zM144 384c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="font-normal text-xs text-gray-700 dark:text-gray-400"
+                                             th:text="${animal.happenDt}"></div>
+                                    </div>
+                                    <div class="font-normal text-xs text-gray-700 dark:text-gray-400"
+                                         th:text="${animal.noticeNo}"></div>
+                                </div>
+                                <div class="flex items-center gap-2 font-normal text-sm text-gray-700 dark:text-stone-400">
+                                    <svg class="h-4 min-w-[16px] fill-gray-700 dark:fill-stone-400" width="16"
+                                         height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                        <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 256c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"></path>
+                                    </svg>
+                                    <div class="overflow-hidden text-ellipsis whitespace-nowrap"
+                                         th:text="${animal.happenPlace}"></div>
+                                </div>
+                                <div class="flex items-center gap-2 font-normal text-sm text-gray-700 dark:text-stone-400">
+                                    <svg class="h-4 min-w-[16px] fill-gray-700 dark:fill-stone-400" width="16"
+                                         height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                        <path d="M128 0c17.7 0 32 14.3 32 32V64H288V32c0-17.7 14.3-32 32-32s32 14.3 32 32V64h48c26.5 0 48 21.5 48 48v48H0V112C0 85.5 21.5 64 48 64H96V32c0-17.7 14.3-32 32-32zM0 192H448V464c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V192zm64 80v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16zm128 0v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H208c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V272c0-8.8-7.2-16-16-16H336zM64 400v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H80c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16H208zm112 16v32c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V400c0-8.8-7.2-16-16-16z"></path>
+                                    </svg>
+                                    <div th:text="${animal.noticeSdt}"></div>
+                                    ~
+                                    <div th:text="${animal.noticeEdt}"></div>
+                                </div>
+                                <div class="font-normal text-sm text-gray-700 dark:text-stone-400 overflow-hidden"
+                                     th:text="${animal.specialMark}"></div>
+                                <div class="flex-1 border-solid border-b border-gray-300"></div>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 rounded text-white bg-emerald-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                          th:text="${animal.processState}"></span>
+                                    <span class="px-2 py-1 rounded text-white bg-sky-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                          th:text="${animal.age}"></span>
+                                    <span class="px-2 py-1 rounded text-white bg-pink-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                          th:text="${animal.colorCd}"></span>
+                                    <span class="px-2 py-1 rounded text-white bg-amber-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease"
+                                          th:text="${animal.weight}"></span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -203,8 +238,8 @@
     </div>
     <!--End of container-->
 </section>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>-->
 </body>
 </html>

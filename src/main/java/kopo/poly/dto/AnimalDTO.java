@@ -1,8 +1,10 @@
 package kopo.poly.dto;
 
 import lombok.Builder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
+@Document(collection = "animalDTO")
 public record AnimalDTO(
 
         /* 요청 항목 */
