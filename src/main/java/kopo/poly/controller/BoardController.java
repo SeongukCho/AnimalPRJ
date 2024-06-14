@@ -44,7 +44,7 @@ public class BoardController {
      */
     @GetMapping(value = "boardList")
     public String BoardList(HttpSession session, ModelMap model,
-                             @RequestParam(defaultValue = "0") int page,
+                             @RequestParam(defaultValue = "1") int page,
                              @RequestParam(defaultValue = "10") int size) throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
@@ -58,11 +58,20 @@ public class BoardController {
         // 페이징된 게시판 리스트 조회하기
         Page<BoardDTO> rList = boardService.getBoardList(page, size);
 
+        log.info("rList : " + rList);
+        log.info("rList.getTotalPages() : " + rList.getTotalPages());
+
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rList", rList.getContent());
         model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
         model.addAttribute("totalPages", rList.getTotalPages());
-        model.addAttribute("totalItems", rList.getTotalElements());
+
+        // 페이지 번호 범위 계산
+        int startPage = Math.max(1, page - 4);
+        int endPage = Math.min(rList.getTotalPages(), page + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".boardList End!");

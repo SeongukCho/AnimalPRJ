@@ -27,7 +27,7 @@
 
         //상세보기 이동
         function doDetail(seq) {
-            location.href = "/animal/animalInfo?" + seq;
+            location.href = "/animal/animalInfo?desertionNo=" + seq;
         }
 
     </script>
@@ -80,7 +80,7 @@
             <nav id="mGnb">
                 <button type="button" class="btnClose"><span>닫기</span></button>
                 <div class="mbTop">
-                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                    <div class="mlogo"><a href="/main/main"></a></div>
                     <ul>
                         <li><a href="/user/userRegForm">회원가입</a></li>
                         <li><a href="/user/login">로그인</a></li>
@@ -137,7 +137,7 @@
                     </div>
                     <div class="lnb mobile">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main/main"></a>
                         </div>
                         <div class="large">유기동물 조회</div>
 
@@ -219,7 +219,41 @@
                 </div>
             </div>
         </div>
+        <!-- 페이징 네비게이션 -->
+        <div class="flex justify-center py-10">
+            <div class="pagination">
+                <ul>
+                    <!-- First page link -->
+                    <li th:if="${currentPage > 1}">
+                        <a th:href="@{/animal/animalList(page=1, size=${size})}">처음</a>
+                    </li>
+
+                    <!-- Previous page link -->
+                    <li th:if="${currentPage > 1}">
+                        <a th:href="@{/animal/animalList(page=${currentPage - 1}, size=${size})}">이전</a>
+                    </li>
+
+                    <!-- Page number links -->
+                    <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:href="@{/animal/animalList(page=${i}, size=${size})}"
+                           th:classappend="${i} == ${currentPage} ? 'active' : ''"
+                           th:text="${i}"></a>
+                    </li>
+
+                    <!-- Next page link -->
+                    <li th:if="${currentPage < totalPages}">
+                        <a th:href="@{/animal/animalList(page=${currentPage + 1}, size=${size})}">다음</a>
+                    </li>
+
+                    <!-- Last page link -->
+                    <li th:if="${currentPage < totalPages}">
+                        <a th:href="@{/animal/animalList(page=${totalPages}, size=${size})}">마지막</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
+</div>
 </div>
 <section id="footer">
     <div class="container">

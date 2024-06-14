@@ -1,10 +1,370 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>유기동물 상세 조회</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+
+    <link rel="stylesheet" href="/css/table.css">
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <link rel="stylesheet" href="/css/paging.css">
+    <link rel="stylesheet" href="/css/animal.css">
+
 </head>
 <body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
 
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+
+                            <li><a href="">고객센터</a></li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="/user/logout">로그아웃</a>
+            </div>
+
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop">
+                    <div class="mlogo"><a href="/main/main"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <ul>
+
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                            <li>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/animal/animalList">유기동물 조회</a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
+                            </li>
+
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">온라인 상담</a>
+                        <ul>
+                            <li><a href="#">이용방법 </a>
+                            </li>
+                            <li><a href="/online/calendar">채팅</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+    <div id="subContainer" style="margin-left: 150px; margin-right: 150px;">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main/main"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main/main"></a>
+                        </div>
+                        <div class="large">유기동물 조회</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">유기동물 조회</span>
+                            <ul>
+                                <li>
+                                    <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="mt-[88px]">
+            <div class="mx-auto max-w-2xl md:max-w-4xl xl:max-w-5xl lg:max-w-5xl py-4 px-4 xl:px-1 sm:px-6 md:px-16 xl:px-8 lg:px-10 relative">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-stone-900 dark:text-stone-100 font-semibold text-xl">
+                        <div class="inline-flex items-center gap-1">
+                            <div class="bg-blue-600 rounded-[2px] text-stone-100 text-xs px-2 py-0.5"><a th:href="@{/notices?page=1}">공고</a></div>
+                            <div class="px-2 rounded-[2px] text-stone-100 bg-emerald-500 text-xs px-2 py-0.5" th:text="${rDTO.orgNm}">전라남도 화순군</div>
+                        </div>
+                        <div class="text-xs" th:text="${#temporals.format(rDTO.happenDt, 'yyyy.MM.dd')}"></div>
+                    </div>
+                    <div class="text-lg text-semibold">
+                        <div class="justify-between items-center">
+                            <div class="inline-flex items-center gap-1">
+                                <svg class="h-5 mb-1 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M298.06,224,448,277.55V496a16,16,0,0,1-16,16H368a16,16,0,0,1-16-16V384H192V496a16,16,0,0,1-16,16H112a16,16,0,0,1-16-16V282.09C58.84,268.84,32,233.66,32,192a32,32,0,0,1,64,0,32.06,32.06,0,0,0,32,32ZM544,112v32a64,64,0,0,1-64,64H448v35.58L320,197.87V48c0-14.25,17.22-21.39,27.31-11.31L374.59,64h53.63c10.91,0,23.75,7.92,28.62,17.69L464,96h64A16,16,0,0,1,544,112Zm-112,0a16,16,0,1,0-16,16A16,16,0,0,0,432,112Z"></path></svg>
+                                <span th:text="${rDTO.kindCd}">믹스견</span>
+                                <svg class="h-5 fill-blue-500 items-center" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M372 64h-79c-10.7 0-16 12.9-8.5 20.5l16.9 16.9-80.7 80.7c-22.2-14-48.5-22.1-76.7-22.1C64.5 160 0 224.5 0 304s64.5 144 144 144 144-64.5 144-144c0-28.2-8.1-54.5-22.1-76.7l80.7-80.7 16.9 16.9c7.6 7.6 20.5 2.2 20.5-8.5V76c0-6.6-5.4-12-12-12zM144 384c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg> -
+                                <div class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap" th:text="${rDTO.noticeNo}">전남-화순-2024-00101</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+<!--                <div class="flex justify-center items-center relative bg-gray-100 dark:bg-stone-900 rounded-lg my-2 border dark:border-stone-900 shadow w-full py-2 min-h-[90px] overflow-hidden">-->
+<!--                    <img class="w-full h-full object-cover" th:src="${rDTO.popfile}" alt="Animal Image">-->
+<!--                </div>-->
+                <div class="openAnimation flex flex-col text-gray-600 gap-6 pt-3">
+                    <div class="flex flex-1 justify-center">
+                        <div class="rounded-lg shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 w-full overflow-hidden">
+                            <div class="relative">
+                                <div class="transition-all w-full h-56 md:h-80 blur-sm bg-gray-800">
+                                    <img loading="lazy" class="w-full h-full inset-0 object-cover bg-center bg-cover" th:src="${rDTO.popfile}" alt="[개] 믹스견 전남-화순-2024-00101 유기동물 배경 이미지 입니다.">
+                                </div>
+                                <div class="transition-all inset-0 w-48 h-48 md:ml-12 md:w-72 md:h-72 m-auto border-white border-[5px] rounded absolute">
+                                    <img loading="lazy" class="absolute w-full h-full inset-0 object-cover bg-center bg-cover" th:src="${rDTO.popfile}" alt="[개] 믹스견 전남-화순-2024-00101 유기동물 이미지 입니다.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden bg-white dark:bg-stone-900 dark:text-stone-100">
+                        <div class="block p-6 shadow-2xl w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">유기동물정보</div>
+                                <div class="flex justify-center items-center rounded-full w-10 bg-blue-600 text-white font-medium text-xs">
+                                    <svg class="h-4 fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 512"><path d="M20 424.229h20V279.771H20c-11.046 0-20-8.954-20-20V212c0-11.046 8.954-20 20-20h112c11.046 0 20 8.954 20 20v212.229h20c11.046 0 20 8.954 20 20V492c0 11.046-8.954 20-20 20H20c-11.046 0-20-8.954-20-20v-47.771c0-11.046 8.954-20 20-20zM96 0C56.235 0 24 32.235 24 72s32.235 72 72 72 72-32.235 72-72S135.764 0 96 0z"></path></svg>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M298.06,224,448,277.55V496a16,16,0,0,1-16,16H368a16,16,0,0,1-16-16V384H192V496a16,16,0,0,1-16,16H112a16,16,0,0,1-16-16V282.09C58.84,268.84,32,233.66,32,192a32,32,0,0,1,64,0,32.06,32.06,0,0,0,32,32ZM544,112v32a64,64,0,0,1-64,64H448v35.58L320,197.87V48c0-14.25,17.22-21.39,27.31-11.31L374.59,64h53.63c10.91,0,23.75,7.92,28.62,17.69L464,96h64A16,16,0,0,1,544,112Zm-112,0a16,16,0,1,0-16,16A16,16,0,0,0,432,112Z"></path></svg>
+                                        <div class="font-semibold text-lg">품종</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.kindCd}">믹스견</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-4 fill-gray-700 dark:fill-stone-100 self-center" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M176 288c61.9 0 112-50.1 112-112s-50.1-112-112-112S64 114.1 64 176s50.1 112 112 112zM352 176c0 86.3-62.1 158.1-144 173.1V384h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H208v32c0 17.7-14.3 32-32 32s-32-14.3-32-32V448H112c-17.7 0-32-14.3-32-32s14.3-32 32-32h32V349.1C62.1 334.1 0 262.3 0 176C0 78.8 78.8 0 176 0s176 78.8 176 176zM271.9 360.6c19.3-10.1 36.9-23.1 52.1-38.4c20 18.5 46.7 29.8 76.1 29.8c61.9 0 112-50.1 112-112s-50.1-112-112-112c-7.2 0-14.3 .7-21.1 2c-4.9-21.5-13-41.7-24-60.2C369.3 66 384.4 64 400 64c37 0 71.4 11.4 99.8 31l20.6-20.6L487 41c-6.9-6.9-8.9-17.2-5.2-26.2S494.3 0 504 0H616c13.3 0 24 10.7 24 24V136c0 9.7-5.8 18.5-14.8 22.2s-19.3 1.7-26.2-5.2l-33.4-33.4L545 140.2c19.5 28.4 31 62.7 31 99.8c0 97.2-78.8 176-176 176c-50.5 0-96-21.3-128.1-55.4z"></path></svg>
+                                        <div class="font-semibold text-lg">성별</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.sexCd}">수컷</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M86.4 5.5L61.8 47.6C58 54.1 56 61.6 56 69.2V72c0 22.1 17.9 40 40 40s40-17.9 40-40V69.2c0-7.6-2-15-5.8-21.6L105.6 5.5C103.6 2.1 100 0 96 0s-7.6 2.1-9.6 5.5zm128 0L189.8 47.6c-3.8 6.5-5.8 14-5.8 21.6V72c0 22.1 17.9 40 40 40s40-17.9 40-40V69.2c0-7.6-2-15-5.8-21.6L233.6 5.5C231.6 2.1 228 0 224 0s-7.6 2.1-9.6 5.5zM317.8 47.6c-3.8 6.5-5.8 14-5.8 21.6V72c0 22.1 17.9 40 40 40s40-17.9 40-40V69.2c0-7.6-2-15-5.8-21.6L361.6 5.5C359.6 2.1 356 0 352 0s-7.6 2.1-9.6 5.5L317.8 47.6zM128 176c0-17.7-14.3-32-32-32s-32 14.3-32 32v48c-35.3 0-64 28.7-64 64v71c8.3 5.2 18.1 9 28.8 9c13.5 0 27.2-6.1 38.4-13.4c5.4-3.5 9.9-7.1 13-9.7c1.5-1.3 2.7-2.4 3.5-3.1c.4-.4 .7-.6 .8-.8l.1-.1 0 0 0 0s0 0 0 0s0 0 0 0c3.1-3.2 7.4-4.9 11.9-4.8s8.6 2.1 11.6 5.4l0 0 0 0 .1 .1c.1 .1 .4 .4 .7 .7c.7 .7 1.7 1.7 3.1 3c2.8 2.6 6.8 6.1 11.8 9.5c10.2 7.1 23 13.1 36.3 13.1s26.1-6 36.3-13.1c5-3.5 9-6.9 11.8-9.5c1.4-1.3 2.4-2.3 3.1-3c.3-.3 .6-.6 .7-.7l.1-.1c3-3.5 7.4-5.4 12-5.4s9 2 12 5.4l.1 .1c.1 .1 .4 .4 .7 .7c.7 .7 1.7 1.7 3.1 3c2.8 2.6 6.8 6.1 11.8 9.5c10.2 7.1 23 13.1 36.3 13.1s26.1-6 36.3-13.1c5-3.5 9-6.9 11.8-9.5c1.4-1.3 2.4-2.3 3.1-3c.3-.3 .6-.6 .7-.7l.1-.1c2.9-3.4 7.1-5.3 11.6-5.4s8.7 1.6 11.9 4.8l0 0 0 0 0 0 .1 .1c.2 .2 .4 .4 .8 .8c.8 .7 1.9 1.8 3.5 3.1c3.1 2.6 7.5 6.2 13 9.7c11.2 7.3 24.9 13.4 38.4 13.4c10.7 0 20.5-3.9 28.8-9V288c0-35.3-28.7-64-64-64V176c0-17.7-14.3-32-32-32s-32 14.3-32 32v48H256V176c0-17.7-14.3-32-32-32s-32 14.3-32 32v48H128V176zM448 394.6c-8.5 3.3-18.2 5.4-28.8 5.4c-22.5 0-42.4-9.9-55.8-18.6c-4.1-2.7-7.8-5.4-10.9-7.8c-2.8 2.4-6.1 5-9.8 7.5C329.8 390 310.6 400 288 400s-41.8-10-54.6-18.9c-3.5-2.4-6.7-4.9-9.4-7.2c-2.7 2.3-5.9 4.7-9.4 7.2C201.8 390 182.6 400 160 400s-41.8-10-54.6-18.9c-3.7-2.6-7-5.2-9.8-7.5c-3.1 2.4-6.8 5.1-10.9 7.8C71.2 390.1 51.3 400 28.8 400c-10.6 0-20.3-2.2-28.8-5.4V480c0 17.7 14.3 32 32 32H416c17.7 0 32-14.3 32-32V394.6z"></path></svg>
+                                        <div class="font-semibold text-lg">나이</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.age}">2022(년생)</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M512 256c0 .9 0 1.8 0 2.7c-.4 36.5-33.6 61.3-70.1 61.3H344c-26.5 0-48 21.5-48 48c0 3.4 .4 6.7 1 9.9c2.1 10.2 6.5 20 10.8 29.9c6.1 13.8 12.1 27.5 12.1 42c0 31.8-21.6 60.7-53.4 62c-3.5 .1-7 .2-10.6 .2C114.6 512 0 397.4 0 256S114.6 0 256 0S512 114.6 512 256zM128 288c0-17.7-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32s32-14.3 32-32zm0-96c17.7 0 32-14.3 32-32s-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32zM288 96c0-17.7-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32s32-14.3 32-32zm96 96c17.7 0 32-14.3 32-32s-14.3-32-32-32s-32 14.3-32 32s14.3 32 32 32z"></path></svg>
+                                        <div class="font-semibold text-lg">색상</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.colorCd}">흰색</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M384 176c0 70.7-57.3 128-128 128s-128-57.3-128-128s57.3-128 128-128s128 57.3 128 128zm7.8-112C359.5 24.9 310.7 0 256 0S152.5 24.9 120.2 64H64C28.7 64 0 92.7 0 128V448c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64H391.8zM296 224c0-10.6-4.1-20.2-10.9-27.4l33.6-78.3c3.5-8.1-.3-17.5-8.4-21s-17.5 .3-21 8.4L255.7 184c-22 .1-39.7 18-39.7 40c0 22.1 17.9 40 40 40s40-17.9 40-40z"></path></svg>
+                                        <div class="font-semibold text-lg">체중</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.weight}">10.00(Kg)</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M304 176c0 61.9-50.1 112-112 112s-112-50.1-112-112s50.1-112 112-112s112 50.1 112 112zM224 349.1c81.9-15 144-86.8 144-173.1C368 78.8 289.2 0 192 0S16 78.8 16 176c0 86.3 62.1 158.1 144 173.1V480c0 17.7 14.3 32 32 32s32-14.3 32-32V349.1z"></path></svg>
+                                        <div class="font-semibold text-lg">중성화여부</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.neuterYn}">아니오</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M253.4 2.9C249.2 1 244.7 0 240 0s-9.2 1-13.4 2.9L38.3 82.8C16.3 92.1-.1 113.8 0 140c.5 99.2 41.3 280.7 213.6 363.2c16.7 8 36.1 8 52.8 0C438.7 420.7 479.5 239.2 480 140c.1-26.2-16.3-47.9-38.3-57.2L253.4 2.9zM144.9 286.2c4.8 1.2 9.9 1.8 15.1 1.8c35.3 0 64-28.7 64-64V160h44.2c12.1 0 23.2 6.8 28.6 17.7L304 192h64c8.8 0 16 7.2 16 16v32c0 44.2-35.8 80-80 80H256v50.7c0 7.3-5.9 13.3-13.3 13.3c-1.8 0-3.6-.4-5.2-1.1l-98.7-42.3c-6.6-2.8-10.8-9.3-10.8-16.4c0-2.8 .6-5.5 1.9-8l15-30zM144 160h40 8v32 32c0 17.7-14.3 32-32 32s-32-14.3-32-32V176c0-8.8 7.2-16 16-16zm128 48a16 16 0 1 0 -32 0 16 16 0 1 0 32 0z"></path></svg>
+                                        <div class="font-semibold text-lg">상태</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.processState}">보호중</div>
+                                </div>
+                            </div>
+                            <div class="w-full mt-3">
+                                <div class="bg-blue-100 rounded-lg p-3 text-blue-700 flex items-center text-sm gap-2" role="alert">
+                                    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="info-circle" class="min-w-[24px] h-5 fill-current" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path></svg>
+                                    신고자 입양원함 목줄이 발에 걸려서 상처가 깊음
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 overflow-hidden">
+                        <div class="block p-6 pb-0 w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">구조정보</div>
+                                <div class="inline-flex">
+                                    <div class="flex justify-center items-center rounded-full w-10 bg-green-600 text-white font-medium text-xs">
+                                        <svg class="h-4 fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M560.02 32c-1.96 0-3.98.37-5.96 1.16L384.01 96H384L212 35.28A64.252 64.252 0 0 0 191.76 32c-6.69 0-13.37 1.05-19.81 3.14L20.12 87.95A32.006 32.006 0 0 0 0 117.66v346.32C0 473.17 7.53 480 15.99 480c1.96 0 3.97-.37 5.96-1.16L192 416l172 60.71a63.98 63.98 0 0 0 40.05.15l151.83-52.81A31.996 31.996 0 0 0 576 394.34V48.02c0-9.19-7.53-16.02-15.98-16.02zM224 90.42l128 45.19v285.97l-128-45.19V90.42zM48 418.05V129.07l128-44.53v286.2l-.64.23L48 418.05zm480-35.13l-128 44.53V141.26l.64-.24L528 93.95v288.97z"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M400 64h-48V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H160V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V160h352v298c0 3.3-2.7 6-6 6z"></path></svg>
+                                        <div class="font-semibold text-lg">접수일시</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.happenDt}">2024년 6월 14일</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M172.268 501.67C26.97 291.031 0 269.413 0 192 0 85.961 85.961 0 192 0s192 85.961 192 192c0 77.413-26.97 99.031-172.268 309.67-9.535 13.774-29.93 13.773-39.464 0zM192 272c44.183 0 80-35.817 80-80s-35.817-80-80-80-80 35.817-80 80 35.817 80 80 80z"></path></svg>
+                                        <div class="font-semibold text-lg">발견장소</div>
+                                    </div>
+                                    <a class="text-sm ml-[24px]" target="_blank" th:href="'https://map.kakao.com/link/search/' + ${rDTO.happenPlace}" th:text="${rDTO.happenPlace}">백아면 맹리길 27</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="map1" class="mt-6 h-56 sm:h-96 w-full"></div>
+                    </div>
+                    <div class="w-full p-6">
+                        <div class="bg-blue-100 rounded-lg p-3 text-blue-700 flex items-center text-sm gap-2" role="alert">
+                            <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="info-circle" class="min-w-[24px] h-5 fill-current" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path></svg>
+                            <span th:text="${rDTO.specialMark}">신고자 입양원함 목줄이 발에 걸려서 상처가 깊음</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 overflow-hidden">
+                        <div class="block p-6 w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">보호센터</div>
+                                <div class="inline-flex">
+                                    <div class="flex justify-center items-center rounded-full w-10 bg-yellow-500 text-white font-medium text-xs">
+                                        <svg class="h-4 fill-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M360 336H216c-13.3 0-24-10.7-24-24v-96c0-13.3 10.7-24 24-24h144c13.3 0 24 10.7 24 24v96c0 13.3-10.7 24-24 24zM208 256c-8.8 0-16 7.2-16 16s7.2 16 16 16s16-7.2 16-16s-7.2-16-16-16zm240-96v208c0 8.8-7.2 16-16 16H408v96c0 8.8-7.2 16-16 16H248c-8.8 0-16-7.2-16-16v-96H208c-8.8 0-16-7.2-16-16V160c0-8.8 7.2-16 16-16h48V96c0-53 43-96 96-96s96 43 96 96v48h48c8.8 0 16 7.2 16 16zm-112 0H304V96c0-22.1 17.9-40 40-40s40 17.9 40 40v64zM144 160h-48c-8.8 0-16 7.2-16 16v48H16c-8.8 0-16 7.2-16 16v208c0 8.8 7.2 16 16 16h16v48c0 8.8 7.2 16 16 16h96c8.8 0 16-7.2 16-16V320c0-8.8-7.2-16-16-16H112v-48h48c8.8 0 16-7.2 16-16V176c0-8.8-7.2-16-16-16zm-16 256v32H64v-32h64zm0-160H64v-32h64v32zm464-32H544v-48c0-8.8-7.2-16-16-16h-48c-8.8 0-16 7.2-16 16v48h-48c-8.8 0-16 7.2-16 16v208c0 8.8 7.2 16 16 16h16v48c0 8.8 7.2 16 16 16h96c8.8 0 16-7.2 16-16V320c0-8.8-7.2-16-16-16h-48v-48h48v32h64v-32c8.8 0 16-7.2 16-16v-48c0-8.8-7.2-16-16-16zM496 416h-64v-32h64v32zm0-160h-64v-32h64v32z"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M384 64h-48V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H160V12c0-6.6-5.4-12-12-12h-40c-6.6 0-12 5.4-12 12v52H48C21.5 64 0 85.5 0 112v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V112c0-26.5-21.5-48-48-48zm-6 400H54c-3.3 0-6-2.7-6-6V160h352v298c0 3.3-2.7 6-6 6z"></path></svg>
+                                        <div class="font-semibold text-lg">보호소</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.careNm}">화순군유기동물보호소</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-4 fill-gray-700 dark:fill-stone-100 self-center" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M96 0C78.3 0 64 14.3 64 32V64c-35.3 0-64 28.7-64 64v352c0 17.7 14.3 32 32 32H352c17.7 0 32-14.3 32-32V128c0-35.3-28.7-64-64-64V32c0-17.7-14.3-32-32-32H96zM288 96H128V64H288V96zM64 128H320c8.8 0 16 7.2 16 16v32H48V144c0-8.8 7.2-16 16-16zm0 80H336V416c0 8.8-7.2 16-16 16H80c-8.8 0-16-7.2-16-16V208zM160 320v64c0 8.8-7.2 16-16 16s-16-7.2-16-16V320c0-8.8 7.2-16 16-16s16 7.2 16 16zm128 0v64c0 8.8-7.2 16-16 16s-16-7.2-16-16V320c0-8.8 7.2-16 16-16s16 7.2 16 16zm-64 0v64c0 8.8-7.2 16-16 16s-16-7.2-16-16V320c0-8.8 7.2-16 16-16s16 7.2 16 16z"></path></svg>
+                                        <div class="font-semibold text-lg">전화번호</div>
+                                    </div>
+                                    <a class="text-sm ml-[24px]" href="tel:+821087643321" th:href="'tel:' + ${rDTO.careTel}" th:text="${rDTO.careTel}">010-8764-3321</a>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M336 448H240c-8.8 0-16-7.2-16-16V80c0-8.8 7.2-16 16-16h16v16c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V64h16c8.8 0 16 7.2 16 16V432c0 8.8-7.2 16-16 16zM112 96c0-8.8-7.2-16-16-16H64c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16H96c8.8 0 16-7.2 16-16V96zM512 80H480c-8.8 0-16 7.2-16 16V432c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16z"></path></svg>
+                                        <div class="font-semibold text-lg">주소</div>
+                                    </div>
+                                    <a class="text-sm ml-[24px]" target="_blank" th:href="'https://map.kakao.com/link/search/' + ${rDTO.careAddr}" th:text="${rDTO.careAddr}">전라남도 화순군 동면 충의로 540</a>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><path d="M303.8 384h-127c-14.6 0-22.7 17.8-12 28.4L224 472.6V512h128v-39.4l59.2-60.2c10.7-10.9 2.6-28.4-12-28.4h-57.6zM624 32h-72V16c0-8.8-7.2-16-16-16h-80c-8.8 0-16 7.2-16 16v16H208V16c0-8.8-7.2-16-16-16h-80c-8.8 0-16 7.2-16 16v16H24C10.8 32 0 42.8 0 56v72c0 13.2 10.8 24 24 24h16v328c0 22.1 17.9 40 40 40h480c22.1 0 40-17.9 40-40V152h16c13.2 0 24-10.8 24-24V56c0-13.2-10.8-24-24-24zM400 448H240v-32h160v32zM128 128c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32zm384 0c-17.7 0-32-14.3-32-32s14.3-32 32-32s32 14.3 32 32s-14.3 32-32 32z"></path></svg>
+                                        <div class="font-semibold text-lg">보호장소</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.careAddr}">화순군유기동물보호소</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M568.4 160H416v-64h40c8.8 0 16-7.2 16-16s-7.2-16-16-16H120c-8.8 0-16 7.2-16 16s7.2 16 16 16h40v64H7.6C3.4 160 0 163.4 0 167.6c0 .6 .1 1.3 .2 1.9L46.4 468c3.8 24.3 25 44 49.5 44h384.2c24.5 0 45.7-19.7 49.5-44l46.2-298.4c.1-.6 .2-1.3 .2-1.9c0-4.2-3.4-7.6-7.6-7.6zM384 96v64H192V96h192zm127.3 363.5c-2.5 16.4-16.8 28.5-33.4 28.5H93.6c-16.6 0-30.8-12.1-33.4-28.5L15.4 176H560.6L511.3 459.5zM328 288c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24zm0 96c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24zm-96-96c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24zm0 96c0-13.3-10.7-24-24-24s-24 10.7-24 24s10.7 24 24 24s24-10.7 24-24z"></path></svg>
+                                        <div class="font-semibold text-lg">담당자</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.chargeNm}">정우주</div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M264 280h-48v48h48V280zm0 96h-48v48h48V376zm192-96h-48v48h48V280zm0 96h-48v48h48V376zM448 96H416V64h32V32H352V0H224V32H160V64h32V96H160c-17.6 0-32 14.4-32 32v352c0 17.6 14.4 32 32 32h288c17.6 0 32-14.4 32-32V128c0-17.6-14.4-32-32-32zM192 96V64h192V96H192zm192 352H192V160h192V448z"></path></svg>
+                                        <div class="font-semibold text-lg">담당자전화번호</div>
+                                    </div>
+                                    <a class="text-sm ml-[24px]" href="tel:+821098762145" th:href="'tel:' + ${rDTO.officetel}" th:text="${rDTO.officetel}">010-9876-2145</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="map2" class="mt-6 h-56 sm:h-96 w-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
+<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>-->
 </body>
 </html>

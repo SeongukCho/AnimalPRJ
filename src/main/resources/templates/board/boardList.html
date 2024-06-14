@@ -196,20 +196,37 @@
                                                                               class="fn_btn_list">글쓰기</a></span>
                 </div>
                 <!-- 페이징 네비게이션 -->
-                <div class="pagination">
-                    <ul>
-                        <li th:if="${currentPage > 0}">
-                            <a th:href="@{boardList(page=${currentPage - 1}, size=${size})}">Previous</a>
-                        </li>
-                        <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a th:href="@{boardList(page=${i}, size=${size})}"
-                               th:classappend="${i} == ${currentPage} ? 'active' : ''"
-                               th:text="${i + 1}"></a>
-                        </li>
-                        <li th:if="${currentPage < totalPages - 1}">
-                            <a th:href="@{boardList(page=${currentPage + 1}, size=${size})}">Next</a>
-                        </li>
-                    </ul>
+                <div style="padding-top: 2.5rem; padding-bottom: 2.5rem; justify-content: center; display: flex;">
+                    <div class="pagination">
+                        <ul>
+                            <!-- First page link -->
+                            <li th:if="${currentPage > 1}">
+                                <a th:href="@{/board/boardList(page=1, size=${size})}">처음</a>
+                            </li>
+
+                            <!-- Previous page link -->
+                            <li th:if="${currentPage > 1}">
+                                <a th:href="@{/board/boardList(page=${currentPage - 1}, size=${size})}">이전</a>
+                            </li>
+
+                            <!-- Page number links -->
+                            <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                <a th:href="@{/board/boardList(page=${i}, size=${size})}"
+                                   th:classappend="${i} == ${currentPage} ? 'active' : ''"
+                                   th:text="${i}"></a>
+                            </li>
+
+                            <!-- Next page link -->
+                            <li th:if="${currentPage < totalPages}">
+                                <a th:href="@{/board/boardList(page=${currentPage + 1}, size=${size})}">다음</a>
+                            </li>
+
+                            <!-- Last page link -->
+                            <li th:if="${currentPage < totalPages}">
+                                <a th:href="@{/board/boardList(page=${totalPages}, size=${size})}">마지막</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

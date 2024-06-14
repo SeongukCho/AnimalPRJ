@@ -1,10 +1,13 @@
 package kopo.poly.dto;
 
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Builder
-@Document(collection = "animalDTO")
+@Document
 public record AnimalDTO(
 
         /* 요청 항목 */
@@ -19,9 +22,10 @@ public record AnimalDTO(
         String neuterYnR,     // 상태 (전체 : null(빈값), 예 : Y, 아니오 : N, 미상 : U)
 
         /* 응답 항목 */
+        @Id
         Long desertionNo,     // 유기번호
         String fileName,      // 썸네일 이미지
-        Long happenDt,        // 접수일
+        Date happenDt,        // 접수일
         String happenPlace,   // 발견 장소
         String kindCd,        // 품종
         String colorCd,       // 생상
