@@ -1,10 +1,14 @@
 package kopo.poly.dto;
 
 import lombok.Builder;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Builder
+@Document
 public record ShelterDTO(
 
+        @Id
         String careRegNo,       // 보호센터등록번호
         String careNm,          // 동물보호센터명
         String orgNm,           // 관리기관명
