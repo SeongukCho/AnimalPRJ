@@ -26,6 +26,7 @@
     <script type="text/javascript">
         // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
         let userIdCheck = "Y";
+        let nickNameCheck = "Y";
 
         // 이메일 중복체크 인증번호 발송 값
         let emailAuthNumber = "";
@@ -38,6 +39,11 @@
             // 아이디 중복체크
             $("#btnUserId").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
                 userIdExists(f)
+            })
+
+            // 닉네임 중복체크
+            $("#btnNickname").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                nickNameExists(f)
             })
 
             // 이메일 중복체크
@@ -78,6 +84,36 @@
                     } else {
                         alert("가입 가능한 아이디입니다.");
                         userIdCheck = "N";
+                    }
+
+                }
+            })
+        }
+
+        // 회원닉네임 중복 체크
+        function nickNameExists(f) {
+
+            if (f.nickName.value === "") {
+                alert("닉네임을 입력하세요.");
+                f.nickName.focus();
+                return;
+            }
+
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                url: "/user/getNickNameExists",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
+                    if (json.existsYn === "Y") {
+                        alert("이미 가입된 닉네임이 존재합니다.");
+                        f.userId.focus();
+
+                    } else {
+                        alert("설정 가능한 닉네임입니다.");
+                        nickNameCheck = "N";
                     }
 
                 }
@@ -148,6 +184,18 @@
             if (f.userName.value === "") {
                 alert("이름을 입력하세요.");
                 f.userName.focus();
+                return;
+            }
+
+            if (f.nickName.value === "") {
+                alert("닉네임을 입력하세요.");
+                f.nickName.focus();
+                return;
+            }
+
+            if (nickNameCheck !== "N") {
+                alert("닉네임 중복 체크 및 중복되지 않은 닉네임으로 가입 바랍니다.");
+                f.nickName.focus();
                 return;
             }
 
@@ -358,7 +406,7 @@
                   onsubmit="doSubmit(this)">
                 <div class="registration-form margin-top-10">
                     <div class="form-group">
-                        <label for="mbrId" id="fn_name_mbrId" class="label-text label-required">아이디</label>
+                        <label for="mbrId" class="label-text label-required">아이디</label>
                         <div class="input-wrapper">
                             <input type="text" name="userId" id="mbrId" class="input-field"
                                    style="ime-mode:disabled; width: 50%" required>
@@ -377,6 +425,7 @@
                         <div class="input-wrapper">
                             <input type="text" name="nickName" id="mbrNick" class="input-field" maxlength="20"
                                    style="ime-mode:disabled; width:50%" required>
+                            <button id="btnNickname" type="button" class="action-button button-small">닉네임 중복확인</button>
                         </div>
                     </div>
                     <div class="form-group">

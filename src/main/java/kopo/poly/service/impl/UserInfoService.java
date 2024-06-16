@@ -64,17 +64,20 @@ public class UserInfoService implements IUserInfoService {
         if (rEntity.isPresent()) {
 
             String userName = rEntity.get().getUserName();
+            String nickName = rEntity.get().getNickName();
             String email = EncryptUtil.decAES128CBC(rEntity.get().getEmail());
             String regDt = rEntity.get().getRegDt();
 
             log.info("userId : " + userId);
             log.info("userName : " + userName);
+            log.info("nickName : " + nickName);
             log.info("email : " + email);
             log.info("regDt : " + regDt);
 
             rDTO = UserInfoDTO.builder()
                     .userId(userId)
                     .userName(userName)
+                    .nickName(nickName)
                     .email(email)
                     .regDt(regDt)
                     .existsYn("Y")

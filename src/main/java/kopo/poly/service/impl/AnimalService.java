@@ -37,7 +37,7 @@ public class AnimalService implements IAnimalService {
 
     private final MongoTemplate mongodb;
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(fixedRate = 21600000)
     @Override
     public void saveAnimalList() {
 

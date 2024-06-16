@@ -15,7 +15,8 @@ public record UserInfoDTO(
 //        String petYn, // 반려동물 유무
 
         int authNumber,
-        String existsYn // 회원아이디 존재여부
+        String existsYn, // 회원아이디 존재여부
+        String profilePath // 프로필 사진 경로
 
 ) {
 }

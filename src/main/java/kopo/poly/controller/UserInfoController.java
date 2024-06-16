@@ -433,15 +433,12 @@ public class UserInfoController {
             model.addAttribute("rDTO", rDTO);
 
         } else {
-
             return "/user/login";
-
         }
 
         log.info(this.getClass().getName() + ".user/myPage End!");
 
         return  "user/myPage";
-
     }
 
 

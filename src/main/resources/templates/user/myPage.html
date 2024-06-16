@@ -22,8 +22,6 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
-    <script>
-    </script>
 </head>
 
 <body>
@@ -155,15 +153,30 @@
                             <div>[[${rDTO.userId}]]</div>
                         </div>
                         <div class="form-group">
-                            <label class="required">닉네임</label>
+                            <label class="required">이름</label>
                             <div>[[${rDTO.userName}]]</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">닉네임</label>
+                            <div>[[${rDTO.nickName}]]</div>
                         </div>
                         <div class="form-group">
                             <label class="required">이메일</label>
                             <div>[[${rDTO.email}]]</div>
                         </div>
+                        <div class="form-group">
+                            <label class="required">가입일</label>
+                            <div>[[${rDTO.regDt}]]</div>
+                        </div>
+                        <div class="form-group">
+                            <button id="btnProfileEdit" class="btnTypeB" style="margin-left: 350px" type="button">회원정보 수정</button>
+                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red" type="button">회원 탈퇴</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div>
+
             </div>
         </div>
     </div>
