@@ -273,6 +273,8 @@ public class UserInfoController {
                 .password(EncryptUtil.encHashSHA256(password)).build();
 
         int res = userInfoService.getUserLogin(pDTO);
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO))
+                        .orElseGet(() -> UserInfoDTO.builder().build());
 
         log.info("res : " +res);
 
@@ -280,6 +282,10 @@ public class UserInfoController {
 
             msg = "로그인 성공!";
             session.setAttribute("SS_USER_ID", userId);
+            session.setAttribute("SS_USER_NAME", rDTO.nickName());
+
+            log.info("SS_USER_ID : " + rDTO.userId());
+            log.info("SS_USER_NAME : " + rDTO.userName());
 
         } else {
             msg = "아이디와 비밀번호가 올바르지 않습니다.";
