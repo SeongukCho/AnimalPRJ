@@ -1,5 +1,8 @@
 package kopo.poly.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.MsgDTO;
@@ -9,14 +12,16 @@ import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @RequestMapping(value = "/user")
@@ -25,7 +30,8 @@ import java.util.Optional;
 public class UserInfoController {
 
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
-
+    private final AmazonS3 s3Client;
+    private final String bucketName;
     private final IUserInfoService userInfoService;
 
 
@@ -100,9 +106,7 @@ public class UserInfoController {
             log.info(this.getClass().getName() + ".user/newPassword success End!");
 
             return "user/newPassword";
-        }
-
-        else {
+        } else {
 
             session.setAttribute("NEW_PASSWORD", "");
 
@@ -122,7 +126,7 @@ public class UserInfoController {
         // 정상적인 접근인지 체크
         String newPassword = CmmUtil.nvl((String) session.getAttribute("NEW_PASSWORD"));
 
-        if(newPassword.length() > 0) { //정상접근
+        if (newPassword.length() > 0) { //정상접근
             String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
 
             log.info("password : " + password);
@@ -138,7 +142,7 @@ public class UserInfoController {
             session.setAttribute("NEW_PASSWORD", "");
             session.removeAttribute("NEW_PASSWORD");
 
-            if(res > 0) {
+            if (res > 0) {
                 msg = "비밀번호가 재설정되었습니다.";
             } else {
                 msg = "비밀번호 변경에 문제가 생겼습니다. 다시 시도해주세요.";
@@ -158,9 +162,8 @@ public class UserInfoController {
     }
 
 
-
     @ResponseBody
-    @PostMapping(value="getUserIdExists")
+    @PostMapping(value = "getUserIdExists")
     public UserInfoDTO getUserExists(HttpServletRequest request) throws Exception {
 
         log.info(this.getClass().getName() + ".getUserIdExists Start!");
@@ -175,6 +178,26 @@ public class UserInfoController {
                 .orElseGet(() -> UserInfoDTO.builder().build());
 
         log.info(this.getClass().getName() + ".getUserIdExists End!");
+
+        return rDTO;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "getNickNameExists")
+    public UserInfoDTO getNickNameExists(HttpServletRequest request) throws Exception {
+
+        log.info(this.getClass().getName() + ".getNickNameExists Start!");
+
+        String nickName = CmmUtil.nvl(request.getParameter("nickName"));
+
+        log.info("nickName : " + nickName);
+
+        UserInfoDTO pDTO = UserInfoDTO.builder().nickName(nickName).build();
+
+        UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getNickNameExists(pDTO))
+                .orElseGet(() -> UserInfoDTO.builder().build());
+
+        log.info(this.getClass().getName() + ".getNickNameExists End!");
 
         return rDTO;
     }
@@ -228,13 +251,21 @@ public class UserInfoController {
     }
 
     @GetMapping(value = "login")
-    public String login() {
+    public String login(HttpSession session) {
 
         log.info(this.getClass().getName() + ".user/login Start!");
 
-        log.info(this.getClass().getName() + ".user/login End!");
+        String userId = (String) session.getAttribute("SS_USER_ID");
 
-        return  "user/login";
+        if (userId != null && userId.length() > 0) {
+
+            return "redirect:/main";
+        } else {
+
+            log.info(this.getClass().getName() + ".user/login End!");
+
+            return "user/login";
+        }
     }
 
     /**
@@ -251,7 +282,7 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".user/passProc End!");
 
-        return  "redirect:/user/login";
+        return "redirect:/user/login";
     }
 
     @ResponseBody
@@ -265,8 +296,8 @@ public class UserInfoController {
         String userId = CmmUtil.nvl(request.getParameter("userId"));
         String password = CmmUtil.nvl(request.getParameter("password"));
 
-        log.info("userId : " +  userId);
-        log.info("password : " +  password);
+        log.info("userId : " + userId);
+        log.info("password : " + password);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
@@ -274,9 +305,9 @@ public class UserInfoController {
 
         int res = userInfoService.getUserLogin(pDTO);
         UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO))
-                        .orElseGet(() -> UserInfoDTO.builder().build());
+                .orElseGet(() -> UserInfoDTO.builder().build());
 
-        log.info("res : " +res);
+        log.info("res : " + res);
 
         if (res == 1) {
 
@@ -297,16 +328,6 @@ public class UserInfoController {
         return dto;
     }
 
-    @GetMapping(value = "loginSuccess")
-    public String loginSuccess() {
-        log.info(this.getClass().getName() + ".user/loginSuccess Start!");
-
-        log.info(this.getClass().getName() + ".user/loginSuccess End!");
-
-        return "user/loginSuccess";
-
-    }
-
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         log.info(this.getClass().getName() + ".logout Start!");
@@ -317,7 +338,7 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".logout End!");
 
-        return "main/main"; // 로그아웃 후 이동할 URL 설정
+        return "main"; // 로그아웃 후 이동할 URL 설정
     }
 
     /**
@@ -363,7 +384,7 @@ public class UserInfoController {
 
         log.info("email : " + email);
 
-        UserInfoDTO pDTO =  UserInfoDTO.builder()
+        UserInfoDTO pDTO = UserInfoDTO.builder()
                 .email(EncryptUtil.encAES128CBC(email))
                 .build();
 
@@ -412,25 +433,22 @@ public class UserInfoController {
 
     // myPage
 
-    @GetMapping(value = "myPage")
-    public String myPage(HttpSession session, ModelMap model) throws Exception {
+    @GetMapping(value = "myPage/{userId}")
+    public String myPage(@PathVariable("userId") String userId, HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".user/myPage Start!");
 
-        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-        log.info("userId : " + userId);
+        String ssUserId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
+        log.info("ssUserId : " + ssUserId);
 
-        if (userId.length() > 0) {
+        if (ssUserId.length() > 0) {
 
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .build();
-
-            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(pDTO))
+            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(ssUserId))
                     .orElseGet(() -> UserInfoDTO.builder().build());
 
             model.addAttribute("rDTO", rDTO);
+            model.addAttribute("userId", ssUserId);
 
         } else {
             return "/user/login";
@@ -438,9 +456,8 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".user/myPage End!");
 
-        return  "user/myPage";
+        return "user/myPage";
     }
-
 
 
     // 유저 정보 수정 페이지 이동
@@ -451,30 +468,31 @@ public class UserInfoController {
         log.info(this.getClass().getName() + ".user/myPageEdit Start!");
 
         String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
         log.info("userId : " + userId);
 
+        UserInfoDTO pDTO = userInfoService.getUserInfo(userId);
+
+        String profilePath = pDTO.profilePath() != null && !pDTO.profilePath().isEmpty() ? pDTO.profilePath() : "/img/profile.png";
+
+        log.info("profilePath : " + profilePath);
+        log.info("userName : " + pDTO.userName());
 
         if (userId.length() > 0) {
 
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .build();
-
-            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(pDTO))
+            UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserInfo(userId))
                     .orElseGet(() -> UserInfoDTO.builder().build());
 
             model.addAttribute("rDTO", rDTO);
 
+            log.info(this.getClass().getName() + ".user/myPageEdit End!");
+
+            return "user/myPageEdit";
         } else {
 
             return "/user/login";
 
         }
-
-        log.info(this.getClass().getName() + ".user/myPageEdit End!");
-
-        return  "user/myPageEdit";
-
     }
 
     // 비밀 번호 변경 (MyPage) 페이지 이동
@@ -505,12 +523,12 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".user/myUpdatePassword Start!");
 
-        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
         String msg = ""; // 웹에 보여줄 메세지
         int result = 0;
 
-        if(userId.length() > 0) { //정상접근
+        if (userId.length() > 0) { //정상접근
 
             String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
 
@@ -524,7 +542,7 @@ public class UserInfoController {
             int res = userInfoService.updatePassword(pDTO);
 
 
-            if(res > 0) {
+            if (res > 0) {
 
                 msg = "비밀번호가 재설정되었습니다.";
                 result = 0;
@@ -558,46 +576,65 @@ public class UserInfoController {
 
 
     // 유저 정보 수정
-    @ResponseBody
+
     @PostMapping(value = "updateUserInfo")
-    public MsgDTO userInfoUpdate(HttpServletRequest request, HttpSession session) throws Exception {
+    public ResponseEntity<?> updateUserInfo(@RequestParam(value = "file", required = false) MultipartFile file,
+                                            @RequestParam(value = "nickName", required = false) String nickName,
+                                            HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() + ".updateUserInfo Start!");
 
-        String msg;
 
-        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
-        String userName = CmmUtil.nvl(request.getParameter("userName"));
-        String email = CmmUtil.nvl(request.getParameter("email"));
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
         log.info("userId : " + userId);
-        log.info("userName : " + userName);
-        log.info("email : " + (email));
+        log.info("nickName : " + nickName);
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
-                .userName(userName)
-                .email(email)
+                .nickName(nickName)
                 .build();
 
-        int res = userInfoService.updateUserInfo(pDTO);
+        userInfoService.newNickNameProc(pDTO);
 
-        log.info("호윈 정보 수정 결과(res) : " + res);
+        UserInfoDTO existingUserDTO = userInfoService.getUserInfo(userId);
 
-        if (res == 1) {
-            msg = "회원 정보 수정되었습니다..";
+        log.info("nickName : " + nickName);
 
-        } else {
+        if (file != null && !file.isEmpty()) {
 
-            msg = "오류로 인해 회원 정보 수정에 실패했습니다.";
+            // 파일이 제공되었고, 기존 이미지 URL이 존재하면 S3에서 기존 이미지 삭제
+            if (existingUserDTO != null && existingUserDTO.profilePath() != null) {
+                URL oldProfileUrl = new URL(existingUserDTO.profilePath());
+                String olds3ProfilePath = oldProfileUrl.getPath().substring(1); // URL에서 객체 키 추출 (앞의 '/' 제거)
+                log.info("olds3ProfilePath: " + olds3ProfilePath);
+                s3Client.deleteObject(bucketName, olds3ProfilePath);
+            }
 
+            String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+            String fileName = "profiles/" + userId + "_" + UUID.randomUUID().toString() + "." + extension;
+
+            try {
+                // S3에 프로필 이미지 업로드
+                s3Client.putObject(new PutObjectRequest(bucketName, fileName, file.getInputStream(), null)
+                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                String imageUrl = s3Client.getUrl(bucketName, fileName).toString();
+
+                // 이미지 경로를 데이터베이스에 저장
+                UserInfoDTO iDTO = UserInfoDTO.builder()
+                        .userId(userId)
+                        .profilePath(imageUrl)
+                        .build();
+                userInfoService.profilePathProc(iDTO);
+
+                return ResponseEntity.ok("프로필 업데이트 성공!");
+            } catch (Exception e) {
+                log.info("error : " + e);
+                return ResponseEntity.badRequest().body("프로필 등록에 실패했습니다.");
+            }
         }
 
-        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
-
-        log.info(this.getClass().getName() + ".updateUserInfo End!");
-
-        return dto;
+        return ResponseEntity.ok("프로필 업데이트 성공!");
     }
 
 

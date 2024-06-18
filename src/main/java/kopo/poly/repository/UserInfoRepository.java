@@ -15,6 +15,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfoEntity, String
     // 회원 존재 여부 체크
     Optional<UserInfoEntity> findByUserId(String userId);
 
+    Optional<UserInfoEntity> findByNickName(String nickName);
+
     Optional<UserInfoEntity> findByEmail(String email);
 
     // 로그인 (아이디, 비밀번호 확인)
@@ -36,8 +38,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfoEntity, String
      */
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query(value = "UPDATE USER_INFO A SET A.email = ?2, A.USER_NAME = ?3 WHERE A.USER_ID = ?1",
+    @Query(value = "UPDATE USER_INFO A SET A.NICKNAME = ?2 WHERE A.USER_ID = ?1",
             nativeQuery = true)
-    int updateUserInfo(String userId, String email, String userName);
+    int updateUserInfo(String userId, String nickName);
 
 }

@@ -12,6 +12,7 @@ import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -49,13 +50,34 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
-    public UserInfoDTO getUserInfo(UserInfoDTO pDTO) throws Exception {
+    public UserInfoDTO getNickNameExists(UserInfoDTO pDTO) throws Exception {
+        log.info(this.getClass().getName() + ".getNickNameExists Start!");
+
+        UserInfoDTO rDTO;
+
+        String nickName = CmmUtil.nvl(pDTO.nickName());
+
+        log.info("nickName : " + nickName);
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByNickName(nickName);
+
+        if (rEntity.isPresent()) {
+            rDTO = UserInfoDTO.builder().existsYn("Y").build();
+        } else {
+            rDTO = UserInfoDTO.builder().existsYn("N").build();
+        }
+
+        log.info(this.getClass().getName() + ".getNickNameExists End!");
+
+        return rDTO;
+    }
+
+    @Override
+    public UserInfoDTO getUserInfo(String userId) throws Exception {
 
         log.info(this.getClass().getName() + ".getUserInfo Start!");
 
         UserInfoDTO rDTO;
-
-        String userId = CmmUtil.nvl(pDTO.userId());
 
         log.info("userId : " + userId);
 
@@ -67,6 +89,7 @@ public class UserInfoService implements IUserInfoService {
             String nickName = rEntity.get().getNickName();
             String email = EncryptUtil.decAES128CBC(rEntity.get().getEmail());
             String regDt = rEntity.get().getRegDt();
+            String profilePath = rEntity.get().getProfilePath();
 
             log.info("userId : " + userId);
             log.info("userName : " + userName);
@@ -81,6 +104,7 @@ public class UserInfoService implements IUserInfoService {
                     .email(email)
                     .regDt(regDt)
                     .existsYn("Y")
+                    .profilePath(profilePath)
                     .build();
 
         } else {
@@ -176,10 +200,11 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + ".sendSignUpEmailAuth Start!");
 
-        String existsYn = pDTO.existsYn();;
+        String existsYn = pDTO.existsYn();
+        ;
 
 
-        int authNumber = ThreadLocalRandom.current().nextInt(100000,1000000);
+        int authNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
 
         log.info("authNumber : " + authNumber);
 
@@ -226,10 +251,10 @@ public class UserInfoService implements IUserInfoService {
         String existsYn = CmmUtil.nvl(rDTO.existsYn());
         log.info("existsYn : " + existsYn);
 
-        if(existsYn.equals("Y")) {
+        if (existsYn.equals("Y")) {
             // 6자리 랜덤 숫자 생성하기
 
-            int authNumber = ThreadLocalRandom.current().nextInt(100000,1000000);
+            int authNumber = ThreadLocalRandom.current().nextInt(100000, 1000000);
 
             log.info("authNumber : " + authNumber);
 
@@ -335,6 +360,45 @@ public class UserInfoService implements IUserInfoService {
 
     }
 
+    /**
+     * 닉네임 변경
+     *
+     * @param pDTO 회원정보
+     */
+    @Transactional
+    @Override   // 닉네임 변경 함수
+    public void newNickNameProc(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + "newNickNameProc start!");
+
+        log.info("nickName : " + pDTO.nickName());
+
+        String userId = CmmUtil.nvl(pDTO.userId());
+
+        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
+
+        if (uEntity.isPresent()) {
+
+            UserInfoEntity rEntity = uEntity.get();
+
+            log.info("userName : " + rEntity.getUserName());
+
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(rEntity.getUserId())
+                    .userName(rEntity.getUserName())
+                    .nickName(pDTO.nickName())
+                    .password(rEntity.getPassword())
+                    .email(rEntity.getEmail())
+                    .regDt(rEntity.getRegDt())
+                    .profilePath(rEntity.getProfilePath())
+                    .build();
+
+            userInfoRepository.save(pEntity);
+        }
+
+        log.info(this.getClass().getName() + "newNickNameProc end!");
+    }
+
     @Override
     public int updatePassword(UserInfoDTO pDTO) throws Exception {
 
@@ -346,7 +410,7 @@ public class UserInfoService implements IUserInfoService {
 
         Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
 
-        if(rEntity.isPresent()){
+        if (rEntity.isPresent()) {
 
             String userName = rEntity.get().getUserName();
             String nickName = rEntity.get().getNickName();
@@ -390,19 +454,19 @@ public class UserInfoService implements IUserInfoService {
 
         Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
 
-        if(rEntity.isPresent()){
+        if (rEntity.isPresent()) {
 
-            String userName = pDTO.userName();
-            String email = EncryptUtil.encAES128CBC(pDTO.email());
+            String nickName = pDTO.nickName();
 
             log.info("userId : " + userId);
-            log.info("userName : " + userName);
-            log.info("email : " + email);
+            log.info("nickName : " + nickName);
 
             // 회원정보 DB에 저장
-            userInfoRepository.updateUserInfo(userId,email,userName);
+            userInfoRepository.updateUserInfo(userId, nickName);
 
             res = 1;
+
+            log.info("res : " + res);
 
         }
 
@@ -426,6 +490,42 @@ public class UserInfoService implements IUserInfoService {
         userInfoRepository.deleteById(userId);
 
         log.info(this.getClass().getName() + ".deleteUserInfo End!");
+
+    }
+
+    @Transactional
+    @Override
+    public void profilePathProc(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + "profilePathProc start!");
+
+        String userId = CmmUtil.nvl(pDTO.userId());
+
+        // 사용자 ID로 사용자 엔티티 조회
+        Optional<UserInfoEntity> uEntity = userInfoRepository.findByUserId(userId);
+
+        if (uEntity.isPresent()) {
+
+            UserInfoEntity rEntity = uEntity.get();
+
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(rEntity.getUserId())
+                    .userName(rEntity.getUserName())
+                    .nickName(rEntity.getNickName())
+                    .password(rEntity.getPassword())
+                    .email(rEntity.getEmail())
+                    .regDt(rEntity.getRegDt())
+                    .profilePath(pDTO.profilePath())
+                    .build();
+
+            userInfoRepository.save(pEntity);
+
+        } else {
+            log.error("No user found with ID: " + userId);
+            throw new RuntimeException("User not found");
+        }
+
+        log.info(this.getClass().getName() + "profilePathProc End!");
 
     }
 }

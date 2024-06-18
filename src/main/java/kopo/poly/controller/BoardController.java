@@ -1,7 +1,11 @@
 package kopo.poly.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kopo.poly.dto.BoardImgDTO;
 import kopo.poly.dto.CommentDTO;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.BoardDTO;
@@ -10,14 +14,22 @@ import kopo.poly.service.IBoardService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /*
  * Controller 선언해야만 Spring 프레임워크에서 Controller인지 인식 가능
@@ -36,6 +48,16 @@ public class BoardController {
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
     private final IBoardService boardService;
     private final ICommentService commentService;
+    private final AmazonS3 s3Client;
+    private final String bucketName;
+
+    @Autowired
+    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService) {
+        this.s3Client = s3Client;
+        this.bucketName = bucketName;
+        this.boardService = boardService;
+        this.commentService = commentService;
+    }
 
     /**
      * 게시판 리스트 보여주기
@@ -44,8 +66,8 @@ public class BoardController {
      */
     @GetMapping(value = "boardList")
     public String BoardList(HttpSession session, ModelMap model,
-                             @RequestParam(defaultValue = "1") int page,
-                             @RequestParam(defaultValue = "10") int size) throws Exception {
+                            @RequestParam(defaultValue = "1") int page,
+                            @RequestParam(defaultValue = "10") int size) throws Exception {
 
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".boardList Start!");
@@ -89,15 +111,21 @@ public class BoardController {
      * GetMapping(value = "board/boardReg") =>  GET방식을 통해 접속되는 URL이 board/boardReg 경우 아래 함수를 실행함
      */
     @GetMapping(value = "boardReg")
-    public String BoardReg() {
+    public String BoardReg(HttpSession session) {
 
         log.info(this.getClass().getName() + ".boardReg Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
         log.info(this.getClass().getName() + ".boardReg End!");
 
         // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
         // templates/board/boardReg.html
-        return "board/boardReg";
+        if (userId.length() > 0) {
+            return "board/boardReg";
+        } else {
+            return "redirect:/user/login";
+        }
     }
 
     /**
@@ -106,22 +134,18 @@ public class BoardController {
      * 게시글 등록은 Ajax로 호출되기 때문에 결과는 JSON 구조로 전달해야만 함
      * JSON 구조로 결과 메시지를 전송하기 위해 @ResponseBody 어노테이션 추가함
      */
-    @ResponseBody
+    @Transactional
     @PostMapping(value = "boardInsert")
-    public MsgDTO boardInsert(HttpServletRequest request, HttpSession session) {
+    public ResponseEntity<?> boardInsert(HttpServletRequest request, @RequestParam("images") MultipartFile[] images, HttpSession session) {
 
         log.info(this.getClass().getName() + ".boardInsert Start!");
 
-        String msg = ""; // 메시지 내용
-
-        MsgDTO dto; // 결과 메시지 구조
-
         try {
             // 로그인된 사용자 아이디를 가져오기
-            // 로그인을 아직 구현하지 않았기에 게시판 리스트에서 로그인 한 것처럼 Session 값을 저장함
             String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
+            List<BoardImgDTO> imgDTOList = new ArrayList<>();
 
             /*
              * ####################################################################################
@@ -136,31 +160,40 @@ public class BoardController {
             BoardDTO pDTO = BoardDTO.builder()
                     .userId(userId)
                     .title(title)
-                    .contents(contents).build();
+                    .contents(contents)
+                    .images(imgDTOList)
+                    .build();
 
             /*
              * 게시글 등록하기위한 비즈니스 로직을 호출
              */
-            boardService.insertBoardInfo(pDTO);
+            Long boardSeq = boardService.insertBoardInfo(pDTO);
 
-            // 저장이 완료되면 사용자에게 보여줄 메시지
-            msg = "등록되었습니다.";
+            // 이미지 처리 및 데이터베이스 저장
+            for (MultipartFile image : images) {
+                if (!image.isEmpty()) {
+                    String extension = FilenameUtils.getExtension(image.getOriginalFilename());
+                    String fileName = "boards/" + userId + "_" + boardSeq + "_" + UUID.randomUUID().toString() + "." + extension;
 
+                    s3Client.putObject(new PutObjectRequest(bucketName, fileName, image.getInputStream(), null)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
+                    String imageUrl = s3Client.getUrl(bucketName, fileName).toString();
+
+                    BoardImgDTO boardImageDTO = new BoardImgDTO(null, boardSeq, imageUrl);
+                    imgDTOList.add(boardImageDTO);
+                }
+            }
+
+            // 이미지 정보 업데이트 (데이터베이스에 이미지 정보 저장)
+            boardService.updateBoardImages(boardSeq, imgDTOList);
+
+            return ResponseEntity.ok("게시글 등록에 성공했습니다.");
         } catch (Exception e) {
-
-            // 저장이 실패되면 사용자에게 보여줄 메시지
-            msg = "실패하였습니다. : " + e.getMessage();
-            log.info(e.toString());
-            e.printStackTrace();
-
+            log.error("게시글 등록 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 등록에 실패했습니다. : " + e.getMessage());
         } finally {
-            // 결과 메시지 전달하기
-            dto = MsgDTO.builder().msg(msg).build();
-
             log.info(this.getClass().getName() + ".boardInsert End!");
         }
-
-        return dto;
     }
 
     /**
@@ -196,11 +229,15 @@ public class BoardController {
         BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, true))
                 .orElseGet(() -> BoardDTO.builder().build());
 
+        List<BoardImgDTO> iList = Optional.ofNullable(boardService.getImageList(pDTO))
+                .orElseGet(ArrayList::new);
+
         List<CommentDTO> cList = Optional.ofNullable(commentService.getCommentList(cDTO))
                 .orElseGet(() -> new ArrayList<>());
 
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rDTO", rDTO);
+        model.addAttribute("iList", iList);
         model.addAttribute("cList", cList);
 
         log.info(this.getClass().getName() + ".boardInfo End!");
@@ -212,53 +249,60 @@ public class BoardController {
      * 게시판 수정 보기
      */
     @GetMapping(value = "boardEditInfo")
-    public String boardEditInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    public String boardEditInfo(HttpServletRequest request, ModelMap model, HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() + ".boardEditInfo Start!");
 
-        String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 공지글번호(PK)
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
-        /*
-         * ####################################################################################
-         * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
-         * ####################################################################################
-         */
-        log.info("nSeq : " + nSeq);
+        if (userId.length() > 0) {
+            String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 공지글번호(PK)
 
-        /*
-         * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
-         */
-        BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
+            /*
+             * ####################################################################################
+             * 반드시, 값을 받았으면, 꼭 로그를 찍어서 값이 제대로 들어오는지 파악해야함 반드시 작성할 것
+             * ####################################################################################
+             */
+            log.info("nSeq : " + nSeq);
 
-        // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
-        BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, false))
-                .orElseGet(() -> BoardDTO.builder().build());
+            /*
+             * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
+             */
+            BoardDTO pDTO = BoardDTO.builder().boardSeq(Long.parseLong(nSeq)).build();
 
-        // 조회된 리스트 결과값 넣어주기
-        model.addAttribute("rDTO", rDTO);
+            // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
+            BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, false))
+                    .orElseGet(() -> BoardDTO.builder().build());
 
-        log.info(this.getClass().getName() + ".boardEditInfo End!");
+            List<BoardImgDTO> iList = Optional.ofNullable(boardService.getImageList(pDTO))
+                    .orElseGet(ArrayList::new);
 
-        return "board/boardEditInfo";
+            // 조회된 리스트 결과값 넣어주기
+            model.addAttribute("rDTO", rDTO);
+            model.addAttribute("iList", iList);
+
+            log.info(this.getClass().getName() + ".boardEditInfo End!");
+
+            return "board/boardEditInfo";
+        } else {
+            return "redirect:/user/login";
+        }
     }
 
     /**
      * 게시판 글 수정
      */
-    @ResponseBody
     @PostMapping(value = "boardUpdate")
-    public MsgDTO boardUpdate(HttpSession session, HttpServletRequest request) {
+    public ResponseEntity<?> boardUpdate(HttpServletRequest request, @RequestParam("images") MultipartFile[] images, HttpSession session) {
 
         log.info(this.getClass().getName() + ".boardUpdate Start!");
 
-        String msg = ""; // 메시지 내용
-        MsgDTO dto = null; // 결과 메시지 구조
-
         try {
             String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 아이디
-            String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 글번호(PK)
+            Long boardSeq = Long.parseLong(CmmUtil.nvl(request.getParameter("nSeq"))); // 글번호(PK)
             String title = CmmUtil.nvl(request.getParameter("title")); // 제목
             String contents = CmmUtil.nvl(request.getParameter("contents")); // 내용
+            List<BoardImgDTO> imageDTOList = new ArrayList<>();
 
             /*
              * ####################################################################################
@@ -266,7 +310,7 @@ public class BoardController {
              * ####################################################################################
              */
             log.info("userId : " + userId);
-            log.info("nSeq : " + nSeq);
+            log.info("boardSeq : " + boardSeq);
             log.info("title : " + title);
             log.info("contents : " + contents);
 
@@ -275,31 +319,38 @@ public class BoardController {
              */
             BoardDTO pDTO = BoardDTO.builder()
                     .userId(userId)
-                    .boardSeq(Long.parseLong(nSeq))
+                    .boardSeq(boardSeq)
                     .title(title)
                     .contents(contents)
+                    .images(imageDTOList)
                     .build();
 
             // 게시글 수정하기 DB
             boardService.updateBoardInfo(pDTO);
 
-            msg = "수정되었습니다.";
+            for (MultipartFile image : images) {
+                if (!image.isEmpty()) {
+                    String extension = FilenameUtils.getExtension(image.getOriginalFilename());
+                    String fileName = "boards/" + userId + "_" + boardSeq + "_" + UUID.randomUUID().toString() + "." + extension;
 
+                    s3Client.putObject(new PutObjectRequest(bucketName, fileName, image.getInputStream(), null)
+                            .withCannedAcl(CannedAccessControlList.PublicRead));
+                    String imageUrl = s3Client.getUrl(bucketName, fileName).toString();
+
+                    BoardImgDTO boardImageDTO = new BoardImgDTO(null, boardSeq, imageUrl);
+                    imageDTOList.add(boardImageDTO);
+                }
+            }
+
+            boardService.updateBoardImages(boardSeq, imageDTOList);
+
+            return ResponseEntity.ok("게시글 수정에 성공했습니다.");
         } catch (Exception e) {
-            msg = "실패하였습니다. : " + e.getMessage();
-            log.info(e.toString());
-            e.printStackTrace();
-
+            log.error("게시글 수정 실패", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("게시글 수정에 실패했습니다. : " + e.getMessage());
         } finally {
-
-            // 결과 메시지 전달하기
-            dto = MsgDTO.builder().msg(msg).build();
-
-            log.info(this.getClass().getName() + ".boardUpdate End!");
-
+            log.info(this.getClass().getName() + ".noticeUpdate End!");
         }
-
-        return dto;
     }
 
     /**
@@ -349,5 +400,44 @@ public class BoardController {
         }
 
         return dto;
+    }
+
+    /**
+     * 게시글 수정 (각 이미지 삭제)
+     */
+    @DeleteMapping("deleteImage/{imageSeq}")
+    public ResponseEntity<?> deleteImage(HttpServletRequest request, @PathVariable("imageSeq") Long imageSeq) {
+
+        log.info(this.getClass().getName() + ".deleteImage Start!");
+
+        try {
+
+            String nSeq = CmmUtil.nvl(request.getParameter("nSeq"));
+            log.info("nSeq : " + nSeq);
+            log.info("imageSeq : " + imageSeq);
+
+            BoardImgDTO pDTO = BoardImgDTO.builder()
+                    .imageSeq(imageSeq)
+                    .boardSeq(Long.parseLong(nSeq))
+                    .build();
+
+            String imagePath = boardService.getImagePath(pDTO);
+
+            if (imagePath != null && !imagePath.isEmpty()) {
+                URL oldimagePath = new URL(imagePath);
+                String substringedimagePath = oldimagePath.getPath().substring(1); // URL에서 객체 키 추출 (앞의 '/' 제거)
+                log.info("substringedimagePath: " + substringedimagePath);
+                s3Client.deleteObject(bucketName, substringedimagePath);
+            }
+
+            boardService.deleteImageById(pDTO);
+
+            log.info(this.getClass().getName() + ".deleteImage End!");
+
+            return ResponseEntity.ok().body("이미지 삭제 성공");
+        } catch (Exception e) {
+            log.error("error : " + e);
+            return ResponseEntity.badRequest().body("이미지 삭제 실패: " + e.getMessage());
+        }
     }
 }
