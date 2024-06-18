@@ -25,15 +25,15 @@ public record AnimalDTO(
         @Id
         Long desertionNo,     // 유기번호
         String fileName,      // 썸네일 이미지
-        Date happenDt,        // 접수일
+        String happenDt,        // 접수일
         String happenPlace,   // 발견 장소
         String kindCd,        // 품종
         String colorCd,       // 생상
         String age,           // 나이
         String weight,        // 체중
         String noticeNo,      // 공고 번호
-        Long noticeSdt,       // 공고 시작일
-        Long noticeEdt,       // 공고 종료일
+        String noticeSdt,       // 공고 시작일
+        String noticeEdt,       // 공고 종료일
         String popfile,         // 이미지
         String processState,    // 상태
         String sexCd,           // 성별

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -37,7 +39,7 @@ public class AnimalService implements IAnimalService {
 
     private final MongoTemplate mongodb;
 
-    @Scheduled(fixedRate = 21600000)
+    @Scheduled(fixedRate = 3600000)
     @Override
     public void saveAnimalList() {
 
@@ -45,6 +47,8 @@ public class AnimalService implements IAnimalService {
 
         int pageNo = 1;
         boolean hasMorePages = true;
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("yy.MM.dd");
 
         try {
             while (hasMorePages) {
@@ -94,18 +98,23 @@ public class AnimalService implements IAnimalService {
                 List<AnimalDTO> animalList = new ArrayList<>();
                 if (itemsNode.isArray() && itemsNode.size() > 0) {
                     for (JsonNode itemNode : itemsNode) {
+                        String kindCd = itemNode.path("kindCd").asText().replaceAll("\\[.*?\\]\\s*", "");
+                        String happenDt = formatDateString(itemNode.path("happenDt").asText(), inputDateFormat, outputDateFormat);
+                        String noticeSdt = formatDateString(itemNode.path("noticeSdt").asText(), inputDateFormat, outputDateFormat);
+                        String noticeEdt = formatDateString(itemNode.path("noticeEdt").asText(), inputDateFormat, outputDateFormat);
+
                         AnimalDTO animal = AnimalDTO.builder()
                                 .desertionNo(itemNode.path("desertionNo").asLong())
                                 .fileName(itemNode.path("fileName").asText())
-                                .happenDt(new Date(itemNode.path("happenDt").asLong()))
+                                .happenDt(happenDt)
                                 .happenPlace(itemNode.path("happenPlace").asText())
-                                .kindCd(itemNode.path("kindCd").asText())
+                                .kindCd(kindCd)
                                 .colorCd(itemNode.path("colorCd").asText())
                                 .age(itemNode.path("age").asText())
                                 .weight(itemNode.path("weight").asText())
                                 .noticeNo(itemNode.path("noticeNo").asText())
-                                .noticeSdt(itemNode.path("noticeSdt").asLong())
-                                .noticeEdt(itemNode.path("noticeEdt").asLong())
+                                .noticeSdt(noticeSdt)
+                                .noticeEdt(noticeEdt)
                                 .popfile(itemNode.path("popfile").asText())
                                 .processState(itemNode.path("processState").asText())
                                 .sexCd(itemNode.path("sexCd").asText())
@@ -127,6 +136,7 @@ public class AnimalService implements IAnimalService {
                     for (AnimalDTO animal : animalList) {
                         mongodb.save(animal);
                     }
+
                     pageNo++;
 
                 } else {
@@ -157,9 +167,12 @@ public Page<AnimalDTO> getAnimalListAll(AnimalDTO pDTO, Pageable pageable) throw
 
     log.info(this.getClass().getName() + ".getAnimalList Start!");
 
-    Query query = new Query().with(pageable);
+    Query query = new Query().with(pageable).with(Sort.by(Sort.Order.desc("happenDt")));
 
     List<AnimalDTO> animalList = mongodb.find(query, AnimalDTO.class);
+
+    log.info("animalList : " + animalList);
+
     long total = mongodb.count(query.skip(-1).limit(-1), AnimalDTO.class); // 전체 데이터 수를 가져옴
 
     log.info("total data : " + total);
@@ -184,6 +197,16 @@ public Page<AnimalDTO> getAnimalListAll(AnimalDTO pDTO, Pageable pageable) throw
         log.info(this.getClass().getName() + ".getAnimalInfoService End!");
 
         return rDTO;
+    }
+
+    private String formatDateString(String dateStr, SimpleDateFormat inputFormat, SimpleDateFormat outputFormat) {
+        try {
+            Date date = inputFormat.parse(dateStr);
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            log.error("Date parsing error: " + dateStr, e);
+            return dateStr;
+        }
     }
 }
 
