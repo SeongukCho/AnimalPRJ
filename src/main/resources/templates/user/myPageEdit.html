@@ -1,10 +1,344 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="ko">
 
+<head>
+    <title>마이페이지</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <script th:inline="javascript">
+
+        const user_id = [[${rDTO.userId}]];
+
+        document.addEventListener("DOMContentLoaded", function() {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.getElementById("myPage");
+            myPage.href = "/user/myPage/" + userId;
+        });
+
+        function isValidFileType(file) {
+            const allowedExtensions = ['image/png', 'image/jpeg'];
+            return allowedExtensions.includes(file.type);
+        }
+
+        $(document).ready(function () {
+            // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+
+            let f = document.getElementById("f");
+
+            // 닉네임 중복체크
+            $("#btnNickname").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
+                nickNameExists(f)
+            })
+
+            $("#btnProfileEdit").on("click", function () {
+                doEdit()
+            })
+
+            $("#btnBack").on("click", function () {
+                location.href = "/user/myPage";
+            })
+        })
+
+        // 회원닉네임 중복 체크
+        function nickNameExists(f) {
+
+            if (f.nickName.value === "") {
+                alert("닉네임을 입력하세요.");
+                f.nickName.focus();
+                return;
+            }
+
+            // Ajax 호출해서 회원가입하기
+            $.ajax({
+                url: "/user/getNickNameExists",
+                type: "post", // 전송방식은 Post
+                dataType: "JSON", // 전송 결과는 JSON으로 받기
+                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                success: function (json) { // 호출이 성공했다면..
+
+                    if (json.existsYn === "Y") {
+                        alert("이미 가입된 닉네임이 존재합니다.");
+                        f.nickName.focus();
+
+                    } else {
+                        alert("설정 가능한 닉네임입니다.");
+                        nickNameCheck = "N";
+                    }
+
+                }
+            })
+        }
+
+        function myPageEdit() {
+            let fileInput = document.getElementById('profileImage');
+            let file = fileInput.files[0];
+            let nickName = document.getElementById('nickName').value;
+
+            if (nickName.length > 16) {
+                alert('닉네임은 16자리 미만이어야 합니다.');
+                return;
+            }
+
+            if (!nickName) {
+                alert('닉네임을 입력해주세요.');
+                document.getElementById('nickName').focus();
+                return;
+            }
+
+            if (file && !isValidFileType(file)) {
+                alert(file.name + ' 파일은 지원되지 않는 형식입니다. PNG 또는 JPG 파일만 업로드해주세요.');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('nickName', nickName);
+
+            // 파일이 선택되었는지 확인
+            if (file) {
+                formData.append('file', file);
+            }
+
+            // Ajax 호출해서 수정하기
+            $.ajax({
+                url: "/user/updateUserInfo",
+                type: "post", // 전송방식은 Post
+                data: formData, // 전송 결과는 JSON으로 받기
+                contentType: false, // 필수: contentType을 false로 설정
+                processData: false, // 필수: processData를 false로 설정
+                success: function (response) {
+                    alert(response); // 메시지 띄우기
+                    location.href = "/user/myPage/" + user_id;
+                    if (file) {
+                        previewProfileImage(fileInput); // 파일이 선택되었다면 미리보기 갱신
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('프로필 등록에 실패했습니다.');
+                }
+            });
+        }
+
+        function previewProfileImage(input) {
+            var file = input.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('profileImg').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="">고객센터</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" id="myPage">마이페이지</a>
+                &nbsp;&nbsp;
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+                <ul>
+                    <li class="has-sub">
+                        <a href="/animal/animalList">유기동물 조회</a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="">고객센터</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/user/myPage" title="마이 페이지">마이 페이지</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/user/myPage" title="마이 페이지">마이 페이지</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">마이 페이지</h1>
+            <div class="sContent">
+                <div id="cms_member_article">
+                    <form id="f" enctype="multipart/form-data">
+                        <div class="writeTypeA mt10">
+                            <div class="form-group" style="position: relative; left: 200px;">
+                                <img th:src="${rDTO.profilePath}" onerror="this.src='/img/profile.png'" alt="프로필 이미지"
+                                     style="width: 200px; height: 200px; border: 1px solid #000;">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">아이디</label>
+                                <div>[[${rDTO.userId}]]</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">이름</label>
+                                <div>[[${rDTO.userName}]]</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="nickName" class="required">닉네임</label>
+                                <div>
+                                    <input type="text" name="nickName" id="nickName" class="input-field" maxlength="20"
+                                           style="ime-mode:disabled; width:50%" th:value="${rDTO.nickName}">
+                                    <button id="btnNickname" type="button" class="action-button button-small">닉네임 중복확인
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">이메일</label>
+                                <div>[[${rDTO.email}]]</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="required">가입일</label>
+                                <div>[[${rDTO.regDt}]]</div>
+                            </div>
+                            <label for="profileImage" class="file-upload-label">프로필 사진 업로드</label>
+                            <input type="file" name="profileImage" id="profileImage" class="file-upload-input"
+                                   accept="image/*">
+                            <span id="fileName" class="file-upload-filename">선택된 파일 없음</span>
+                            <div class="form-group">
+                                <button type="button" class="btnTypeB" style="margin-left: 350px" onclick="myPageEdit()" >
+                                    회원정보 수정
+                                </button>
+                                <button id="btnWithDrawal" class="btnTypeB" style="background-color: red" type="button">
+                                    회원 탈퇴
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
+<script>
+    const profileImageInput = document.getElementById('profileImage');
+    const fileNameSpan = document.getElementById('fileName');
+
+    profileImageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        const validExtensions = ['image/jpeg', 'image/png'];
+        if (file) {
+            if (!validExtensions.includes(file.type)) {
+                alert('JPG 및 PNG 파일만 업로드 가능합니다.');
+                this.value = ''; // 선택된 파일을 초기화합니다.
+                fileNameSpan.textContent = '선택된 파일 없음';
+            } else {
+                fileNameSpan.textContent = file.name;
+            }
+        } else {
+            fileNameSpan.textContent = '선택된 파일 없음';
+        }
+    });
+</script>
 </html>

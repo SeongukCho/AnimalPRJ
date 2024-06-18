@@ -24,13 +24,56 @@
 
     <script type="text/javascript">
 
+        let currentFiles = [];
+
         // HTML로딩이 완료되고, 실행됨
+        document.addEventListener("DOMContentLoaded", function() {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.getElementById("myPage");
+            myPage.href = "/user/myPage/" + userId;
+        });
+
         $(document).ready(function () {
+
+            $('#image').on('change', function () {
+                // 선택된 파일들을 배열에 추가
+                Array.from(this.files).forEach(file => {
+                    currentFiles.push(file);
+                });
+                displayFileList(); // 파일 리스트 업데이트
+            });
+
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-            $("#btnSend").on("click", function () {
+            $("#btnEdit").on("click", function () {
                 doSubmit(); // 게시판 수정하기 실행
             })
         })
+
+        $("button[type='reset']").on("click", function () {
+            currentFiles = [];
+            displayFileList(); // 파일 리스트 업데이트
+        });
+
+        function displayFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            currentFiles.forEach((file, index) => {
+                const fileEntry = document.createElement('div');
+                fileEntry.textContent = file.name;
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = 'Remove';
+                removeBtn.onclick = function () {
+                    removeFile(index);
+                };
+                fileEntry.appendChild(removeBtn);
+                fileList.appendChild(fileEntry);
+            });
+        }
+
+        function removeFile(index) {
+            currentFiles.splice(index, 1);
+            displayFileList();
+        }
 
         //글자 길이 바이트 단위로 체크하기(바이트값 전달)
         function calBytes(str) {
@@ -49,100 +92,260 @@
             return tcount;
         }
 
+        function deleteImage(imageSeq) {
+            // rDTO.boardSeq 값 가져오기
+            const nSeq = document.getElementById("nSeq").value;
+
+            $.ajax({
+                url: '/board/deleteImage/' + imageSeq,
+                type: 'DELETE',
+                data: {nSeq: nSeq},
+                success: function (response) {
+                    $('#image-container-' + imageSeq).hide();
+                },
+                error: function () {
+                    alert('이미지 삭제 실패');
+                }
+            });
+        }
+
         // 게시판 저장하기
         function doSubmit() {
 
-            let f = document.getElementById("f"); // form 태그
+            const form = document.getElementById("f"); // form 태그
+            const formData = new FormData(form);
 
-            if (f.title.value === "") {
-                alert("제목을 입력하시기 바랍니다.");
-                f.title.focus();
-                return;
+            formData.delete('images');
+
+            if (currentFiles.length > 0) {
+                currentFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+            } else {
+                formData.append('images', new Blob(), '');
             }
-            if (calBytes(f.title.value) > 200) {
-                alert("최대 200Bytes까지 입력 가능합니다.");
-                f.title.focus();
-                return;
-            }
-            // let boardCheck = false; //체크 여부 확인 변수
-            // for (let i = 0; i < f.boardYn.length; i++) {
-            //     if (f.boardYn[i].checked) {
-            //         boardCheck = true;
-            //         break;
-            //     }
-            // }
-            // if (boardCheck === false) {
-            //     alert("공지글 여부를 선택하시기 바랍니다.");
-            //     f.boardYn[0].focus();
-            //     return;
-            // }
-            if (f.contents.value === "") {
-                alert("내용을 입력하시기 바랍니다.");
-                f.contents.focus();
-                return;
-            }
-            if (calBytes(f.contents.value) > 4000) {
-                alert("최대 4000Bytes까지 입력 가능합니다.");
-                f.contents.focus();
+
+            formData.append('title', form.title.value);
+            formData.append('contents', form.contents.value);
+
+            if (!validateForm(form)) {
                 return;
             }
 
             // Ajax 호출해서 글 등록하기
             $.ajax({
-                    url: "/board/boardUpdate",
-                    type: "post", // 전송방식은 Post
-                    dataType: "JSON", // 전송 결과는 JSON으로 받기
-                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
-                    success: function (json) { // /board/boardUpdate 호출이 성공했다면..
-                        alert(json.msg); // 메시지 띄우기
-                        location.href = "/board/boardList"; // 게시판 리스트 이동
-                    }
+                url: "/board/boardUpdate",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    alert(response);
+                    window.location.href = "/board/boardList";
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + xhr.responseText);
                 }
-            )
+            });
+        }
+
+        function validateForm(form) {
+            if (form.title.value === "") {
+                alert("제목을 입력하시기 바랍니다.");
+                form.title.focus();
+                return false;
+            }
+            if (calBytes(form.title.value) > 200) {
+                alert("최대 200Bytes까지 입력 가능합니다.");
+                form.title.focus();
+                return false;
+            }
+            if (form.contents.value === "") {
+                alert("내용을 입력하시기 바랍니다.");
+                form.contents.focus();
+                return false;
+            }
+            if (calBytes(form.contents.value) > 4000) {
+                alert("최대 4000Bytes까지 입력 가능합니다.");
+                form.contents.focus();
+                return false;
+            }
+
+            return true;
         }
     </script>
 </head>
 <body>
-<h2>글 수정</h2>
-<hr/>
-<br/>
-<form name="f" id="f">
-    <input type="hidden" name="nSeq" th:value="${rDTO.boardSeq}"/>
-    <div class="divTable minimalistBlack">
-        <div class="divTableBody">
-            <div class="divTableRow">
-                <div class="divTableCell">제목</div>
-                <div class="divTableCell">
-                    <input type="text" name="title" maxlength="100" th:value="${rDTO.title}"
-                           style="width: 95%"/>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="">고객센터</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" id="myPage">마이페이지</a>
+                &nbsp;&nbsp;
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+                <ul>
+                    <li class="has-sub">
+                        <a href="/animal/animalList">유기동물 조회</a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="">고객센터</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/board/boardList" title="게시판">게시판</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <div class="large">회원</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">게시판</span>
+                            <ul>
+                                <li>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
-<!--            <div class="divTableRow">-->
-<!--                <div class="divTableCell">공지글 여부</div>-->
-<!--                <div class="divTableCell">-->
-<!--                    예<input type="radio" name="boardYn" value="Y" th:checked="${rDTO.boardYn eq 'Y'}"/>-->
-<!--                    아니오<input type="radio" name="boardYn" value="N" th:checked="${rDTO.boardYn eq 'N'}"/>-->
-<!--                </div>-->
-<!--            </div>-->
-            <div class="divTableRow">
-                <div class="divTableCell">조회수</div>
-                <div class="divTableCell" th:text="${rDTO.readCnt}">
-                </div>
-            </div>
-            <div class="divTableRow">
-                <div class="divTableCell">내용</div>
-                <div class="divTableCell">
-                    <textarea name="contents"
-                              style="width: 95%; height: 400px" th:text="${rDTO.contents}"></textarea>
-                </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">작성글 수정</h1>
+            <div id="cms_board_article">
+                <form name="f" id="f" enctype="multipart/form-data">
+                    <input type="hidden" name="nSeq" id="nSeq" th:value="${rDTO.boardSeq}"/>
+                    <div class="form-group">
+                        <label for="title">제목 :</label>
+                        <input type="text" name="title" id="title" class="form-control" maxlength="100"
+                               th:value="${rDTO.title}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contents">내용 :</label>
+                        <textarea name="contents" id="contents" class="form-control" style="height: 400px"
+                                  th:text="${rDTO.contents}" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>현재 이미지 :</label>
+                        <div>
+                            <th:block th:each="image : ${iList}">
+                                <div th:id="'image-container-' + ${image.imageSeq}">
+                                    <img th:src="${image.imagePath}" alt="Image" style="width: 100px; height: auto;"/>
+                                    <button type="button" th:onclick="'deleteImage(' + ${image.imageSeq} + ');'">삭제
+                                    </button>
+                                </div>
+                            </th:block>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="image">이미지 파일 추가 :</label>
+                        <input type="file" name="images" id="image" class="form-control-file" multiple>
+                    </div>
+                    <div class="form-group">
+                        <strong>선택된 파일 목록 :</strong>
+                        <div id="fileList" style="margin-top: 10px;"></div>
+                    </div>
+                    <div class="btnWrapA">
+                    <div class="btnWrapA">
+                        <button id="btnEdit" type="button">수정</button>
+                        <button type="reset">초기화</button>
+                    </div>
+                    <div class="btnWrapB">
+                        <span class="btnBc">
+                            <a href="/board/boardList" class="fn_btn_list">목록</a>
+                        </span>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <div>
-        <button id="btnSend" type="button">수정</button>
-        <button type="reset">다시 작성</button>
-    </div>
-</form>
+</div>
 <section id="footer">
     <div class="container">
         <div class="row text-center">

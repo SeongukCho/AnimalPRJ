@@ -22,6 +22,13 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.getElementById("myPage");
+            myPage.href = "/user/myPage/" + userId;
+        });
+    </script>
 </head>
 
 <body>
@@ -29,17 +36,15 @@
     <!-- 내비게이션 바 -->
     <header id="header" class>
         <div class="head_box">
-            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
             <button type="button" class="btnMenu"><span>메뉴</span></button>
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-
                     <li>
                         <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a></li>
-
                         </ul>
                     </li>
                     <li>
@@ -48,11 +53,10 @@
                             <li><a href="/board/boardList">게시판</a></li>
                         </ul>
                     </li>
-                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     <li>
                         <a href="#"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="/online/calendar">채팅</a></li>
+                            <li><a href="">고객센터</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -65,27 +69,33 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" id="myPage">마이페이지</a>
+                &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
-            <!-- 모바일 환경에서 네비게이션바 -->
             <nav id="mGnb">
                 <button type="button" class="btnClose"><span>닫기</span></button>
-                <div class="mbTop">
-                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
                         <li><a href="/user/userRegForm">회원가입</a></li>
                         <li><a href="/user/login">로그인</a></li>
                     </ul>
                 </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
                 <ul>
-
                     <li class="has-sub">
                         <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
-
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -93,21 +103,15 @@
                         <ul>
                             <li><a href="/board/boardList">게시판</a>
                             </li>
-                            <li>
-                            </li>
                         </ul>
                     </li>
-
                     <li class="has-sub">
                         <a href="#">고객센터</a>
                         <ul>
-                            <li><a href="#">이용방법 </a>
-                            </li>
-                            <li><a href="/online/calendar">채팅</a>
+                            <li><a href="">고객센터</a>
                             </li>
                         </ul>
                     </li>
-
                 </ul>
             </nav>
             <div class="fix_bg"></div>
@@ -122,7 +126,7 @@
                 <div class="inner">
                     <div class="lnb pc">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
                         <ul>
                             <li>
@@ -132,7 +136,7 @@
                     </div>
                     <div class="lnb mobile">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
                         <ul>
                             <li>
@@ -146,8 +150,11 @@
         <div id="content">
             <h1 class="title">마이 페이지</h1>
             <div class="sContent">
-                <div id="cms_member_article">
+                <div id="cms_member_article" style="position: relative;">
                     <div class="writeTypeA mt10">
+                        <div class="form-group" style="position: relative; left: 200px;">
+                            <img th:src="${rDTO.profilePath}" onerror="this.src='/img/profile.png'" alt="프로필 이미지" style="width: 200px; height: 200px; border: 1px solid #000;">
+                        </div>
                         <div class="form-group">
                             <label class="required">아이디</label>
                             <div>[[${rDTO.userId}]]</div>
@@ -169,14 +176,11 @@
                             <div>[[${rDTO.regDt}]]</div>
                         </div>
                         <div class="form-group">
-                            <button id="btnProfileEdit" class="btnTypeB" style="margin-left: 350px" type="button">회원정보 수정</button>
-                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red" type="button">회원 탈퇴</button>
+                            <button onclick="location.href='/user/myPageEdit'" class="btnTypeB" style="margin-left: 350px">회원정보 수정</button>
+                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red">회원 탈퇴</button>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div>
-
             </div>
         </div>
     </div>

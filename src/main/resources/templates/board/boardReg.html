@@ -23,14 +23,63 @@
     <link rel="stylesheet" href="/css/ui_content.css">
 
     <script type="text/javascript">
+        let currentFiles = [];
 
         // HTML로딩이 완료되고, 실행됨
+        document.addEventListener("DOMContentLoaded", function() {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.getElementById("myPage");
+            myPage.href = "/user/myPage/" + userId;
+        });
+
         $(document).ready(function () {
+
+            $('#image').on('change', function() {
+                // 선택된 파일들을 배열에 추가
+                Array.from(this.files).forEach(file => {
+                    if (isValidFileType(file)) {
+                        currentFiles.push(file);
+                    } else {
+                        alert(file.name + ' 파일은 지원되지 않는 형식입니다. PNG 또는 JPG 파일만 업로드해주세요.');
+                    }
+                });
+                displayFileList(); // 파일 리스트 업데이트
+            });
+
             // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
             $("#btnSend").on("click", function () {
                 doSubmit(); // 게시판 등록하기 실행
             })
+
+            $("button[type='reset']").on("click", function () {
+                currentFiles = [];
+                displayFileList(); // 파일 리스트 업데이트
+            });
         })
+
+        function isValidFileType(file) {
+            const allowedExtensions = ['image/png', 'image/jpeg'];
+            return allowedExtensions.includes(file.type);
+        }
+
+        function displayFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            currentFiles.forEach((file, index) => {
+                const fileEntry = document.createElement('div');
+                fileEntry.textContent = file.name;
+                const removeBtn = document.createElement('button');
+                removeBtn.textContent = 'Remove';
+                removeBtn.onclick = function() { removeFile(index); };
+                fileEntry.appendChild(removeBtn);
+                fileList.appendChild(fileEntry);
+            });
+        }
+
+        function removeFile(index) {
+            currentFiles.splice(index, 1);
+            displayFileList();
+        }
 
         //글자 길이 바이트 단위로 체크하기(바이트값 전달)
         function calBytes(str) {
@@ -49,46 +98,115 @@
             return tcount;
         }
 
-        // 게시판 저장하기
         function doSubmit() {
 
-            let f = document.getElementById("f"); // form 태그
+            const form  = document.getElementById("f");
+            const formData = new FormData(form);
 
-            if (f.title.value === "") {
-                alert("제목을 입력하시기 바랍니다.");
-                f.title.focus();
-                return;
-            }
-            if (calBytes(f.title.value) > 200) {
-                alert("최대 200Bytes까지 입력 가능합니다.");
-                f.title.focus();
-                return;
-            }
-            if (f.contents.value === "") {
-                alert("내용을 입력하시기 바랍니다.");
-                f.contents.focus();
-                return;
-            }
-            if (calBytes(f.contents.value) > 4000) {
-                alert("최대 4000Bytes까지 입력 가능합니다.");
-                f.contents.focus();
-                return;
+            formData.delete('images');
+
+            // 현재 파일 배열에 있는 모든 파일을 FormData에 추가
+            if (currentFiles.length > 0) {
+                currentFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+            } else {
+                formData.append('images', new Blob(), '');
             }
 
-            // Ajax 호출해서 글 등록하기
+            // 기타 폼 데이터 추가
+            formData.append('title', form.title.value);
+            formData.append('contents', form.contents.value);
+
+            if (!validateForm(form)) {
+                return;
+            }
+
             $.ajax({
-                    url: "/board/boardInsert",
-                    type: "post", // 전송방식은 Post
-                    // contentType: "application/json",
-                    dataType: "JSON", // 전송 결과는 JSON으로 받기
-                    data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
-                    success: function (json) { // /board/boardInsert 호출이 성공했다면..
-                        alert(json.msg); // 메시지 띄우기
-                        location.href = "/board/boardList"; // 게시판 리스트 이동
-                    }
+                url: "/board/boardInsert",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    alert(response);
+                    location.href = "/board/boardList";
+                },
+                error: function (xhr, status, error) {
+                    alert("Error: " + xhr.responseText);
                 }
-            )
+            });
         }
+
+        function validateForm(form) {
+            if (form.title.value === "") {
+                alert("제목을 입력하시기 바랍니다.");
+                form.title.focus();
+                return false;
+            }
+            if (calBytes(form.title.value) > 200) {
+                alert("최대 200Bytes까지 입력 가능합니다.");
+                form.title.focus();
+                return false;
+            }
+
+            if (form.contents.value === "") {
+                alert("내용을 입력하시기 바랍니다.");
+                form.contents.focus();
+                return false;
+            }
+            if (calBytes(form.contents.value) > 4000) {
+                alert("최대 4000Bytes까지 입력 가능합니다.");
+                form.contents.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // // 게시판 저장하기
+        // function doSubmit() {
+        //
+        //     const f = document.getElementById("f"); // form 태그
+        //     const formData = new FormData(f);
+        //
+        //     formData.delete('images');
+        //
+        //     if (f.title.value === "") {
+        //         alert("제목을 입력하시기 바랍니다.");
+        //         f.title.focus();
+        //         return;
+        //     }
+        //     if (calBytes(f.title.value) > 200) {
+        //         alert("최대 200Bytes까지 입력 가능합니다.");
+        //         f.title.focus();
+        //         return;
+        //     }
+        //     if (f.contents.value === "") {
+        //         alert("내용을 입력하시기 바랍니다.");
+        //         f.contents.focus();
+        //         return;
+        //     }
+        //     if (calBytes(f.contents.value) > 4000) {
+        //         alert("최대 4000Bytes까지 입력 가능합니다.");
+        //         f.contents.focus();
+        //         return;
+        //     }
+        //
+        //     // Ajax 호출해서 글 등록하기
+        //     $.ajax({
+        //             url: "/board/boardInsert",
+        //             type: "post", // 전송방식은 Post
+        //             // contentType: "application/json",
+        //             dataType: "JSON", // 전송 결과는 JSON으로 받기
+        //             data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+        //             success: function (json) { // /board/boardInsert 호출이 성공했다면..
+        //                 alert(json.msg); // 메시지 띄우기
+        //                 location.href = "/board/boardList"; // 게시판 리스트 이동
+        //             }
+        //         }
+        //     )
+        // }
     </script>
 </head>
 <body>
@@ -96,12 +214,12 @@
     <!-- 내비게이션 바 -->
     <header id="header" class>
         <div class="head_box">
-            <h1 class="logo"><a href="/main/main">펫밀리</a></h1>
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
             <button type="button" class="btnMenu"><span>메뉴</span></button>
             <!-- gnb -->
             <nav id="gnb">
                 <ul class="gnb">
-                     <li>
+                    <li>
                         <a href="/animal/animalList"><span>정보센터</span></a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a></li>
@@ -111,19 +229,14 @@
                         <a href="/board/boardList"><span>게시판</span></a>
                         <ul>
                             <li><a href="/board/boardList">게시판</a></li>
-
                         </ul>
                     </li>
-                    <li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
                     <li>
                         <a href="#"><span>고객센터</span></a>
                         <ul>
-
                             <li><a href="">고객센터</a></li>
-
                         </ul>
                     </li>
-
                 </ul>
             </nav>
             <!-- //gnb -->
@@ -135,68 +248,63 @@
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" id="myPage">마이페이지</a>
+                &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
-
             <nav id="mGnb">
                 <button type="button" class="btnClose"><span>닫기</span></button>
-                <div class="mbTop">
-                    <div class="mlogo"><a href="/main/main"><img src="/img/logo.png"></a></div>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
                         <li><a href="/user/userRegForm">회원가입</a></li>
                         <li><a href="/user/login">로그인</a></li>
                     </ul>
                 </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
                 <ul>
-
-                    <li class="has-sub">
-                        <a href="/board/boardList">게시판</a>
-                        <ul>
-                            <li><a href="/board/boardList">게시판</a>
-                            </li>
-                            <li>
-                            </li>
-                        </ul>
-                    </li>
                     <li class="has-sub">
                         <a href="/animal/animalList">유기동물 조회</a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a>
                             </li>
-
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">온라인 상담</a>
+                        <a href="/board/boardList">게시판</a>
                         <ul>
-                            <li><a href="#">이용방법 </a>
+                            <li><a href="/board/boardList">게시판</a>
                             </li>
-                            <li><a href="/online/calendar">채팅</a>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="">고객센터</a>
                             </li>
-                </ul>
-                </li>
-                <!--<li>
-                    <a href="#"><span>고객센터</span></a>
-                    <ul>
-                        <li><a href="#">고객센터</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </li>-->
+                        </ul>
+                    </li>
                 </ul>
             </nav>
             <div class="fix_bg"></div>
         </div>
     </header>
     <!-- // 내비게이션 바 -->
+
     <div id="subContainer">
         <div class="subSkin bg"></div>
-
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
                     <div class="lnb pc">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
                         <ul>
                             <li>
@@ -206,7 +314,7 @@
                     </div>
                     <div class="lnb mobile">
                         <div class="home">
-                            <a href="/main/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
                         <div class="large">게시판</div>
 
@@ -242,6 +350,15 @@
                                     <textarea name="contents" cols="120" rows="25"></textarea>
                                 </label>
                             </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="image">이미지 파일 추가</label>
+                            <input type="file" name="images" id="image" class="form-control-file" multiple accept=".png, .jpg, .jpeg">
+                            <small class="form-text text-muted">파일을 선택하고 나서 다시 선택하면 추가로 파일을 업로드할 수 있습니다.</small>
+                        </div>
+                        <div class="form-group">
+                            <strong>선택된 파일 목록:</strong>
+                            <div id="fileList" style="margin-top: 10px;"></div>
                         </div>
                     </div>
                 </div>
