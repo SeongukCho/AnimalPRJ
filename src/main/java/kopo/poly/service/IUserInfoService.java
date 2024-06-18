@@ -47,5 +47,10 @@ public interface IUserInfoService {
      */
     void profilePathProc(UserInfoDTO pDTO) throws Exception;
 
-    void deleteUserInfo(UserInfoDTO pDTO) throws Exception;
+    /**
+     * 회원탈퇴
+     *
+     * @param pDTO 회원정보
+     */
+    void withDrawProc(UserInfoDTO pDTO) throws Exception;
 }

@@ -484,6 +484,7 @@ public class UserInfoController {
                     .orElseGet(() -> UserInfoDTO.builder().build());
 
             model.addAttribute("rDTO", rDTO);
+            model.addAttribute("userId", userId);
 
             log.info(this.getClass().getName() + ".user/myPageEdit End!");
 
@@ -638,72 +639,56 @@ public class UserInfoController {
     }
 
 
-//    // 회원 탈퇴 페이지
-//    @GetMapping(value = "withdrawal")
-//    public String Withdrawal(HttpSession session) {
-//
-//        log.info(this.getClass().getName() + ".user/withdrawal Start!");
-//
-//        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-//
-//        if(userId != null){
-//
-//        } else {
-//            return "user/login";
-//        }
-//
-//        log.info(this.getClass().getName() + ".user/withdrawal End!");
-//
-//        return "user/withdrawal";
-//    }
+    // 회원 탈퇴 페이지
+    @GetMapping(value = "withdraw")
+    public String Withdrawal(HttpSession session, ModelMap model) {
 
+        log.info(this.getClass().getName() + ".user/withdraw Start!");
 
-    /**
-     * 유저 정보 삭제
-     */
-    @ResponseBody
-    @PostMapping(value = "deleteUserInfo")
-    public MsgDTO DeleteUserInfo(HttpSession session) {
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
 
-        log.info(this.getClass().getName() + ".deleteUserInfo Start!");
+        model.addAttribute("userId", userId);
 
-        String msg = ""; // 메시지 내용
-        MsgDTO dto = null; // 결과 메시지 구조
+        if (userId != null) {
+            log.info(this.getClass().getName() + ".user/withdraw End!");
 
-        try {
-            String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID")); // 글번호(PK)
-
-            log.info("userId : " + userId);
-
-            /*
-             * 값 전달은 반드시 DTO 객체를 이용해서 처리함 전달 받은 값을 DTO 객체에 넣는다.
-             */
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .build();
-
-            // 게시글 삭제하기 DB
-            userInfoService.deleteUserInfo(pDTO);
-
-            session.invalidate();
-
-            msg = "탈퇴하였습니다.";
-
-        } catch (Exception e) {
-            msg = "실패하였습니다. : " + e.getMessage();
-            log.info(e.toString());
-            e.printStackTrace();
-
-        } finally {
-
-            // 결과 메시지 전달하기
-            dto = MsgDTO.builder().msg(msg).build();
-
-            log.info(this.getClass().getName() + ".deleteUserInfo End!");
-
+            return "user/withDraw";
+        } else {
+            return "user/login";
         }
-
-        return dto;
     }
 
+    @ResponseBody
+    @GetMapping(value = "withDraw")
+    public ResponseEntity<?> withDrawProc(HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".user/deleteUserProc Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        log.info("userId : " + userId);
+
+        UserInfoDTO userInfo = userInfoService.getUserInfo(userId);
+
+        if (userInfo != null && userInfo.profilePath() != null && !userInfo.profilePath().isEmpty()) {
+            try {
+                // 프로필 이미지 경로에서 파일 이름 추출
+                String fileName = userInfo.profilePath().substring(userInfo.profilePath().lastIndexOf("/") + 1);
+
+                // S3에서 파일 삭제
+                s3Client.deleteObject(bucketName, "profiles/" + fileName);
+                log.info("S3 버킷에서 파일 삭제 성공: " + fileName);
+            } catch (Exception e) {
+                log.error("S3 버킷에서 파일 삭제 실패: " + e.getMessage());
+            }
+        }
+
+        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
+
+        // 회원가입 서비스 호출하여 결과 받기
+        userInfoService.withDrawProc(pDTO);
+
+        log.info(this.getClass().getName() + ".user/deleteUserProc End!");
+
+        return ResponseEntity.ok().body("회원탈퇴 성공!");
+    }
 }

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 탈퇴</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function(link) {
+                link.href = "/user/myPage/" + userId;
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="">고객센터</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" class="myPage">마이페이지</a>
+                &nbsp;&nbsp;
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+                <ul>
+                    <li class="has-sub">
+                        <a href="/animal/animalList">유기동물 조회</a>
+                        <ul>
+                            <li><a href="/animal/animalList">유기동물 조회</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="#">고객센터</a>
+                        <ul>
+                            <li><a href="">고객센터</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="#" class="myPage">마이 페이지</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="#" class="myPage">마이 페이지</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content">
+            <h1 class="title">회원 탈퇴</h1>
+            <p class="text-danger">회원 탈퇴 시 모든 정보는 삭제되고 복구가 불가능합니다. 이에 동의하시면 '탈퇴합니다'를 입력해주세요.</p>
+            <input type="text" id="confirmation" class="form-control mb-3" placeholder="'탈퇴합니다'를 입력해주세요">
+            <button id="btn">탈퇴하기</button>
+            <p id="responseMessage" class="mt-3"></p>
+        </div>
+    </div>
+    <section id="footer">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="designer">
+                    </div>
+                </div>
+            </div>
+            <!--End of row-->
+        </div>
+        <!--End of container-->
+    </section>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#btn').click(function() {
+            var confirmation = $('#confirmation').val();
+            if (confirmation === '탈퇴합니다') {
+                $.ajax({
+                    url: '/user/withDraw',
+                    type: 'GET',
+                    success: function(response) {
+                        alert(response);
+                        window.location.href = '/user/login';
+                    },
+                    error: function() {
+                        $('#responseMessage').text('탈퇴 요청 중 오류가 발생했습니다.').addClass('text-danger');
+                    }
+                });
+            } else {
+                $('#responseMessage').text("정확히 '탈퇴합니다'를 입력해주세요.").addClass('text-danger');
+            }
+        });
+    });
+</script>
+</body>
+</html>

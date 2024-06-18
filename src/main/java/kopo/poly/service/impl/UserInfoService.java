@@ -476,23 +476,6 @@ public class UserInfoService implements IUserInfoService {
 
     }
 
-    @Override
-    public void deleteUserInfo(UserInfoDTO pDTO) throws Exception {
-
-        log.info(this.getClass().getName() + ".deleteUserInfo Start!");
-
-        String userId = pDTO.userId();
-
-        log.info("userId : " + userId);
-
-
-        // 데이터 수정하기
-        userInfoRepository.deleteById(userId);
-
-        log.info(this.getClass().getName() + ".deleteUserInfo End!");
-
-    }
-
     @Transactional
     @Override
     public void profilePathProc(UserInfoDTO pDTO) throws Exception {
@@ -527,5 +510,15 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + "profilePathProc End!");
 
+    }
+
+    @Override
+    public void withDrawProc(UserInfoDTO pDTO) throws Exception {
+
+        log.info(this.getClass().getName() + ".withDrawProc Service Start!");
+
+        userInfoRepository.deleteById(pDTO.userId());
+
+        log.info(this.getClass().getName() + ".withDrawProc Service End!");
     }
 }
