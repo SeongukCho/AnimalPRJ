@@ -23,10 +23,13 @@
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function(link) {
+                link.href = "/user/myPage/" + userId;
+            });
         });
     </script>
 </head>
@@ -42,9 +45,15 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>구조동물</span></a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
                         </ul>
                     </li>
                     <li>
@@ -70,7 +79,7 @@
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
-                <a href="#" id="myPage">마이페이지</a>
+                <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
@@ -86,7 +95,7 @@
                 <div class="mbTop" th:if="${session.SS_USER_ID != null}">
                     <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
-                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
                         <li><a href="/user/logout">로그아웃</a></li>
                     </ul>
                 </div>
@@ -130,7 +139,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/user/myPage" title="마이 페이지">마이 페이지</a>
+                                <a href="#" class="myPage">마이 페이지</a>
                             </li>
                         </ul>
                     </div>
@@ -140,7 +149,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/user/myPage" title="마이 페이지">마이 페이지</a>
+                                <a href="#" class="myPage">마이 페이지</a>
                             </li>
                         </ul>
                     </div>
@@ -151,40 +160,65 @@
             <h1 class="title">마이 페이지</h1>
             <div class="sContent">
                 <div id="cms_member_article" style="position: relative;">
-                    <div class="writeTypeA mt10">
-                        <div class="form-group" style="position: relative; left: 200px;">
-                            <img th:src="${rDTO.profilePath}" onerror="this.src='/img/profile.png'" alt="프로필 이미지" style="width: 200px; height: 200px; border: 1px solid #000;">
+                    <div class="writeTypeA mt10" style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div class="form-group" style="margin-right: 50px;">
+                                <img th:src="${rDTO.profilePath}" onerror="this.src='/img/profile.png'" alt="프로필 이미지"
+                                     style="width: 200px; height: 200px; border: 1px solid #000;">
+                            </div>
+                            <div>
+                                <div class="form-group">
+                                    <label class="profile-name">아이디</label>
+                                    <div class="profile">[[${rDTO.userId}]]</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="profile-name">이름</label>
+                                    <div class="profile">[[${rDTO.userName}]]</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="profile-name">닉네임</label>
+                                    <div class="profile">[[${rDTO.nickName}]]</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="profile-name">이메일</label>
+                                    <div class="profile">[[${rDTO.email}]]</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="profile-name">가입일</label>
+                                    <div class="profile">[[${rDTO.regDt}]]</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="required">아이디</label>
-                            <div>[[${rDTO.userId}]]</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="required">이름</label>
-                            <div>[[${rDTO.userName}]]</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="required">닉네임</label>
-                            <div>[[${rDTO.nickName}]]</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="required">이메일</label>
-                            <div>[[${rDTO.email}]]</div>
-                        </div>
-                        <div class="form-group">
-                            <label class="required">가입일</label>
-                            <div>[[${rDTO.regDt}]]</div>
-                        </div>
-                        <div class="form-group">
-                            <button onclick="location.href='/user/myPageEdit'" class="btnTypeB" style="margin-left: 350px">회원정보 수정</button>
-                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red">회원 탈퇴</button>
+                        <div class="form-group" style="display: flex; gap: 10px;">
+                            <button onclick="location.href='/user/myPageEdit'" class="btnTypeB" style="background-color: #ffcb00">
+                                회원정보 수정
+                            </button>
+                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red">
+                                회원 탈퇴
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <section id="footer">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="designer">
+                    </div>
+                </div>
+            </div>
+            <!--End of row-->
+        </div>
+        <!--End of container-->
+    </section>
 </div>
-
 </body>
 </html>

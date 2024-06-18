@@ -26,15 +26,18 @@
         let currentFiles = [];
 
         // HTML로딩이 완료되고, 실행됨
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function(link) {
+                link.href = "/user/myPage/" + userId;
+            });
         });
 
         $(document).ready(function () {
 
-            $('#image').on('change', function() {
+            $('#image').on('change', function () {
                 // 선택된 파일들을 배열에 추가
                 Array.from(this.files).forEach(file => {
                     if (isValidFileType(file)) {
@@ -70,7 +73,9 @@
                 fileEntry.textContent = file.name;
                 const removeBtn = document.createElement('button');
                 removeBtn.textContent = 'Remove';
-                removeBtn.onclick = function() { removeFile(index); };
+                removeBtn.onclick = function () {
+                    removeFile(index);
+                };
                 fileEntry.appendChild(removeBtn);
                 fileList.appendChild(fileEntry);
             });
@@ -100,7 +105,7 @@
 
         function doSubmit() {
 
-            const form  = document.getElementById("f");
+            const form = document.getElementById("f");
             const formData = new FormData(form);
 
             formData.delete('images');
@@ -220,9 +225,15 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>구조동물</span></a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
                         </ul>
                     </li>
                     <li>
@@ -248,7 +259,7 @@
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
-                <a href="#" id="myPage">마이페이지</a>
+                <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
@@ -264,7 +275,7 @@
                 <div class="mbTop" th:if="${session.SS_USER_ID != null}">
                     <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
-                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
                         <li><a href="/user/logout">로그아웃</a></li>
                     </ul>
                 </div>
@@ -353,7 +364,8 @@
                         </div>
                         <div class="form-group">
                             <label for="image">이미지 파일 추가</label>
-                            <input type="file" name="images" id="image" class="form-control-file" multiple accept=".png, .jpg, .jpeg">
+                            <input type="file" name="images" id="image" class="form-control-file" multiple
+                                   accept=".png, .jpg, .jpeg">
                             <small class="form-text text-muted">파일을 선택하고 나서 다시 선택하면 추가로 파일을 업로드할 수 있습니다.</small>
                         </div>
                         <div class="form-group">

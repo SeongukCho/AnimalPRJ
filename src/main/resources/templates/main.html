@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>펫 밀리</title>
@@ -23,10 +23,13 @@
     <link rel="stylesheet" href="/css/paging.css">
     <link rel="stylesheet" href="/css/animal.css">
     <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function(link) {
+                link.href = "/user/myPage/" + userId;
+            });
         });
     </script>
 </head>
@@ -42,9 +45,15 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>구조동물</span></a>
                         <ul>
                             <li><a href="/animal/animalList">유기동물 조회</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
                         </ul>
                     </li>
                     <li>
@@ -70,7 +79,7 @@
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
-                <a href="#" id="myPage">마이페이지</a>
+                <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
@@ -86,7 +95,7 @@
                 <div class="mbTop" th:if="${session.SS_USER_ID != null}">
                     <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
-                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
                         <li><a href="/user/logout">로그아웃</a></li>
                     </ul>
                 </div>

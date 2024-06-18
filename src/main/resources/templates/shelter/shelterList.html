@@ -2,40 +2,45 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>게시판</title>
+    <title>유기동물 조회</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
-    <script type="text/javascript" src="/js/common.js"></script>
 
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
     <link rel="stylesheet" href="/css/etc.css">
     <link rel="stylesheet" href="/css/font.css">
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/carousel.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
     <link rel="stylesheet" href="/css/paging.css">
+    <link rel="stylesheet" href="/css/animal.css">
 
     <script type="text/javascript">
 
         document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
-        })
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function(link) {
+                link.href = "/user/myPage/" + userId;
+            });
+        });
 
         //상세보기 이동
         function doDetail(seq) {
-            location.href = "/board/boardInfo?nSeq=" + seq;
+            location.href = "/animal/animalInfo?desertionNo=" + seq;
+        }
+
+        function removeBrackets(str) {
+            return str.replace(/\[.*?\]\s*/, '');
         }
 
     </script>
@@ -133,35 +138,32 @@
         </div>
     </header>
     <!-- // 내비게이션 바 -->
-
-    <div id="subContainer">
-        <!--  중간배경   -->
+    <div id="subContainer" style="margin-left: 150px; margin-right: 150px;">
         <div class="subSkin bg"></div>
-        <!--중앙 내비게이션 바-->
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
                     <div class="lnb pc">
                         <div class="home">
-                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"></a>
                         </div>
                         <ul>
                             <li>
-                                <a href="/board/boardList" title="게시판">게시판</a>
+                                <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
                             </li>
                         </ul>
                     </div>
                     <div class="lnb mobile">
                         <div class="home">
-                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                            <a href="/main"></a>
                         </div>
-                        <div class="large">게시판</div>
+                        <div class="large">유기동물 조회</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">게시판</span>
+                            <span data-mobile-tit="">유기동물 조회</span>
                             <ul>
                                 <li>
-                                    <a href="/board/boardList" title="게시판">게시판</a>
+                                    <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
                                 </li>
                             </ul>
                         </div>
@@ -169,87 +171,78 @@
                 </div>
             </div>
         </nav>
-        <div id="content">
-            <h1 class="title">게시판</h1>
-            <div id="cms_board_article">
-                <div class="viewTypeB">
-                    <div class="info-header">
-                        <span class="item item-seq">번호</span>
-                        <span class="item item-header">제목</span>
-                        <span class="item item-user">작성자</span>
-                        <span class="item item-date">작성일</span>
-                        <span class="item item-read">조회수</span>
-                    </div>
-                    <div class="info-body">
-                        <div class="tbody" th:each="dto : ${rList}">
-                            <span class="item item-seq" th:text="${dto.boardSeq}"></span>
-                            <span class="item item-title"
-                                  th:attr="onclick='doDetail(\'' + ${dto.boardSeq} + '\')'"
-                                  th:text="${dto.title}"></span>
-                            <span class="item item-user" th:text="${dto.userId}"></span>
-                            <span class="item item-date" th:text="${dto.regDt}"></span>
-                            <span class="item item-read" th:text="${dto.readCnt}"></span>
+        <div class="flex flex-1 flex-col gap-2 undefined">
+            <div class="openAnimation w-full h-full flex items-center justify-center">
+                <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-3 gap-x-3">
+                    <div th:each="shelter : ${rList}" class="col-lg-3 col-md-4 col-sm-6 col-12 d-flex">
+                        <div class="bg-white dark:bg-stone-900 border border-gray-200 rounded-lg shadow-md dark:bg-gray-800 dark:border-gray-700">
+                            <div class="h-full flex flex-col gap-2 p-2 sm:p-5">
+                                <div>
+                                    <div class="flex items-center justify-between flex-wrap gap-2">
+                                        <a th:href="'/shelters/' + ${shelter.id} + '?page=1&amp;org_nm=' + ${shelter.orgNm}">
+                                            <h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white" th:text="${shelter.careNm}">Shelter Name</h5>
+                                        </a>
+                                        <span class="text-xs text-gray-400" th:text="${shelter.divisionNm}">Organization Type</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 font-normal text-sm text-gray-700 dark:text-stone-400">
+                                    <svg class="h-4 min-w-[16px] fill-gray-700 dark:fill-stone-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                                        <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 256c-35.3 0-64-28.7-64-64s28.7-64 64-64s64 28.7 64 64s-28.7 64-64 64z"></path>
+                                    </svg>
+                                    <div class="overflow-hidden text-ellipsis whitespace-nowrap" th:text="${shelter.careAddr}">Address</div>
+                                </div>
+                                <div class="flex items-center gap-2 font-normal text-sm text-gray-700 dark:text-stone-400">
+                                    <svg class="h-4 min-w-[16px] fill-gray-700 dark:fill-stone-400" viewBox="0 0 512 512">
+                                        <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"></path>
+                                    </svg>
+                                    <div class="overflow-hidden text-ellipsis whitespace-nowrap" th:text="${shelter.careTel}">Telephone</div>
+                                </div>
+                                <div class="flex-1 border-solid border-b border-gray-300"></div>
+                                <div class="flex flex-wrap gap-1">
+                                    <span class="px-2 py-1 rounded text-white bg-sky-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" th:text="'운영시간 ' + ${shelter.weekOprStime} + ' ~ ' + ${shelter.weekOprEtime}">운영시간</span>
+                                    <span class="px-2 py-1 rounded text-white bg-pink-500 font-semibold text-xs flex align-center w-max cursor-pointer active:bg-gray-300 transition duration-300 ease" th:text="${shelter.closeDay}">Close Day</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="topGlob">
-                    <span class="btnBc" style="float: right; margin: 10px"><a href="/board/boardReg" title="글쓰기"
-                                                                              class="fn_btn_list">글쓰기</a></span>
-                </div>
-                <!-- 페이징 네비게이션 -->
-                <div style="padding-top: 2.5rem; padding-bottom: 2.5rem; justify-content: center; display: flex;">
-                    <div class="pagination">
-                        <ul>
-                            <!-- First page link -->
-                            <li th:if="${currentPage > 1}">
-                                <a th:href="@{/board/boardList(page=1, size=${size})}">처음</a>
-                            </li>
-
-                            <!-- Previous page link -->
-                            <li th:if="${currentPage > 1}">
-                                <a th:href="@{/board/boardList(page=${currentPage - 1}, size=${size})}">이전</a>
-                            </li>
-
-                            <!-- Page number links -->
-                            <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                                <a th:href="@{/board/boardList(page=${i}, size=${size})}"
-                                   th:classappend="${i} == ${currentPage} ? 'active' : ''"
-                                   th:text="${i}"></a>
-                            </li>
-
-                            <!-- Next page link -->
-                            <li th:if="${currentPage < totalPages}">
-                                <a th:href="@{/board/boardList(page=${currentPage + 1}, size=${size})}">다음</a>
-                            </li>
-
-                            <!-- Last page link -->
-                            <li th:if="${currentPage < totalPages}">
-                                <a th:href="@{/board/boardList(page=${totalPages}, size=${size})}">마지막</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
             </div>
         </div>
+        <!-- 페이징 네비게이션 -->
+        <div class="flex justify-center py-10">
+            <div class="pagination">
+                <ul>
+                    <!-- First page link -->
+                    <li th:if="${currentPage > 1}">
+                        <a th:href="@{/animal/animalList(page=1, size=${size})}">처음</a>
+                    </li>
+
+                    <!-- Previous page link -->
+                    <li th:if="${currentPage > 1}">
+                        <a th:href="@{/animal/animalList(page=${currentPage - 1}, size=${size})}">이전</a>
+                    </li>
+
+                    <!-- Page number links -->
+                    <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                        <a th:href="@{/animal/animalList(page=${i}, size=${size})}"
+                           th:classappend="${i} == ${currentPage} ? 'active' : ''"
+                           th:text="${i}"></a>
+                    </li>
+
+                    <!-- Next page link -->
+                    <li th:if="${currentPage < totalPages}">
+                        <a th:href="@{/animal/animalList(page=${currentPage + 1}, size=${size})}">다음</a>
+                    </li>
+
+                    <!-- Last page link -->
+                    <li th:if="${currentPage < totalPages}">
+                        <a th:href="@{/animal/animalList(page=${totalPages}, size=${size})}">마지막</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--페이징 네비게이션 -->
     </div>
 </div>
-
-<section id="footer">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-6">
-                <div class="copyright">
-                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="designer">
-                </div>
-            </div>
-        </div>
-        <!--End of row-->
-    </div>
-    <!--End of container-->
-</section>
 </body>
 </html>

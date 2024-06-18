@@ -74,9 +74,9 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>정보센터</span></a>
+                        <a href="/animal/animalList"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/animalList">유기동물 구조동물
                         </ul>
                     </li>
                     <li>
@@ -102,7 +102,7 @@
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
                 <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
-                <a href="#" id="myPage">마이페이지</a>
+                <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
             </div>
@@ -118,7 +118,7 @@
                 <div class="mbTop" th:if="${session.SS_USER_ID != null}">
                     <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
                     <ul>
-                        <li><a href="#" id="myPage">마이 페이지</a></li>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
                         <li><a href="/user/logout">로그아웃</a></li>
                     </ul>
                 </div>
