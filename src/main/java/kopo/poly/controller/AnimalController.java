@@ -1,14 +1,12 @@
 package kopo.poly.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.AnimalDTO;
-import kopo.poly.dto.BoardDTO;
-import kopo.poly.dto.CommentDTO;
 import kopo.poly.service.impl.AnimalService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Slf4j
@@ -48,11 +44,15 @@ public class AnimalController {
         return rList;
     }*/
     @GetMapping(value = "animalList")
-    public String getAnimalListAll(AnimalDTO pDTO, ModelMap model,
+    public String getAnimalListAll(AnimalDTO pDTO, ModelMap model, HttpSession session,
                                    @RequestParam(defaultValue = "1") int page,
                                    @RequestParam(defaultValue = "40") int size) throws Exception {
 
         log.info(this.getClass().getName() + ".getAnimalListAllController Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -109,20 +109,24 @@ public class AnimalController {
                 .neuterYnR(neuter_yn)
                 .build();
 
-//        List<AnimalDTO> rList = animalService.getAnimalListAll(pDTO);
-
+//        List<AnimalDTO> rList = animalService.searchAnimalList(pDTO);
+//
 //        log.info("rList : " + rList);
-
-        // 조회된 리스트 결과값 넣어주기
+//
+//         조회된 리스트 결과값 넣어주기
 //        model.addAttribute("rList", rList);
 
-        return "animal/animalSearch";
+        return "animal/animalList";
     }
 
     @GetMapping(value = "animalInfo")
-    public String getAnimalInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    public String getAnimalInfo(HttpServletRequest request,HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".getAnimalInfoController Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
 
         String desertionNo = CmmUtil.nvl(request.getParameter("desertionNo"), "0"); // 공고번호
 
@@ -143,29 +147,5 @@ public class AnimalController {
         log.info(this.getClass().getName() + ".getAnimalInfoController End!");
 
         return "animal/animalInfo";
-    }
-
-    @GetMapping(value = "shelterList")
-    public String getShelterList(HttpServletRequest request, ModelMap model,
-                                 @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size) throws Exception {
-
-        log.info(this.getClass().getName() + ".getShelterListController Start!");
-
-        log.info(this.getClass().getName() + ".getShelterListController End!");
-
-        return "animal/shelterList";
-    }
-
-    @GetMapping(value = "shelterInfo")
-    public String getShelterInfo(HttpServletRequest request, ModelMap model,
-                                 @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) throws Exception {
-
-        log.info(this.getClass().getName() + ".getShelterInfoController Start!");
-
-
-        log.info(this.getClass().getName() + ".getShelterInfoController End!");
-
-        return "animal/shelterInfo";
     }
 }

@@ -72,6 +72,10 @@ public class BoardController {
         // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".boardList Start!");
 
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
+
         // 로그인된 사용자 아이디는 Session에 저장함
         // 교육용으로 아직 로그인을 구현하지 않았기 때문에 Session에 데이터를 저장하지 않았음
         // 추후 로그인을 구현할 것으로 가정하고, 게시판 리스트 출력하는 함수에서 로그인 한 것처럼 Session 값을 생성함
@@ -111,11 +115,13 @@ public class BoardController {
      * GetMapping(value = "board/boardReg") =>  GET방식을 통해 접속되는 URL이 board/boardReg 경우 아래 함수를 실행함
      */
     @GetMapping(value = "boardReg")
-    public String BoardReg(HttpSession session) {
+    public String BoardReg(HttpSession session,ModelMap model) {
 
         log.info(this.getClass().getName() + ".boardReg Start!");
 
         String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        model.addAttribute("userId", userId);
 
         log.info(this.getClass().getName() + ".boardReg End!");
 
@@ -200,9 +206,13 @@ public class BoardController {
      * 게시판 상세보기
      */
     @GetMapping(value = "boardInfo")
-    public String boardInfo(HttpServletRequest request, ModelMap model) throws Exception {
+    public String boardInfo(HttpServletRequest request,HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".boardInfo Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
 
         String nSeq = CmmUtil.nvl(request.getParameter("nSeq"), "0"); // 공지글번호(PK)
 
@@ -254,6 +264,8 @@ public class BoardController {
         log.info(this.getClass().getName() + ".boardEditInfo Start!");
 
         String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        model.addAttribute("userId", userId);
 
         if (userId.length() > 0) {
             String nSeq = CmmUtil.nvl(request.getParameter("nSeq")); // 공지글번호(PK)
