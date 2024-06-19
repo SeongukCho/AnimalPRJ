@@ -19,7 +19,7 @@ public record AnimalDTO(
         String orgCd,        // 시군구 코드
         String careRegNo,   // 보호소 번호
         String state,         // 상태(전체 : null(빈값), 공고중 : notice, 보호중 : protect)
-        String neuterYnR,     // 상태 (전체 : null(빈값), 예 : Y, 아니오 : N, 미상 : U)
+        String neuterYnR,    // 상태 (전체 : null(빈값), 예 : Y, 아니오 : N, 미상 : U)
 
         /* 응답 항목 */
         @Id

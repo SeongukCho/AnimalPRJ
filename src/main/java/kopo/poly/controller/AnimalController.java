@@ -58,7 +58,7 @@ public class AnimalController {
 
         log.info("pageable : " + pageable);
 
-        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable);
+        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable, "animalDTO");
 
         List<AnimalDTO> rList = animalPage.getContent(); // 페이징된 데이터 리스트
 
@@ -81,6 +81,86 @@ public class AnimalController {
         log.info(this.getClass().getName() + ".getAnimalListAllController End!");
 
         return "animal/animalList"; // 적절한 뷰 이름으로 변경
+    }
+
+    @GetMapping(value = "noticeAnimal")
+    public String getNoticeAnimalList(AnimalDTO pDTO, ModelMap model, HttpSession session,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(defaultValue = "40") int size) throws Exception {
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        log.info("pageable : " + pageable);
+
+        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable, "noticeAnimal");
+
+        List<AnimalDTO> rList = animalPage.getContent(); // 페이징된 데이터 리스트
+
+        log.info("rList : " + rList);
+        log.info("animalPage : " + animalPage);
+        log.info("animalPage.getTotalPages() : " + animalPage.getTotalPages());
+
+        model.addAttribute("rList", rList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+        model.addAttribute("totalPages", animalPage.getTotalPages());
+
+// 페이지 번호 범위 계산
+        int startPage = Math.max(1, page - 4);
+        int endPage = Math.min(animalPage.getTotalPages(), page + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController End!");
+
+        return "animal/noticeAnimal"; // 적절한 뷰 이름으로 변경
+    }
+
+    @GetMapping(value = "protectAnimal")
+    public String getProtectAnimal(AnimalDTO pDTO, ModelMap model, HttpSession session,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(defaultValue = "40") int size) throws Exception {
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        log.info("pageable : " + pageable);
+
+        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable, "protectAnimal");
+
+        List<AnimalDTO> rList = animalPage.getContent(); // 페이징된 데이터 리스트
+
+        log.info("rList : " + rList);
+        log.info("animalPage : " + animalPage);
+        log.info("animalPage.getTotalPages() : " + animalPage.getTotalPages());
+
+        model.addAttribute("rList", rList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+        model.addAttribute("totalPages", animalPage.getTotalPages());
+
+// 페이지 번호 범위 계산
+        int startPage = Math.max(1, page - 4);
+        int endPage = Math.min(animalPage.getTotalPages(), page + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController End!");
+
+        return "animal/protectAnimal"; // 적절한 뷰 이름으로 변경
     }
 
     @Transactional
@@ -119,16 +199,13 @@ public class AnimalController {
         return "animal/animalList";
     }
 
-    @GetMapping(value = "animalInfo")
-    public String getAnimalInfo(HttpServletRequest request,HttpSession session, ModelMap model) throws Exception {
+    @GetMapping(value = "animalInfo/{desertionNo}")
+    public String getAnimalInfo(@PathVariable String desertionNo, HttpServletRequest request,HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".getAnimalInfoController Start!");
 
         String userId = (String) session.getAttribute("SS_USER_ID");
-
         model.addAttribute("userId", userId);
-
-        String desertionNo = CmmUtil.nvl(request.getParameter("desertionNo"), "0"); // 공고번호
 
         log.info("desertionNo : " + desertionNo);
 

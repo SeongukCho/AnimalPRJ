@@ -2,12 +2,14 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>유기동물 상세 조회</title>
+    <title>구조동물</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=213a1a4befc94c34139ceb8cc96c3f40&libraries=services"></script>
 
     <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
@@ -23,12 +25,13 @@
     <link rel="stylesheet" href="/css/paging.css">
     <link rel="stylesheet" href="/css/animal.css">
 
-    <script type="text/javascript">
+    <script th:inline="javascript">
+
         document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
             let myPage = document.querySelectorAll(".myPage");
 
-            myPage.forEach(function(link) {
+            myPage.forEach(function (link) {
                 link.href = "/user/myPage/" + userId;
             });
         });
@@ -45,9 +48,16 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
                         </ul>
                     </li>
                     <li>
@@ -57,9 +67,9 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><span>고객센터</span></a>
+                        <a href="/chat/intro"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="">고객센터</a></li>
+                            <li><a href="/chat/intro">문의하기</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -95,10 +105,10 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/animal/animalList">유기동물 조회</a>
+                        <a href="/animal/protectAnimal">구조동물</a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a>
-                            </li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -109,9 +119,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/chat/intro">고객센터</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/chat/intro">문의하기</a>
                             </li>
                         </ul>
                     </li>
@@ -132,23 +142,20 @@
                             <a href="/main"></a>
                         </div>
                         <ul>
-                            <li>
-                                <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
-                            </li>
+                            <li><a href="/animal/animalList" title="구조동물">구조동물</a></li>
+                            <li><a href="/animal/animalList" title="구조동물">구조동물</a></li>
                         </ul>
                     </div>
                     <div class="lnb mobile">
                         <div class="home">
                             <a href="/main"></a>
                         </div>
-                        <div class="large">유기동물 조회</div>
+                        <div class="large">구조동물</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">유기동물 조회</span>
+                            <span data-mobile-tit="">구조동물</span>
                             <ul>
-                                <li>
-                                    <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
-                                </li>
+                                <li><a href="/animal/animalList" title="구조동물">구조동물</a></li>
                             </ul>
                         </div>
                     </div>
@@ -160,8 +167,7 @@
                 <div class="flex flex-col gap-2">
                     <div class="flex justify-between items-center text-stone-900 dark:text-stone-100 font-semibold text-xl">
                         <div class="inline-flex items-center gap-1">
-                            <div class="bg-blue-600 rounded-[2px] text-stone-100 text-xs px-2 py-0.5"><a
-                                    th:href="@{/notices?page=1}"></a>공고
+                            <div class="bg-blue-600 rounded-[2px] text-stone-100 text-xs px-2 py-0.5">공고
                             </div>
                             <div class="px-2 rounded-[2px] text-stone-100 bg-emerald-500 text-xs px-2 py-0.5"
                                  th:text="${rDTO.orgNm}"></div>
@@ -187,9 +193,6 @@
                         </div>
                     </div>
                 </div>
-                <!--                <div class="flex justify-center items-center relative bg-gray-100 dark:bg-stone-900 rounded-lg my-2 border dark:border-stone-900 shadow w-full py-2 min-h-[90px] overflow-hidden">-->
-                <!--                    <img class="w-full h-full object-cover" th:src="${rDTO.popfile}" alt="Animal Image">-->
-                <!--                </div>-->
                 <div class="openAnimation flex flex-col text-gray-600 gap-6 pt-3">
                     <div class="flex flex-1 justify-center">
                         <div class="rounded-lg shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 w-full overflow-hidden">
@@ -209,7 +212,7 @@
                     <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden bg-white dark:bg-stone-900 dark:text-stone-100">
                         <div class="block p-6 shadow-2xl w-full">
                             <div class="flex space-x-2 justify-between h-10">
-                                <div class="text-2xl font-bold self-center">유기동물정보</div>
+                                <div class="text-2xl font-bold self-center">구조동물</div>
                                 <div class="flex justify-center items-center rounded-full w-10 bg-blue-600 text-white font-medium text-xs">
                                     <svg class="h-4 fill-white" xmlns="http://www.w3.org/2000/svg"
                                          viewBox="0 0 192 512">
@@ -342,6 +345,18 @@
                             </div>
                         </div>
                         <div id="map1" class="mt-6 h-56 sm:h-96 w-full"></div>
+                        <div class="w-full p-6">
+                            <div class="bg-blue-100 rounded-lg p-3 text-blue-700 flex items-center text-sm gap-2"
+                                 role="alert">
+                                <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="info-circle"
+                                     class="min-w-[24px] h-5 fill-current" role="img" xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 512 512">
+                                    <path fill="currentColor"
+                                          d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z"></path>
+                                </svg>
+                                유기동물 문의는 보호센터에 연락하시기 바랍니다.
+                            </div>
+                        </div>
                     </div>
                     <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 overflow-hidden">
                         <div class="block p-6 w-full">
@@ -448,8 +463,113 @@
     </div>
     <!--End of container-->
 </section>
-<!--<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
-<!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>-->
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 첫 번째 지도 설정
+    var mapContainer1 = document.getElementById('map1'), // 지도를 표시할 div
+        mapOption1 = {
+            center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+
+    // 첫 번째 지도를 생성합니다
+    var map1 = new kakao.maps.Map(mapContainer1, mapOption1);
+
+    // 첫 번째 주소-좌표 변환 객체를 생성합니다
+    var geocoder1 = new kakao.maps.services.Geocoder();
+
+    // 첫 번째 마커 이미지의 주소
+    var imageSrc1 = '/img/favicon-96x96.png', // 마커 이미지 URL
+        imageSize1 = new kakao.maps.Size(64, 69), // 마커 이미지의 크기
+        imageOption1 = {offset: new kakao.maps.Point(27, 69)}; // 마커 이미지의 옵션 (마커의 좌표와 일치시킬 좌표 설정)
+
+    // 첫 번째 마커 이미지를 생성합니다
+    var markerImage1 = new kakao.maps.MarkerImage(imageSrc1, imageSize1, imageOption1);
+
+    // 첫 번째 주소로 좌표를 검색합니다
+    geocoder1.addressSearch(`[[${rDTO.happenPlace}]]`, function (result, status) {
+
+        // 정상적으로 검색이 완료됐으면
+        if (status === kakao.maps.services.Status.OK) {
+
+            var coords1 = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+            // 첫 번째 결과값으로 받은 위치를 마커로 표시합니다
+            var marker1 = new kakao.maps.Marker({
+                map: map1,
+                position: coords1,
+                image: markerImage1 // 마커 이미지 설정
+            });
+
+            // 첫 번째 인포윈도우로 장소에 대한 설명을 표시합니다
+            var infowindow1 = new kakao.maps.InfoWindow({
+                content: '<div style="width:150px;text-align:center;padding:6px 0;">[[${rDTO.happenPlace}]]</div>'
+            });
+            infowindow1.open(map1, marker1);
+
+            // 첫 번째 마커 클릭 이벤트 추가
+            kakao.maps.event.addListener(marker1, 'click', function () {
+                window.open(`https://map.kakao.com/link/search/${encodeURIComponent('[[${rDTO.happenPlace}]]')}`, '_blank');
+            });
+
+            // 첫 번째 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+            map1.setCenter(coords1);
+        }
+    });
+
+    // 두 번째 지도 설정
+    var mapContainer2 = document.getElementById('map2'), // 지도를 표시할 div
+        mapOption2 = {
+            center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+
+    // 두 번째 지도를 생성합니다
+    var map2 = new kakao.maps.Map(mapContainer2, mapOption2);
+
+    // 두 번째 주소-좌표 변환 객체를 생성합니다
+    var geocoder2 = new kakao.maps.services.Geocoder();
+
+    // 두 번째 마커 이미지의 주소
+    var imageSrc2 = '/img/favicon-96x96.png', // 마커 이미지 URL
+        imageSize2 = new kakao.maps.Size(64, 69), // 마커 이미지의 크기
+        imageOption2 = {offset: new kakao.maps.Point(27, 69)}; // 마커 이미지의 옵션 (마커의 좌표와 일치시킬 좌표 설정)
+
+    // 두 번째 마커 이미지를 생성합니다
+    var markerImage2 = new kakao.maps.MarkerImage(imageSrc2, imageSize2, imageOption2);
+
+    // 두 번째 주소로 좌표를 검색합니다
+    geocoder2.addressSearch(`[[${rDTO.careAddr}]]`, function (result, status) {
+
+        // 정상적으로 검색이 완료됐으면
+        if (status === kakao.maps.services.Status.OK) {
+
+            var coords2 = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+            // 두 번째 결과값으로 받은 위치를 마커로 표시합니다
+            var marker2 = new kakao.maps.Marker({
+                map: map2,
+                position: coords2,
+                image: markerImage2 // 마커 이미지 설정
+            });
+
+            // 두 번째 인포윈도우로 장소에 대한 설명을 표시합니다
+            var infowindow2 = new kakao.maps.InfoWindow({
+                content: '<div style="width:150px;text-align:center;padding:6px 0;">[[${rDTO.careAddr}]]</div>'
+            });
+            infowindow2.open(map2, marker2);
+
+            // 두 번째 마커 클릭 이벤트 추가
+            kakao.maps.event.addListener(marker2, 'click', function () {
+                window.open(`https://map.kakao.com/link/search/${encodeURIComponent('[[${rDTO.careAddr}]]')}`, '_blank');
+            });
+
+            // 두 번째 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+            map2.setCenter(coords2);
+        }
+    });
+    /*]]>*/
+</script>
 </body>
 </html>

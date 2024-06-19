@@ -10,9 +10,13 @@ import java.util.Map;
 
 public interface IAnimalService {
 
-    void saveAnimalList() throws Exception;
-    Page<AnimalDTO> getAnimalListAll(AnimalDTO pDTO, Pageable pageable) throws Exception;
+    void saveAnimalList();
 
+    void saveNoticeAnimal();
+
+    void saveProtectAnimal();
+    Page<AnimalDTO> getAnimalListAll(AnimalDTO pDTO, Pageable pageable, String collectionName) throws Exception;
     AnimalDTO getAnimalInfo(AnimalDTO pDTO) throws Exception;
+//    List<AnimalDTO> searchAnimalList(AnimalDTO pDTO) throws Exception;
 }
 
