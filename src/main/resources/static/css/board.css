@@ -13,6 +13,14 @@
     font-size: 1.5em;
 }
 
+.profile {
+    width: 200px;
+}
+
+.profile-name {
+    width: 30%;
+}
+
 .form-group {
     margin-bottom: 15px;
     display: flex;
@@ -20,7 +28,6 @@
 }
 
 .form-group label {
-    width: 18%;
     margin-right: 2%;
     font-weight: bold;
 }
@@ -38,6 +45,25 @@
     margin-bottom: 15px;
     display: flex;
     align-items: center;
+}
+
+.withDraw {
+    width: 40%;
+    margin-left: 34%;
+}
+
+.btnWithDraw {
+    margin-left: 34%;
+    width: 100px;
+    height: 30px;
+    font-weight: bold;
+    font-size: 13px;
+    color: #ffffff !important;
+    line-height: 30px;
+    text-align: center;
+    text-decoration: none !important;
+    border: 0px;
+    background-color: red;
 }
 
 .label-text {
@@ -62,8 +88,6 @@
 }
 
 .action-button {
-    margin-left: 10px;
-    padding: 8px 12px;
     background-color: #28a745;
     color: #fff;
     border: none;
@@ -106,7 +130,6 @@
 }
 
 .input-container button {
-    padding: 10px 20px;
     margin-left: 10px;
     color: white;
     border: none;
@@ -2310,6 +2333,7 @@ tbody td .state.st3 {
     flex: 2;
     text-align: left;
     cursor: pointer;
+    text-indent: 30px;
 }
 
 .item-header {
@@ -2667,7 +2691,6 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
 }
 
 .id-search-primary-button {
-    padding: 10px 20px;
     border: none;
     border-radius: 4px;
     font-size: 14px;
@@ -2752,7 +2775,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
 }
 
 .password-reset-primary-button {
-    padding: 10px 20px;
+
     border: none;
     border-radius: 4px;
     font-size: 14px;
@@ -2823,7 +2846,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
 }
 
 .password-reset-primary-button {
-    padding: 10px 20px;
+
     border: none;
     border-radius: 4px;
     font-size: 14px;
@@ -2894,7 +2917,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
 }
 
 .password-new-button {
-    padding: 10px 20px;
+
     border: none;
     border-radius: 4px;
     font-size: 14px;
@@ -2957,7 +2980,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="te
 .custom-button {
     background-color: #ffc107;
     color: white;
-    padding: 10px 20px;
+
     border: none;
     border-radius: 5px;
     cursor: pointer;
