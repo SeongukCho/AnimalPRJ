@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>1대1 문의</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+<!--    <script type="text/javascript" src="/js/jquery-3.6.0.min.js"></script>-->
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <script th:inline="javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function (link) {
+                link.href = "/user/myPage/" + userId;
+            });
+        });
+
+
+        /*<![CDATA[*/
+
+        let data = {}; // 전송 데이터(JSON)
+        let ws; // 웹소켓 객체
+
+        const ss_user_id = [[${session.SS_USER_ID}]];
+        const user_id = [[${dto.userId}]];
+        const roomName = /*[[${roomName}]]*/ 'defaultRoom'; // 채팅룸 이름
+        const roomOwner = [[${roomOwner}]];
+        const userName = [[${dto.userName}]]; // 채팅유저 이름
+        const userId = [[${dto.userId}]];
+        const profilePath = [[${dto.profilePath}]];
+        const protocol = location.protocol === "https:" ? "wss://" : "ws://"; // 프로토콜 설정
+        const wsUrl = protocol + "localhost:11000/ws/" + roomName + "/" + userName + "/ko";
+
+        $(document).ready(function () {
+
+            getRoomList();
+
+            // 웹소켓 객체를 생성하는 중
+            if (ws !== undefined && ws.readyState !== WebSocket.CLOSED) {
+                console.log("WebSocket is already opened.");
+                return;
+            }
+
+            // ws = new WebSocket("ws://" + location.host + "/ws/" + roomName + "/" + userName + "/ko");
+            ws = new WebSocket(wsUrl);
+
+            // 웹소켓 열기
+            ws.onopen = function (event) {
+                if (event.data === undefined)
+                    return;
+
+                console.log(event.data);
+            };
+
+            // 웹소켓으로부터 메시지를 받을 때마다 실행됨
+            ws.onmessage = function (msg) {
+                let data = JSON.parse(msg.data);
+
+                if (!data.userId || data.userId.trim() === "") {
+                    data.userId = "admin"; // userId가 없거나 비어 있으면 'admin'으로 설정
+                }
+
+                let isSelf = (ss_user_id === user_id && data.name === userName);
+                let messageClass = isSelf ? 'self' : 'admin';
+                let profileImageHtml = isSelf ? '' : "<img src='" + data.profilePath + "' class='profile-image' onerror=\"this.src='/img/profile.png'\" style='width: 8%'>"; // 상대방의 프로필 이미지 URL 설정
+
+                let messageHtml = "<div class='chat-message-container " + messageClass + "'>" +
+                    profileImageHtml +
+                    "<div class='chat-message " + messageClass + "'>" +
+                    "<div class='sender-name'>" + data.name + "</div>" +
+                    "<div class='message-content'>" + data.msg + "</div>" +
+                    "<div class='timestamp'>" + data.date + "</div>" +
+                    "</div></div>";
+                $("#chat").append(messageHtml);
+                $('#chat').scrollTop($('#chat')[0].scrollHeight);
+            };
+
+            // 전송 버튼 클릭 이벤트
+            $("#btnSend").on("click", function () {
+                sendMessage();
+            });
+
+            // 엔터 키 이벤트를 처리하기 위한 함수
+            $("#msg").keypress(function (event) {
+                if (event.which === 13) { // 엔터 키 코드는 13
+                    event.preventDefault(); // 폼 전송을 방지
+                    sendMessage();
+                }
+            });
+
+            // 메시지 전송을 처리하는 함수
+            function sendMessage() {
+                var message = $("#msg").val(); // 입력한 메시지 가져오기
+                if (message.trim() === "") {
+                    alert("내용을 입력해주세요."); // 입력 필드가 비어 있으면 경고
+                    return; // 함수 종료
+                }
+                data.name = userName; // 사용자 이름
+                data.msg = message;  // 입력한 메시지
+                data.userId = userId;
+                data.profilePath = profilePath;
+                ws.send(JSON.stringify(data));
+                let chatMsg = JSON.stringify(data); // JSON 형태로 변환하고 웹소켓을 통해 메시지 전송
+                $("#msg").val(""); // 입력 필드 초기화
+            }
+
+            // 채팅방 나가기 버튼 클릭 이벤트
+            $("#leaveBtn").on("click", function () {
+                leaveRoom();
+            });
+
+            // 채팅방 삭제 버튼 클릭 이벤트
+            $("#deleteBtn").on("click", function () {
+                if (confirm("정말 채팅방을 삭제하시겠습니까?")) {
+                    deleteRoom();
+                }
+            });
+
+            function leaveRoom() {
+                if (ws) {
+                    ws.close(); // 웹소켓 연결을 닫습니다.
+                }
+                window.location.href = "/chat/intro";
+            }
+
+            function deleteRoom() {
+                $.ajax({
+                    url: "/chat/deleteRoom/" + roomName,
+                    type: "GET",
+                    success: function (result) {
+                        if (ws) {
+                            ws.close(); // 웹소켓 연결을 닫습니다.
+                        }
+                        window.location.href = "/chat/intro";
+                    },
+                    error: function (err) {
+                        alert("채팅방 삭제 중 오류가 발생했습니다.");
+                    }
+                });
+            }
+
+            // 채팅방 소유자만 삭제 버튼을 볼 수 있게 설정
+            if (ss_user_id === roomOwner) {
+                $("#deleteBtn").show();
+            } else {
+                $("#deleteBtn").hide();
+            }
+        });
+
+        // 채팅방 리스트 가져오기
+        getRoomList();
+
+        // 3초마다 채팅방 리스트 갱신
+        setInterval(getRoomList, 3000);
+
+        function getRoomList() {
+            $.ajax({
+                url: "/chat/roomList",
+                type: "POST",
+                dataType: "JSON",
+                success: function (json) {
+                    $("#room_list").empty();
+                    for (let i = 0; i < json.length; i++) {
+                        $("#room_list").append("<div class='room-item' data-room='" + json[i] + "'>" + json[i] + "</div>");
+                    }
+                    $('.room-item').click(function () {
+                        var roomName = $(this).data('room');
+                        window.location.href = "/chat/chatroom/" + roomName;
+                    });
+                }
+            });
+        }
+
+        /*]]>*/
+    </script>
+    <style>
+        body {
+            background-color: #f0f0f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        #content {
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #444;
+        }
+        .chat-message-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 2px 0;
+        }
+
+        .chat-message {
+            display: inline-block;
+            min-width: 100px;
+            min-height: 46px;
+            max-width: 60%;
+            margin: 4px;
+            padding: 10px;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .chat-message.self {
+            margin-left: auto;
+            background-color: #ffeb00;
+            color: black;
+        }
+
+        .chat-message.admin {
+            margin-right: auto;
+            background-color: #ffffff;
+            color: black;
+        }
+
+        .sender-name {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .message-content {
+            font-size: 1em;
+            color: #444;
+        }
+
+        .timestamp {
+            font-size: 0.7em;
+            color: gray;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+
+        .left-column, .right-column {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        .left-column {
+            flex: 1;
+            max-width: 30%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .right-column {
+            flex: 2;
+            max-width: 70%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-column h2 {
+            margin-bottom: 10px;
+            font-size: 20px;
+            color: #444;
+        }
+
+        #room_list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .chat-box {
+            flex-grow: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            height: 500px;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .input-container button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .input-container button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .button-container button {
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .leave-button {
+            background-color: #ff0000;
+            color: white;
+        }
+
+        .leave-button:hover {
+            background-color: #cc0000;
+        }
+
+        .delete-button {
+            background-color: #555;
+            color: white;
+        }
+
+        .delete-button:hover {
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
+                        <ul>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/chat/intro"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="/chat/intro">문의하기</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" class="myPage">마이페이지</a>
+                &nbsp;&nbsp;
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+                <ul>
+                    <li class="has-sub">
+                        <a href="/animal/protectAnimal">구조동물</a>
+                        <ul>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/chat/intro">고객센터</a>
+                        <ul>
+                            <li><a href="/chat/intro">문의하기</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
+
+    <div id="subContainer">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/chat/intro">문의하기</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/chat/intro">문의하기</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="content" style="max-height: 1000px">
+            <h1 th:text="'현재 채팅방 이름은 '+ ${roomName} + ' 입니다.'"></h1>
+            <div class="container">
+                <div class="left-column">
+                    <h2>현재 개설된 채팅방들</h2>
+                    <div id="room_list"></div>
+                </div>
+                <div class="right-column">
+                    <div class="chat-box" id="chat">
+                        <!-- 채팅 내용 -->
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="msg" placeholder="메시지를 입력하세요">
+                        <button id="btnSend">전송</button>
+                    </div>
+                    <div class="button-container">
+                        <button class="leave-button" id="leaveBtn" style="width: 100px">채팅방 나가기</button>
+                        <button class="delete-button" id="deleteBtn" style="display:none;width: 120px">채팅방 삭제하기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <section id="footer">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-6">
+                    <div class="copyright">
+                        <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="designer">
+                    </div>
+                </div>
+            </div>
+            <!--End of row-->
+        </div>
+        <!--End of container-->
+    </section>
+</div>
+</body>
+</html>
