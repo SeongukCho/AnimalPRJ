@@ -27,7 +27,7 @@
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
             let myPage = document.querySelectorAll(".myPage");
 
-            myPage.forEach(function(link) {
+            myPage.forEach(function (link) {
                 link.href = "/user/myPage/" + userId;
             });
         });
@@ -45,9 +45,10 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li>
@@ -63,9 +64,9 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><span>고객센터</span></a>
+                        <a href="/chat/intro"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="">고객센터</a></li>
+                            <li><a href="/chat/intro">문의하기</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -101,10 +102,10 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/animal/animalList">유기동물 조회</a>
+                        <a href="/animal/protectAnimal">구조동물</a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a>
-                            </li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -115,9 +116,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/chat/intro">고객센터</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/chat/intro">문의하기</a>
                             </li>
                         </ul>
                     </li>
@@ -140,6 +141,11 @@
                         <ul>
                             <li>
                                 <a href="#" class="myPage">마이 페이지</a>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li>
+                                <a href="/user/withDraw">회원 탈퇴</a>
                             </li>
                         </ul>
                     </div>
@@ -190,11 +196,13 @@
                             </div>
                         </div>
                         <div class="form-group" style="display: flex; gap: 10px;">
-                            <button onclick="location.href='/user/myPageEdit'" class="btnTypeB" style="background-color: #ffcb00">
+                            <button onclick="location.href='/user/myPageEdit'" class="btnTypeB"
+                                    style="background-color: #ffcb00">
                                 회원정보 수정
                             </button>
-                            <button id="btnWithDrawal" class="btnTypeB" style="background-color: red">
-                                회원 탈퇴
+                            <button onclick="location.href='/user/changePassword'" class="btnTypeB"
+                                    style="background-color: #ffcb00">
+                                비밀번호 변경
                             </button>
                         </div>
                     </div>

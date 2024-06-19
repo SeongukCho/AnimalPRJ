@@ -26,7 +26,7 @@
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
             let myPage = document.querySelectorAll(".myPage");
 
-            myPage.forEach(function(link) {
+            myPage.forEach(function (link) {
                 link.href = "/user/myPage/" + userId;
             });
         });
@@ -43,9 +43,10 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li>
@@ -61,9 +62,9 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><span>고객센터</span></a>
+                        <a href="/chat/intro"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="">고객센터</a></li>
+                            <li><a href="/chat/intro">문의하기</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -99,10 +100,10 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/animal/animalList">유기동물 조회</a>
+                        <a href="/animal/protectAnimal">구조동물</a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a>
-                            </li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -113,9 +114,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/chat/intro">고객센터</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/chat/intro">문의하기</a>
                             </li>
                         </ul>
                     </li>
@@ -156,10 +157,14 @@
         </nav>
         <div id="content">
             <h1 class="title">회원 탈퇴</h1>
-            <p class="text-danger">회원 탈퇴 시 모든 정보는 삭제되고 복구가 불가능합니다. 이에 동의하시면 '탈퇴합니다'를 입력해주세요.</p>
-            <input type="text" id="confirmation" class="form-control mb-3" placeholder="'탈퇴합니다'를 입력해주세요">
-            <button id="btn">탈퇴하기</button>
-            <p id="responseMessage" class="mt-3"></p>
+            <div class="withDraw">
+                <p class="text-danger">회원 탈퇴 시 작성한 게시글이나 댓글 등을 삭제하실 수 없습니다. 이에 동의하시면 아래 빈칸에 '탈퇴합니다'를 입력해주시길 바랍니다.</p>
+                <br>
+                <input type="text" id="confirmation" class="form-control mb-3" style="width: 50%;margin-left: 24%" placeholder="'탈퇴합니다'">
+                <br>
+                <button id="btn" class="btnWithDraw">회원 탈퇴</button>
+                <p id="responseMessage" class="mt-3"></p>
+            </div>
         </div>
     </div>
     <section id="footer">
@@ -181,18 +186,18 @@
     </section>
 </div>
 <script>
-    $(document).ready(function() {
-        $('#btn').click(function() {
+    $(document).ready(function () {
+        $('#btn').click(function () {
             var confirmation = $('#confirmation').val();
             if (confirmation === '탈퇴합니다') {
                 $.ajax({
-                    url: '/user/withDraw',
+                    url: '/user/withDrawProc',
                     type: 'GET',
-                    success: function(response) {
+                    success: function (response) {
                         alert(response);
                         window.location.href = '/user/login';
                     },
-                    error: function() {
+                    error: function () {
                         $('#responseMessage').text('탈퇴 요청 중 오류가 발생했습니다.').addClass('text-danger');
                     }
                 });

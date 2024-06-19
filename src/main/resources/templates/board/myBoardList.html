@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>[[${msg}]]</title>
     <meta charset="UTF-8">
+    <title>게시판</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
@@ -10,6 +10,8 @@
     <script type="text/javascript" src="/js/menu.js"></script>
     <script type="text/javascript" src="/js/common.js"></script>
 
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
     <link rel="stylesheet" href="/css/re.css">
@@ -21,23 +23,37 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
+    <link rel="stylesheet" href="/css/paging.css">
 
     <script type="text/javascript">
 
-        // HTML로딩이 완료되고, 실행됨
         document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
+            let myPage = document.querySelectorAll(".myPage");
+            let myBoardList = document.querySelectorAll(".myBoardList");
+
+            myPage.forEach(function (link) {
+                link.href = "/user/myPage/" + userId;
+            });
+
+            myBoardList.forEach(function (link) {
+                link.href = "/board/myBoardList/" + userId;
+            });
         });
 
-        $(document).ready(function () {
+        //상세보기 이동
+        function doDetail(seq) {
+            location.href = "/board/boardInfo?nSeq=" + seq;
+        }
 
-            // 로그인 화면 이동
-            $("#btnLogin").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-                location.href = "/user/login";
-            })
-        })
+        // function goToMyBoardList() {
+        //     let userId = '[[${userId}]]';
+        //     // var userId = document.getElementById('userId').value;
+        //
+        //     window.location.href = "/board/myBoardList/" + userId;
+        //
+        // }
+
     </script>
 </head>
 <body>
@@ -136,7 +152,9 @@
     <!-- // 내비게이션 바 -->
 
     <div id="subContainer">
+        <!--  중간배경   -->
         <div class="subSkin bg"></div>
+        <!--중앙 내비게이션 바-->
         <nav id="lnb">
             <div class="area_subVisual">
                 <div class="inner">
@@ -146,19 +164,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                            </li>
-                            <li>
-                                <a href="/user/login" title="로그인">로그인</a>
-                            </li>
-                            <li>
-                                <a href="/user/logout" title="로그아웃">로그아웃</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                            </li>
-                            <li>
-                                <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                <a href="/board/boardList" title="게시판">게시판</a>
                             </li>
                         </ul>
                     </div>
@@ -166,25 +172,13 @@
                         <div class="home">
                             <a href="/main"><img src="/img/icon_home.png" alt="홈"></a>
                         </div>
-                        <div class="large">회원</div>
+                        <div class="large">게시판</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">로그인</span>
+                            <span data-mobile-tit="">게시판</span>
                             <ul>
                                 <li>
-                                    <a href="/user/userRegForm" title="회원가입">회원가입</a>
-                                </li>
-                                <li>
-                                    <a href="/user/login" title="로그인">로그인</a>
-                                </li>
-                                <li>
-                                    <a href="/user/logout" title="로그아웃">로그아웃</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchUserId" title="아이디찾기">아이디찾기</a>
-                                </li>
-                                <li>
-                                    <a href="/user/searchPassword" title="비밀번호찾기">비밀번호찾기</a>
+                                    <a href="/board/boardList" title="게시판">게시판</a>
                                 </li>
                             </ul>
                         </div>
@@ -193,23 +187,71 @@
             </div>
         </nav>
         <div id="content">
-            <h1 class="title">비밀번호 재설정 결과</h1>
-            <form id="f" class="custom-form">
-                <div class="custom-table minimalistBlack">
-                    <div class="custom-table-body">
-                        <div class="custom-table-row">
-                            <div class="custom-table-cell">비밀번호가 재설정되었습니다.
-                            </div>
+            <h1 class="title">게시판</h1>
+            <div id="cms_board_article">
+                <div class="viewTypeB">
+                    <div class="info-header">
+                        <span class="item item-seq">번호</span>
+                        <span class="item item-header">제목</span>
+                        <span class="item item-user">작성자</span>
+                        <span class="item item-date">작성일</span>
+                        <span class="item item-read">조회수</span>
+                    </div>
+                    <div class="info-body">
+                        <div class="tbody" th:each="dto : ${rList}">
+                            <span class="item item-seq" th:text="${dto.boardSeq}"></span>
+                            <span class="item item-title"
+                                  th:attr="onclick='doDetail(\'' + ${dto.boardSeq} + '\')'"
+                                  th:text="${dto.title}"></span>
+                            <span class="item item-user" id="userId" th:text="${dto.userId}"></span>
+                            <span class="item item-date" th:text="${dto.regDt}"></span>
+                            <span class="item item-read" th:text="${dto.readCnt}"></span>
                         </div>
                     </div>
                 </div>
-                <div class="custom-button-container">
-                    <button id="btnLogin" type="button" class="custom-button">로그인</button>
+                <div class="topGlob" style="margin-top: 30px">
+                    <i class="bx bx-message-rounded"></i>
+                    <span class="btnBc" style="margin: 10px; margin-left: 50%;"><a href="/board/boardList" title="목록으로"
+                                                                              class="fn_btn_list">목록으로</a></span>
                 </div>
-            </form>
+                <!-- 페이징 네비게이션 -->
+                <!--<div style="padding-top: 2.5rem; padding-bottom: 2.5rem; justify-content: center; display: flex;">
+                    <div class="pagination">
+                        <ul>
+                            &lt;!&ndash; First page link &ndash;&gt;
+                            <li th:if="${currentPage > 1}">
+                                <a th:href="@{/board/boardList(page=1, size=${size})}">처음</a>
+                            </li>
+
+                            &lt;!&ndash; Previous page link &ndash;&gt;
+                            <li th:if="${currentPage > 1}">
+                                <a th:href="@{/board/boardList(page=${currentPage - 1}, size=${size})}">이전</a>
+                            </li>
+
+                            &lt;!&ndash; Page number links &ndash;&gt;
+                            <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
+                                <a th:href="@{/board/boardList(page=${i}, size=${size})}"
+                                   th:classappend="${i} == ${currentPage} ? 'active' : ''"
+                                   th:text="${i}"></a>
+                            </li>
+
+                            &lt;!&ndash; Next page link &ndash;&gt;
+                            <li th:if="${currentPage < totalPages}">
+                                <a th:href="@{/board/boardList(page=${currentPage + 1}, size=${size})}">다음</a>
+                            </li>
+
+                            &lt;!&ndash; Last page link &ndash;&gt;
+                            <li th:if="${currentPage < totalPages}">
+                                <a th:href="@{/board/boardList(page=${totalPages}, size=${size})}">마지막</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>-->
+            </div>
         </div>
     </div>
 </div>
+
 <section id="footer">
     <div class="container">
         <div class="row text-center">

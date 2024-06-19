@@ -29,13 +29,29 @@
 
         document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
-            let myPage = document.getElementById("myPage");
-            myPage.href = "/user/myPage/" + userId;
-        })
+            let myPage = document.querySelectorAll(".myPage");
+            let myBoardList = document.querySelectorAll(".myBoardList");
+
+            myPage.forEach(function (link) {
+                link.href = "/user/myPage/" + userId;
+            });
+
+            myBoardList.forEach(function (link) {
+                link.href = "/board/myBoardList/" + userId;
+            });
+        });
 
         //상세보기 이동
         function doDetail(seq) {
             location.href = "/board/boardInfo?nSeq=" + seq;
+        }
+
+        function goToMyBoardList() {
+
+            var userId = document.getElementById('userId').value;
+
+            window.location.href = "/board/myBoardList/" + userId;
+
         }
 
     </script>
@@ -51,9 +67,10 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li>
@@ -69,9 +86,9 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><span>고객센터</span></a>
+                        <a href="/chat/intro"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="">고객센터</a></li>
+                            <li><a href="/chat/intro">문의하기</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -107,10 +124,10 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/animal/animalList">유기동물 조회</a>
+                        <a href="/animal/protectAnimal">구조동물</a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a>
-                            </li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li class="has-sub">
@@ -121,9 +138,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/chat/intro">고객센터</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/chat/intro">문의하기</a>
                             </li>
                         </ul>
                     </li>
@@ -186,15 +203,17 @@
                             <span class="item item-title"
                                   th:attr="onclick='doDetail(\'' + ${dto.boardSeq} + '\')'"
                                   th:text="${dto.title}"></span>
-                            <span class="item item-user" th:text="${dto.userId}"></span>
+                            <span class="item item-user" id="userId" th:text="${dto.userId}"></span>
                             <span class="item item-date" th:text="${dto.regDt}"></span>
                             <span class="item item-read" th:text="${dto.readCnt}"></span>
                         </div>
                     </div>
                 </div>
                 <div class="topGlob">
+                    <i class="bx bx-message-rounded"></i>
                     <span class="btnBc" style="float: right; margin: 10px"><a href="/board/boardReg" title="글쓰기"
                                                                               class="fn_btn_list">글쓰기</a></span>
+                    <span class="btnBc" style="float: right; margin: 10px"><a href="#" class="myBoardList">내글</a></span>
                 </div>
                 <!-- 페이징 네비게이션 -->
                 <div style="padding-top: 2.5rem; padding-bottom: 2.5rem; justify-content: center; display: flex;">
