@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public record ShelterDTO(
 
         @Id
-        String careRegNo,       // 보호센터등록번호
+        String id,
         String careNm,          // 동물보호센터명
         String orgNm,           // 관리기관명
         String divisionNm,      // 동물보호센터유형

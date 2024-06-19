@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>유기동물 조회</title>
+    <title>동물보호센터</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
@@ -56,9 +56,10 @@
             <nav id="gnb">
                 <ul class="gnb">
                     <li>
-                        <a href="/animal/animalList"><span>구조동물</span></a>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a></li>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
                         </ul>
                     </li>
                     <li>
@@ -74,9 +75,9 @@
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><span>고객센터</span></a>
+                        <a href="/chat/intro"><span>고객센터</span></a>
                         <ul>
-                            <li><a href="">고객센터</a></li>
+                            <li><a href="/chat/intro">문의하기</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -112,9 +113,9 @@
                 </div>
                 <ul>
                     <li class="has-sub">
-                        <a href="/animal/animalList">유기동물 조회</a>
+                        <a href="/animal/animalList">동물보호센터</a>
                         <ul>
-                            <li><a href="/animal/animalList">유기동물 조회</a>
+                            <li><a href="/animal/animalList">동물보호센터</a>
                             </li>
                         </ul>
                     </li>
@@ -126,9 +127,9 @@
                         </ul>
                     </li>
                     <li class="has-sub">
-                        <a href="#">고객센터</a>
+                        <a href="/chat/intro">고객센터</a>
                         <ul>
-                            <li><a href="">고객센터</a>
+                            <li><a href="/chat/intro">문의하기</a>
                             </li>
                         </ul>
                     </li>
@@ -149,7 +150,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
+                                <a href="/shelter/shelterList" title="동물보호센터">동물보호센터</a>
                             </li>
                         </ul>
                     </div>
@@ -157,13 +158,13 @@
                         <div class="home">
                             <a href="/main"></a>
                         </div>
-                        <div class="large">유기동물 조회</div>
+                        <div class="large">동물보호센터</div>
 
                         <div class="small">
-                            <span data-mobile-tit="">유기동물 조회</span>
+                            <span data-mobile-tit="">동물보호센터</span>
                             <ul>
                                 <li>
-                                    <a href="/animal/animalList" title="유기동물 조회">유기동물 조회</a>
+                                    <a href="/shelter/shelterList" title="동물보호센터">동물보호센터</a>
                                 </li>
                             </ul>
                         </div>
@@ -171,6 +172,7 @@
                 </div>
             </div>
         </nav>
+        <br>
         <div class="flex flex-1 flex-col gap-2 undefined">
             <div class="openAnimation w-full h-full flex items-center justify-center">
                 <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-3 gap-x-3">
@@ -179,7 +181,7 @@
                             <div class="h-full flex flex-col gap-2 p-2 sm:p-5">
                                 <div>
                                     <div class="flex items-center justify-between flex-wrap gap-2">
-                                        <a th:href="'/shelters/' + ${shelter.id} + '?page=1&amp;org_nm=' + ${shelter.orgNm}">
+                                        <a th:href="'/shelter/shelterInfo/' + ${shelter.id}">
                                             <h5 class="text-xl font-bold tracking-tight text-gray-900 dark:text-white" th:text="${shelter.careNm}">Shelter Name</h5>
                                         </a>
                                         <span class="text-xs text-gray-400" th:text="${shelter.divisionNm}">Organization Type</span>

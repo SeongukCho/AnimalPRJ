@@ -1,10 +1,426 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>동물보호센터</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui.js"></script>
+    <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=213a1a4befc94c34139ceb8cc96c3f40&libraries=services"></script>
+
+    <link rel="stylesheet" href="/css/table.css">
+    <link rel="stylesheet" href="/css/fullpage.css">
+    <link rel="stylesheet" href="/css/board.css">
+    <link rel="stylesheet" href="/css/re.css">
+    <link rel="stylesheet" href="/css/etc.css">
+    <link rel="stylesheet" href="/css/font.css">
+    <link rel="stylesheet" href="/css/carousel.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/ui_content.css">
+    <link rel="stylesheet" href="/css/paging.css">
+    <link rel="stylesheet" href="/css/animal.css">
+
+    <script th:inline="javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+            let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
+            let myPage = document.querySelectorAll(".myPage");
+
+            myPage.forEach(function (link) {
+                link.href = "/user/myPage/" + userId;
+            });
+        });
+    </script>
 </head>
 <body>
+<div id="wrapper">
+    <!-- 내비게이션 바 -->
+    <header id="header" class>
+        <div class="head_box">
+            <h1 class="logo"><a href="/main">펫밀리</a></h1>
+            <button type="button" class="btnMenu"><span>메뉴</span></button>
+            <!-- gnb -->
+            <nav id="gnb">
+                <ul class="gnb">
+                    <li>
+                        <a href="/animal/protectAnimal"><span>구조동물</span></a>
+                        <ul>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/shelter/shelterList"><span>동물보호센터</span></a>
+                        <ul>
+                            <li><a href="/shelter/shelterList">동물보호센터</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/board/boardList"><span>게시판</span></a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="/chat/intro"><span>고객센터</span></a>
+                        <ul>
+                            <li><a href="/chat/intro">문의하기</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <!-- //gnb -->
+            <div class="topGlob" th:if="${session.SS_USER_ID == null}">
+                <ul>
+                    <li><a href="/user/userRegForm">회원가입</a></li>
+                    <li><a href="/user/login">로그인</a></li>
+                </ul>
+            </div>
+            <div class="topGlob" th:if="${session.SS_USER_ID != null}">
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <a href="#" class="myPage">마이페이지</a>
+                &nbsp;&nbsp;
+                <a href="/user/logout">로그아웃</a>
+            </div>
+            <nav id="mGnb">
+                <button type="button" class="btnClose"><span>닫기</span></button>
+                <div class="mbTop" th:if="${session.SS_USER_ID == null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="/user/userRegForm">회원가입</a></li>
+                        <li><a href="/user/login">로그인</a></li>
+                    </ul>
+                </div>
+                <div class="mbTop" th:if="${session.SS_USER_ID != null}">
+                    <div class="mlogo"><a href="/main"><img src="/img/logo.png"></a></div>
+                    <ul>
+                        <li><a href="#" class="myPage">마이 페이지</a></li>
+                        <li><a href="/user/logout">로그아웃</a></li>
+                    </ul>
+                </div>
+                <ul>
+                    <li class="has-sub">
+                        <a href="/animal/protectAnimal">구조동물</a>
+                        <ul>
+                            <li><a href="/animal/protectAnimal">입양대기 동물</a></li>
+                            <li><a href="/animal/noticeAnimal">반환대기 동물</a></li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/board/boardList">게시판</a>
+                        <ul>
+                            <li><a href="/board/boardList">게시판</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="has-sub">
+                        <a href="/chat/intro">고객센터</a>
+                        <ul>
+                            <li><a href="/chat/intro">문의하기</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+            <div class="fix_bg"></div>
+        </div>
+    </header>
+    <!-- // 내비게이션 바 -->
 
+    <div id="subContainer" style="margin-left: 150px; margin-right: 150px;">
+        <div class="subSkin bg"></div>
+        <nav id="lnb">
+            <div class="area_subVisual">
+                <div class="inner">
+                    <div class="lnb pc">
+                        <div class="home">
+                            <a href="/main"></a>
+                        </div>
+                        <ul>
+                            <li>
+                                <a href="/shelter/shelterList" title="보호소 조회">보호소 조회</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="lnb mobile">
+                        <div class="home">
+                            <a href="/main"></a>
+                        </div>
+                        <div class="large">구조동물</div>
+
+                        <div class="small">
+                            <span data-mobile-tit="">구조동물</span>
+                            <ul>
+                                <li>
+                                    <a href="/shelter/shelterList" title="보호소 조회">보호소 조회</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="mt-[88px]">
+            <div class="mx-auto max-w-2xl md:max-w-4xl xl:max-w-5xl lg:max-w-5xl py-4 px-4 xl:px-1 sm:px-6 md:px-16 xl:px-8 lg:px-10 relative bg-gray-200 dark:bg-stone-800">
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center text-stone-900 dark:text-stone-100 font-semibold text-xl undefined">
+                        <div class="inline-flex items-center gap-1">
+                            <div class="bg-blue-600 rounded-[2px] text-stone-100 text-xs px-2 py-0.5">동물보호센터</div>
+                            <div class="px-2 rounded-[2px] text-stone-100 bg-emerald-500 text-xs px-2 py-0.5"
+                                 th:text="${rDTO.orgNm}"></div>
+                        </div>
+                        <div class="text-xs" th:text="${rDTO.dsignationDate}"></div>
+                    </div>
+                    <div class="text-lg text-semibold">
+                        <div class="justify-between items-center">
+                            <div class="inline-flex items-center gap-1">
+                                <div class="flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+                                     th:text="${rDTO.careNm}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="openAnimation flex flex-col text-gray-600 gap-6 pt-3">
+                    <div class="flex flex-1 flex-col justify-center">
+                        <div class="block p-6 rounded-lg shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">보호센터정보</div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">동물보호센터명</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.careNm}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-4 w-5 m-[2px] fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">전화번호</div>
+                                    </div>
+                                    <a class="text-sm ml-[24px]" th:href="'tel:' + ${rDTO.careTel}"
+                                       th:text="${rDTO.careTel}"></a>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">관리기관명</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.orgNm}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">동물보호센터유형</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.divisionNm}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">구조대상동물</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.saveTrgtAnimal}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">동물보호센터지정일자</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.dsignationDate}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">수의사수</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.vetPersonCnt} + '명'"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <svg class="h-5 w-5 fill-gray-700 dark:fill-stone-100"
+                                             xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                            <path d="..."></path>
+                                        </svg>
+                                        <div class="font-semibold text-lg">사양관리사수</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.specsPersonCnt} + '명'"></div>
+                                </div>
+                                <!-- More fields here as needed -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-1 flex-col justify-center">
+                        <div class="block p-6 rounded-lg shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">운영시간</div>
+                                <div class="flex justify-center items-center rounded-full w-10 bg-green-600 text-white font-medium text-xs">
+                                    <!-- SVG for clock icon -->
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <!-- SVG for dot icon -->
+                                        <div class="font-semibold text-lg">평일운영시간</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.weekOprStime()}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <!-- SVG for close icon -->
+                                        <div class="font-semibold text-lg">휴무일</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.closeDay}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="flex flex-1 flex-col justify-center rounded-lg overflow-hidden">
+                        <div class="block p-6 shadow-2xl bg-white dark:bg-stone-900 dark:text-stone-100 w-full">
+                            <div class="flex space-x-2 justify-between h-10">
+                                <div class="text-2xl font-bold self-center">보호센터위치</div>
+                                <div class="inline-flex">
+                                    <div class="flex justify-center items-center rounded-full w-10 bg-cyan-600 text-white font-medium text-xs">
+                                        <!-- SVG for location icon -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                <div class="sm:col-span-2 flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <!-- SVG for location pin icon -->
+                                        <div class="font-semibold text-lg">보호센터주소</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.careAddr}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <!-- SVG for dot icon -->
+                                        <div class="font-semibold text-lg">위도</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.lat}"></div>
+                                </div>
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex gap-1 items-center">
+                                        <!-- SVG for dot icon -->
+                                        <div class="font-semibold text-lg">경도</div>
+                                    </div>
+                                    <div class="text-sm ml-[24px]" th:text="${rDTO.lng}"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="map1" class="h-56 w-full sm:h-96 false">
+                            <!-- Map embed code here, typically an iframe if using a third-party map service -->
+                        </div>
+                    </div>
+                    <!-- Add other sections similarly -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<section id="footer">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-6">
+                <div class="copyright">
+                    <p>펫밀리<span><a href="">&#9798;</a></span></p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="designer">
+                </div>
+            </div>
+        </div>
+        <!--End of row-->
+    </div>
+    <!--End of container-->
+</section>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // 첫 번째 지도 설정
+    var mapContainer1 = document.getElementById('map1'), // 지도를 표시할 div
+        mapOption1 = {
+            center: new kakao.maps.LatLng([[${rDTO.lat}]], [[${rDTO.lng}]]), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+
+    // 첫 번째 지도를 생성합니다
+    var map1 = new kakao.maps.Map(mapContainer1, mapOption1);
+
+    // 첫 번째 주소-좌표 변환 객체를 생성합니다
+    var geocoder1 = new kakao.maps.services.Geocoder();
+
+    // 첫 번째 마커 이미지의 주소
+    var imageSrc1 = '/img/favicon-96x96.png', // 마커 이미지 URL
+        imageSize1 = new kakao.maps.Size(64, 69), // 마커 이미지의 크기
+        imageOption1 = {offset: new kakao.maps.Point(27, 69)}; // 마커 이미지의 옵션 (마커의 좌표와 일치시킬 좌표 설정)
+
+    // 첫 번째 마커 이미지를 생성합니다
+    var markerImage1 = new kakao.maps.MarkerImage(imageSrc1, imageSize1, imageOption1);
+
+    // 첫 번째 주소로 좌표를 검색합니다
+    geocoder1.addressSearch(`[[${rDTO.careAddr}]]`, function (result, status) {
+
+        // 정상적으로 검색이 완료됐으면
+        if (status === kakao.maps.services.Status.OK) {
+
+            var coords1 = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+            // 첫 번째 결과값으로 받은 위치를 마커로 표시합니다
+            var marker1 = new kakao.maps.Marker({
+                map: map1,
+                position: coords1,
+                image: markerImage1 // 마커 이미지 설정
+            });
+
+            // 첫 번째 인포윈도우로 장소에 대한 설명을 표시합니다
+            var infowindow1 = new kakao.maps.InfoWindow({
+                content: '<div style="width:150px;text-align:center;padding:6px 0;">[[${rDTO.careAddr}]]</div>'
+            });
+            infowindow1.open(map1, marker1);
+
+            // 첫 번째 마커 클릭 이벤트 추가
+            kakao.maps.event.addListener(marker1, 'click', function () {
+                window.open(`https://map.kakao.com/link/search/${encodeURIComponent('[[${rDTO.careAddr}]]')}`, '_blank');
+            });
+
+            // 첫 번째 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+            map1.setCenter(coords1);
+        }
+    });
+    /*]]>*/
+</script>
 </body>
 </html>
