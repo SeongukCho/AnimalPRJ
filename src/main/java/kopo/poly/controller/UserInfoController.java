@@ -5,8 +5,11 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import kopo.poly.dto.BoardDTO;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.UserInfoDTO;
+import kopo.poly.repository.UserInfoRepository;
+import kopo.poly.repository.entity.UserInfoEntity;
 import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
@@ -20,11 +23,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
-@RequestMapping(value = "/user")
+@RequestMapping(value = "user")
 @RequiredArgsConstructor
 @Controller
 public class UserInfoController {
@@ -33,6 +38,7 @@ public class UserInfoController {
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final IUserInfoService userInfoService;
+    private final UserInfoRepository userInfoRepository;
 
 
     @GetMapping(value = "userRegForm")
@@ -158,7 +164,82 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".user/updatePassword End!");
 
-        return "/user/newPasswordResult";
+        return "user/newPasswordResult";
+    }
+
+    @GetMapping(value = "changePassword")
+    public String changePassword(HttpSession session,ModelMap model) throws Exception{
+
+        log.info(this.getClass().getName() + ".changePassword Controller Start!");
+
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        model.addAttribute("userId", userId);
+
+        if (userId.length() > 0) {
+
+        } else {
+            return "user/login";
+        }
+
+        return "user/changePassword";
+    }
+
+    @ResponseBody
+    @PostMapping(value = "changePasswordProc")
+    public MsgDTO ChangePasswordProc(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".ChangePasswordProc Start!");
+
+        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+
+        String msg = ""; // 웹에 보여줄 메세지
+        int result = 0;
+
+        if(userId.length() > 0) { //정상접근
+
+            String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
+
+            log.info("password : " + password);
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .password(EncryptUtil.encHashSHA256(password))
+                    .build();
+
+            int res = userInfoService.updatePassword(pDTO);
+
+
+            if(res > 0) {
+
+                msg = "비밀번호가 재설정되었습니다.";
+                result = 0;
+
+            } else {
+
+                msg = "비밀번호 변경에 실패하였습니다. 다시 시도해주세요.";
+
+                result = 1;
+
+            }
+
+        } else { //비정상 접근
+
+            msg = "비정상 접근입니다.";
+            result = 2;
+
+        }
+
+        MsgDTO rDTO = MsgDTO.builder()
+                .msg(msg)
+                .result(result)
+                .build();
+
+        log.info("rDTO : " + rDTO);
+
+        log.info(this.getClass().getName() + ".ChangePasswordProc End!");
+
+        return rDTO;
     }
 
 
@@ -282,7 +363,7 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".user/passProc End!");
 
-        return "redirect:/user/login";
+        return "redirect:user/login";
     }
 
     @ResponseBody
@@ -451,7 +532,7 @@ public class UserInfoController {
             model.addAttribute("userId", ssUserId);
 
         } else {
-            return "/user/login";
+            return "user/login";
         }
 
         log.info(this.getClass().getName() + ".user/myPage End!");
@@ -491,90 +572,10 @@ public class UserInfoController {
             return "user/myPageEdit";
         } else {
 
-            return "/user/login";
-
-        }
-    }
-
-    // 비밀 번호 변경 (MyPage) 페이지 이동
-    @GetMapping(value = "myNewPassword")
-    public String myNewPassword(HttpSession session) {
-
-        log.info(this.getClass().getName() + ".user/myNewPassword Start!");
-
-        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-
-        if (userId.length() > 0) {
-
-        } else {
-
-
             return "user/login";
 
         }
-
-        return "user/myNewPassword";
-
     }
-
-
-    @ResponseBody
-    @PostMapping(value = "myUpdatePassword")
-    public MsgDTO myUpdatePassword(HttpServletRequest request, HttpSession session) throws Exception {
-
-        log.info(this.getClass().getName() + ".user/myUpdatePassword Start!");
-
-        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
-
-        String msg = ""; // 웹에 보여줄 메세지
-        int result = 0;
-
-        if (userId.length() > 0) { //정상접근
-
-            String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
-
-            log.info("password : " + password);
-
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .password(EncryptUtil.encHashSHA256(password))
-                    .build();
-
-            int res = userInfoService.updatePassword(pDTO);
-
-
-            if (res > 0) {
-
-                msg = "비밀번호가 재설정되었습니다.";
-                result = 0;
-
-            } else {
-
-                msg = "비밀번호 변경에 문제가 생겼습니다. 다시 시도해주세요.";
-
-                result = 1;
-
-            }
-
-        } else { //비정상 접근
-
-            msg = "비정상 접근입니다.";
-            result = 2;
-
-        }
-
-        MsgDTO mDTO = MsgDTO.builder()
-                .msg(msg)
-                .result(result)
-                .build();
-
-        log.info("msg : " + msg);
-
-        log.info(this.getClass().getName() + ".user/myUpdatePassword End!");
-
-        return mDTO;
-    }
-
 
     // 유저 정보 수정
 
@@ -638,9 +639,8 @@ public class UserInfoController {
         return ResponseEntity.ok("프로필 업데이트 성공!");
     }
 
-
     // 회원 탈퇴 페이지
-    @GetMapping(value = "withdraw")
+    @GetMapping(value = "withDraw")
     public String Withdrawal(HttpSession session, ModelMap model) {
 
         log.info(this.getClass().getName() + ".user/withdraw Start!");
@@ -659,7 +659,7 @@ public class UserInfoController {
     }
 
     @ResponseBody
-    @GetMapping(value = "withDraw")
+    @GetMapping(value = "withDrawProc")
     public ResponseEntity<?> withDrawProc(HttpSession session) throws Exception {
 
         log.info(this.getClass().getName() + ".user/deleteUserProc Start!");
@@ -686,6 +686,8 @@ public class UserInfoController {
 
         // 회원가입 서비스 호출하여 결과 받기
         userInfoService.withDrawProc(pDTO);
+
+        session.invalidate();
 
         log.info(this.getClass().getName() + ".user/deleteUserProc End!");
 
