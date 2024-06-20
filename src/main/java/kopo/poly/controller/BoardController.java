@@ -5,12 +5,10 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import kopo.poly.dto.BoardImgDTO;
-import kopo.poly.dto.CommentDTO;
-import kopo.poly.dto.MsgDTO;
-import kopo.poly.dto.BoardDTO;
+import kopo.poly.dto.*;
 import kopo.poly.service.ICommentService;
 import kopo.poly.service.IBoardService;
+import kopo.poly.service.IUserInfoService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,13 +48,15 @@ public class BoardController {
     private final ICommentService commentService;
     private final AmazonS3 s3Client;
     private final String bucketName;
+    private final IUserInfoService userInfoService;
 
     @Autowired
-    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService) {
+    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService, IUserInfoService userInfoService) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.boardService = boardService;
         this.commentService = commentService;
+        this.userInfoService = userInfoService;
     }
 
     /**
@@ -130,7 +130,7 @@ public class BoardController {
         if (userId.length() > 0) {
             return "board/boardReg";
         } else {
-            return "redirect:/user/login";
+            return "redirect:user/login";
         }
     }
 
@@ -297,7 +297,7 @@ public class BoardController {
 
             return "board/boardEditInfo";
         } else {
-            return "redirect:/user/login";
+            return "redirect:user/login";
         }
     }
 
@@ -451,5 +451,24 @@ public class BoardController {
             log.error("error : " + e);
             return ResponseEntity.badRequest().body("이미지 삭제 실패: " + e.getMessage());
         }
+    }
+
+    @GetMapping(value = "myBoardList/{userId}")
+    public String myNoticeList(@PathVariable("userId") String userId, HttpSession session, ModelMap model)
+            throws Exception {
+
+        log.info(this.getClass().getName() + ".myBoardList Start!");
+
+        UserInfoDTO rDTO = userInfoService.getUserInfo(userId);
+
+        List<BoardDTO> rList = Optional.ofNullable(boardService.getUserNoticeListUsingNativeQuery(userId))
+                .orElseGet(ArrayList::new);
+
+        model.addAttribute("userId", rDTO.userId());
+        model.addAttribute("rList", rList);
+
+        log.info(this.getClass().getName() + ".myBoardList End!");
+
+        return "board/myBoardList";
     }
 }

@@ -76,4 +76,9 @@ public interface IBoardService {
      * 특정 userId 기준 게시글 개수 조회
      */
     long countByUserId(String userId) throws Exception;
+
+    /**
+     * NativeQuery 사용하여 내 게시글만 가져오기
+     */
+    List<BoardDTO> getUserNoticeListUsingNativeQuery(String userId);
 }

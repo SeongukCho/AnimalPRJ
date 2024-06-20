@@ -6,8 +6,10 @@ import kopo.poly.dto.BoardDTO;
 import kopo.poly.dto.BoardImgDTO;
 import kopo.poly.repository.BoardImgRepository;
 import kopo.poly.repository.BoardRepository;
+import kopo.poly.repository.NoticeSQLRepository;
 import kopo.poly.repository.entity.BoardEntity;
 import kopo.poly.repository.entity.BoardImgEntity;
+import kopo.poly.repository.entity.BoardSQLEntity;
 import kopo.poly.repository.entity.ImagePK;
 import kopo.poly.service.IBoardService;
 import kopo.poly.util.CmmUtil;
@@ -36,6 +38,7 @@ public class BoardService implements IBoardService {
     // 예전에는 autowired 어노테이션를 통해 설정했었지만, 이젠 생성자를 통해 객체 주입함
     private final BoardRepository boardRepository;
     private final BoardImgRepository boardImgRepository;
+    private final NoticeSQLRepository noticeSQLRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -312,5 +315,23 @@ public class BoardService implements IBoardService {
     @Override
     public long countByUserId(String userId) throws Exception {
         return boardRepository.countByUserId(userId);
+    }
+
+    @Override
+    public List<BoardDTO> getUserNoticeListUsingNativeQuery(String userId) {
+
+        log.info(this.getClass().getName() + ".getUserNoticeListUsingNativeQuery Start!");
+
+        List<BoardSQLEntity> rList = noticeSQLRepository.getUserNoticeListUsingSQL(userId);
+
+        log.info("rList : " + rList);
+
+        List<BoardDTO> nList = new ObjectMapper().convertValue(rList,
+                new TypeReference<List<BoardDTO>>() {
+                });
+
+        log.info(this.getClass().getName() + ".getUserNoticeListUsingNativeQuery End!");
+
+        return nList;
     }
 }

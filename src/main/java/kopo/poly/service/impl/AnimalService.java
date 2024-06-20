@@ -205,7 +205,6 @@ public class AnimalService implements IAnimalService {
                 JsonNode rootNode = objectMapper.readTree(sb.toString());
                 JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
 
-                String collectionName = "noticeAnimal";
 
                 List<AnimalDTO> animalList = new ArrayList<>();
                 if (itemsNode.isArray() && !itemsNode.isEmpty()) {

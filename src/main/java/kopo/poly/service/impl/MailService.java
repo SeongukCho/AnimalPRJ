@@ -62,7 +62,7 @@ public class MailService implements IMailService {
 
         } catch (Exception e) { //모든 에러 다 잡기
             res = 0 ; // 메일 발송 실패
-            log.info("[ERRPR] " + this.getClass().getName() + ".doSendMail : " + e);
+            log.info("[ERROR] " + this.getClass().getName() + ".doSendMail : " + e);
         }
 
         // 로그 찍기
