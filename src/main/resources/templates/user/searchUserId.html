@@ -37,6 +37,12 @@
             $("#btnSearchUserId").on("click", function () {
                 let f = document.getElementById("f"); // form 태그
 
+                if (f.userName.value === "") {
+                    alert("이름을 입력하세요.");
+                    f.userName.focus();
+                    return;
+                }
+
                 if (f.email.value === "") {
                     alert("이메일을 입력하세요.");
                     f.email.focus();
@@ -57,7 +63,7 @@
 
                             }
                         }
-                    })
+                    });
                 }
             })
         })
@@ -212,8 +218,8 @@
                             </div>
                             <div class="id-search-button-group">
                                 <button class="id-search-primary-button id-search-primary-button-green" id="btnSearchUserId" type="button">아이디 찾기</button>
-                                <button class="id-search-primary-button id-search-primary-button-black" type="button" title="취소">
-                                    <a href="/user/login"></a>이전</button>
+                                <button class="id-search-primary-button id-search-primary-button-black" type="button" title="이전" onclick="window.location.href='/user/login'">
+                                    이전</button>
                             </div>
                         </div>
                     </form>

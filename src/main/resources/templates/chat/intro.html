@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>1대1 문의</title>
+    <title>문의하기</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -136,6 +136,11 @@
         form button:hover {
             background-color: #45a049;
         }
+
+        .room-item {
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -244,7 +249,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/chat/intro">문의하기</a>
+                                <a href="/chat/intro" title="문의하기">문의하기</a>
                             </li>
                         </ul>
                     </div>
@@ -254,7 +259,7 @@
                         </div>
                         <ul>
                             <li>
-                                <a href="/chat/intro">문의하기</a>
+                                <a href="/chat/intro" title="문의하기">문의하기</a>
                             </li>
                         </ul>
                     </div>
@@ -264,7 +269,7 @@
         <div id="content">
             <div class="">
                 <h2>대화 가능한 채팅방들</h2>
-                <div id="room_list"></div>
+                <div id="room_list" th:if="${session.SS_USER_ID == 'admin'}"></div>
             </div>
             <div class="">
                 <form name="f" id="f" method="post" style="margin-top: 100%">

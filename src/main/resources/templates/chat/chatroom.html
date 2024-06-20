@@ -46,8 +46,8 @@
         const userName = [[${dto.userName}]]; // 채팅유저 이름
         const userId = [[${dto.userId}]];
         const profilePath = [[${dto.profilePath}]];
-        const protocol = location.protocol === "https:" ? "wss://" : "ws://"; // 프로토콜 설정
-        const wsUrl = protocol + "localhost:11000/ws/" + roomName + "/" + userName + "/ko";
+        const protocol = location.protocol === "http:" ? "wss://" : "ws://"; // 프로토콜 설정
+        // const wsUrl = protocol + "3.37.241.229:11000/ws/" + roomName + "/" + userName + "/ko";
 
         $(document).ready(function () {
 
@@ -59,8 +59,8 @@
                 return;
             }
 
-            // ws = new WebSocket("ws://" + location.host + "/ws/" + roomName + "/" + userName + "/ko");
-            ws = new WebSocket(wsUrl);
+            ws = new WebSocket("ws://" + location.host + "/ws/" + roomName + "/" + userName + "/ko");
+            // ws = new WebSocket(wsUrl);
 
             // 웹소켓 열기
             ws.onopen = function (event) {
@@ -308,6 +308,7 @@
             border: 1px solid #ccc;
             padding: 10px;
             border-radius: 8px;
+            cursor: pointer;
         }
 
         .chat-box {
@@ -510,7 +511,7 @@
         <div id="content" style="max-height: 1000px">
             <h1 th:text="'현재 채팅방 이름은 '+ ${roomName} + ' 입니다.'"></h1>
             <div class="container">
-                <div class="left-column">
+                <div class="left-column" th:if="${session.SS_USER_ID == 'admin'}">
                     <h2>현재 개설된 채팅방들</h2>
                     <div id="room_list"></div>
                 </div>
