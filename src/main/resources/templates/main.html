@@ -9,6 +9,8 @@
     <script type="text/javascript" src="/js/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="/js/jquery-ui.js"></script>
     <script type="text/javascript" src="/js/menu.js"></script>
+    <script type="text/javascript" src="/js/base.js"></script>
+
     <link rel="stylesheet" href="/css/table.css">
     <link rel="stylesheet" href="/css/fullpage.css">
     <link rel="stylesheet" href="/css/board.css">
@@ -22,16 +24,67 @@
     <link rel="stylesheet" href="/css/ui_content.css">
     <link rel="stylesheet" href="/css/paging.css">
     <link rel="stylesheet" href="/css/animal.css">
+    <link rel="stylesheet" href="/css/slick.css">
+
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="//cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.5.8/slick-theme.min.css">
+    <!-- jQuery CDN -->
+<!--    <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>-->
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <!-- slick Carousel CDN -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.7/slick.min.js"></script>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function () {
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
             let myPage = document.querySelectorAll(".myPage");
 
-            myPage.forEach(function(link) {
+            myPage.forEach(function (link) {
                 link.href = "/user/myPage/" + userId;
             });
         });
+
+        $('.post-wrapper').slick({
+            slidesToShow: 3,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 2000,
+            nextArrow: $('.next'),
+            prevArrow: $('.prev'),
+        });
+
     </script>
+    <style>
+        .class {
+            margin: auto;
+            width: 800px;
+            height: 500px;
+            text-align: center;
+        }
+
+        .class2 {
+            width: 100%;
+            height: 100%;
+        }
+
+
+        /* 화살표 색상 변경*/
+        .slick-prev:before, .slick-next:before {
+            color: black !important;
+            opacity: 1;
+        }
+
+        /* 화살표 위치 변경 */
+        .slick-prev {
+            left: 20px !important;
+            z-index: 9;
+        }
+
+        .slick-next {
+            right: 20px !important;
+            z-index: 9;
+        }
+    </style>
 </head>
 
 <body>
@@ -128,31 +181,40 @@
         </div>
     </header>
     <!-- // 내비게이션 바 -->
-
+    <br><br><br><br><br><br><br><br><br><br>
     <!--Start of slider section-->
-    <section id="slider">
-        <div id="carousel-example-generic" class="" data-ride="carousel"
-             data-interval="3000">
-            <!-- Indicators -->
-            <ol class="">
-                <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-                <!--                <li data-target="#carousel-example-generic" data-slide-to="1"></li>-->
-            </ol>
-            <!-- Wrapper for slides -->
-            <div class="" role="listbox">
-                <div class="item active">
-                    <div class="">
-                        <br><br><br><br><br>
-                        <img src="/img/main.jpg" alt="..." class="slider-image">
-                        <div class="carousel-caption">
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="class">
+        <div class="class2">
+            <img src="/img/banner_sample1.png">
         </div>
-    </section>
+        <div class="class2">
+            <img src="/img/banner_sample2.png">
+        </div>
+        <div class="class2">
+            <img src="/img/banner_sample3.png">
+        </div>
+        <div class="class2">
+            <img src="/img/banner_sample4.png">
+        </div>
+    </div>
+    <!--post slider-->
+</div>
 </div>
 <!--Scroll to top-->
 <a href="#" id="back-to-top" title="Back to top">&uarr;</a>
+<script>
+    $(document).ready(function () {
+        $('.class').slick({
+            slidesToShow: 1, //한번에 보여줄 슬라이드 갯수
+            slidesToScroll: 1, //한번에 넘겨지는 슬라이드 갯수
+            arrows: true, //넘기기 버튼 화살표 여부
+            dots: true, //네비게이션 버튼 dot유형
+            asNavFor: '.terms-nav', //함께 움직이는 슬라이드 메뉴영역
+            infinite: false, //무한반복 옵션
+            adaptiveHeight: true, // 슬라이더 높이를 현재 슬라이드에 맞춤
+            draggable: true //드래그 가능여부
+        });
+    });
+</script>
 </body>
 </html>
