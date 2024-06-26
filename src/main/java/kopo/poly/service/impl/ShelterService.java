@@ -36,7 +36,7 @@ public class ShelterService implements IShelterService {
 
     private final MongoTemplate mongodb;
 
-    @Scheduled(cron = "0 0 0 1 * ?")
+//    @Scheduled(cron = "0 0 0 1 * ?")
 //    @Scheduled(fixedRate = 1000000)
     @Override
     public void saveShelterList() {
