@@ -192,6 +192,7 @@ public class UserInfoController {
         log.info(this.getClass().getName() + ".ChangePasswordProc Start!");
 
         String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        String img;
 
         String msg = ""; // 웹에 보여줄 메세지
         int result = 0;
