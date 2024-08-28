@@ -1,13 +1,13 @@
 package kopo.poly.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-
 @Builder
 @Document
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public record AnimalDTO(
 
         /* 요청 항목 */
