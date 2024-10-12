@@ -2,7 +2,6 @@ package kopo.poly.config;
 
 import feign.Contract;
 import feign.Logger;
-import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenFeignConfig {
 
-    @Value("${naver.papago.clientId}")
-    private String clientId;
+    @Value("${api.encodingKey}")
+    private String serviceKey;
 
-    @Value("${naver.papago.clientSecret}")
-    private String clientSecret;
+    @Value("${api.type}")
+    private String type;
 
     // API 접속을 위해 접속 방법은 기본 값으로 설정함(반드시 설정되어야 함)
     @Bean
@@ -26,14 +25,14 @@ public class OpenFeignConfig {
      * 네이버API 호출에 사용되는 X-Naver-Client-Id, X-Naver-Client-Secret 설정
      * OpenFeign 통해 호출되는 모든 API 헤더에 적용됨
      */
-    @Bean
-    public RequestInterceptor requestInterceptor() {
-
-        return requestTemplate -> {
-//            requestTemplate.header("X-Naver-Client-Id", clientId);
-            requestTemplate.header("X-Naver-Client-Secret", clientSecret);
-        };
-    }
+//    @Bean
+//    public RequestInterceptor requestInterceptor() {
+//
+//        return requestTemplate -> {
+//            requestTemplate.header("serviceKey", serviceKey);
+//            requestTemplate.header("%5Ftype", type);
+//        };
+//    }
 
     @Bean
     Logger.Level feignLoggerLevel() {
