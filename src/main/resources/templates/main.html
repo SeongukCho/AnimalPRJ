@@ -182,6 +182,25 @@
     </header>
     <!-- // 내비게이션 바 -->
     <br><br><br><br><br><br><br><br><br><br>
+
+    <!--날씨 api-->
+    <div class="weatherInfo" style="display: flex; align-items: center; justify-content: center;">
+        <div id="topInfo">
+            <div id="date" th:text="${wDTO.announceTime()}"></div>
+            <div id="wf" style="margin-top: 5px; text-align:center" th:text="${wDTO.wf()}"></div>
+        </div>
+        <div id="botInfo">
+            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                <img id="taImg" src="/img/temp.png" style="width: 30px; height: 20px; margin-right: 5px;" alt="ta" />
+                <div id="ta" th:text="${wDTO.ta()}+'℃'"></div>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <img id="rnImg" src="/img/rain.png" style="width: 30px; height: 20px; margin-right: 5px;" alt="rn" />
+                <div id="rnSt" th:text="${wDTO.rnSt()}+'%'"></div>
+            </div>
+        </div>
+    </div>
+
     <!--Start of slider section-->
     <div class="class">
         <div class="class2">
