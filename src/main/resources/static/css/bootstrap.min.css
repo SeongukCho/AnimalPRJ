@@ -3483,6 +3483,14 @@ a.btn.disabled, fieldset[disabled] a.btn {
     color: #fff;
     background-color: #333
 }
+.btn-search {
+    background-color: #ffcb00;
+    border-color: #ffcb00;
+    color: white;
+
+    border-radius: 4px;
+    cursor: pointer;
+}
 
 .btn-primary {
     color: #fff;
