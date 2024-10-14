@@ -23,6 +23,9 @@
     <link rel="stylesheet" href="/css/font-awesome.min.css">
     <link rel="stylesheet" href="/css/ui_content.css">
 
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcEwmAqAAAAAAhc5_yZspn222vXe5i8NTXnsUz9"></script>
+
+
     <script type="text/javascript">
         // 아이디 중복체크여부 (중복 Y / 중복아님 : N)
         let userIdCheck = "Y";
@@ -65,15 +68,8 @@
             })
 
             $("#btnSend").on("click", function () { // 버튼 클릭했을때, 발생되는 이벤트 생성함(onclick 이벤트와 동일함)
-                grecaptcha.ready(function() {
-                    grecaptcha.execute('6LdCQ2AqAAAAAKhOcwCURgQ0yjgCIGgTMFLV6QZy', {action: 'submit'}).then(function(token) {
-                        // 토큰을 폼에 추가
-                        $('#f').append('<input type="hidden" name="g-recaptcha-response" value="' + token + '">');
-                        // 폼 제출
-                        doSubmit(f);
-                    });
-                });
-            });
+                doSubmit(f);
+            })
         })
 
         // 회원아이디 중복 체크
@@ -185,6 +181,7 @@
         //회원가입 정보의 유효성 체크하기
         function doSubmit(f) {
 
+
             if (f.userId.value === "") {
                 alert("아이디를 입력하세요.");
                 f.userId.focus();
@@ -251,27 +248,79 @@
                 return;
             }
 
-            // Ajax 호출해서 회원가입하기
+            // reCAPTCHA 토큰을 먼저 가져오기
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LcEwmAqAAAAAAhc5_yZspn222vXe5i8NTXnsUz9', {action: 'submit'}).then(function(token) {
+                    // reCAPTCHA 검증 요청
+                    verifyRecaptcha(token, f);
+                });
+            });
+
+            // // Ajax 호출해서 회원가입하기
+            // $.ajax({
+            //     url: "/user/insertUserInfo",
+            //     type: "post", // 전송방식은 Post
+            //     dataType: "JSON", // 전송 결과는 JSON으로 받기
+            //     data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+            //     success: function (json) { // /user/insertUserInfo 호출이 성공했다면..
+            //
+            //         if (json.result === 1) { // 회원가입 성공
+            //             alert(json.msg); // 메시지 띄우기
+            //             location.href = "/user/login"; // 로그인 페이지 이동
+            //
+            //         } else { // 회원가입 실패
+            //             alert(json.msg); // 메시지 띄우기
+            //             location.href = "/user/userRegForm"
+            //         }
+            //     }
+            // })
+        }
+
+        // reCAPTCHA 검증 함수
+        function verifyRecaptcha(token, form) {
             $.ajax({
-                url: "/user/insertUserInfo",
-                type: "post", // 전송방식은 Post
-                dataType: "JSON", // 전송 결과는 JSON으로 받기
-                data: $("#f").serialize(), // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
-                success: function (json) { // /user/insertUserInfo 호출이 성공했다면..
-
-                    if (json.result === 1) { // 회원가입 성공
-                        alert(json.msg); // 메시지 띄우기
-                        location.href = "/user/login"; // 로그인 페이지 이동
-
-                    } else { // 회원가입 실패
-                        alert(json.msg); // 메시지 띄우기
-                        location.href = "/user/userRegForm"
-                    }
+                url: "/api/v1/recaptcha/verify-recaptcha",  // reCAPTCHA 검증 API 호출
+                type: "post",
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    token: token // JSON 형태로 보내기
+                }),
+                success: function(response) {
+                    // 성공적으로 검증된 경우
+                    submitUserInfo(form); // 사용자 정보를 제출하는 메서드
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.log(token);
+                    console.error('reCAPTCHA 검증 실패:', error);
                 }
-            })
+            });
+        }
+
+        function submitUserInfo(form) {
+            $.ajax({
+                url: "/user/insertUserInfo",  // 회원가입 API 호출
+                type: "post",
+                dataType: "JSON",
+                data: $(form).serialize(),  // 폼 데이터를 직렬화하여 전송
+                success: function(json) {
+                    if (json.result === 1) {
+                        alert(json.msg);
+                        location.href = "/user/login";
+                    } else {
+                        alert(json.msg);
+                        location.href = "/user/userRegForm";
+                    }
+                },
+                error: function() {
+                    alert("회원가입 중 오류가 발생했습니다.");
+                }
+            });
         }
 
     </script>
+
+
 </head>
 
 <body>
@@ -475,6 +524,8 @@
                             <button id="btnAuth" type="button" class="action-button button-small">인증번호 확인</button>
                         </div>
                     </div>
+                    <!-- reCAPTCHA 토큰을 저장할 hidden input 필드 추가 -->
+                    <input type="hidden" id="recaptchaToken" name="recaptchaToken">
                 </div>
                 <!-- btnset -->
                 <div class="btnWrap">
@@ -503,7 +554,5 @@
     </div>
     <!--End of container-->
 </section>
-<script src="https://www.google.com/recaptcha/api.js?render=6LdCQ2AqAAAAAKhOcwCURgQ0yjgCIGgTMFLV6QZy"></script>
-
 </body>
 </html>

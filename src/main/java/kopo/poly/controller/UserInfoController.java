@@ -15,18 +15,14 @@ import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.http.HttpEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -42,6 +38,9 @@ public class UserInfoController {
     private final IUserInfoService userInfoService;
     private final UserInfoRepository userInfoRepository;
     private final RecaptchaService recaptchaService;
+
+    @Value("${v3.secretKey}")
+    private String secretKey;
 
 
     @GetMapping(value = "userRegForm")
@@ -295,74 +294,87 @@ public class UserInfoController {
 
         String msg;
 
-        // 클라이언트에서 전송된 reCAPTCHA 토큰 수신
-        String recaptchaResponse = CmmUtil.nvl(request.getParameter("g-recaptcha-response"));
-        log.info("reCAPTCHA 응답 토큰 : " + recaptchaResponse);
+        String userId = CmmUtil.nvl(request.getParameter("userId"));
+        String userName = CmmUtil.nvl(request.getParameter("userName"));
+        String nickName = CmmUtil.nvl(request.getParameter("nickName"));
+        String password = CmmUtil.nvl(request.getParameter("password"));
+        String email = CmmUtil.nvl(request.getParameter("email"));
 
-        // reCAPTCHA 검증
-        String recaptchaSecretKey = "6LdCQ2AqAAAAAF2vdP7QO_rSjkt60JKEZJtXy3Tc";  // 구글 reCAPTCHA 비밀 키
-        String recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
+//        String response = request.getParameter("g-recaptcha-response");
+//
+//        log.info("g-recaptcha-response : " + response); // reCAPTCHA 응답 로그
 
-        RestTemplate restTemplate = new RestTemplate();
-        MultiValueMap<String, String> requestData = new LinkedMultiValueMap<>();
-        requestData.add("secret", recaptchaSecretKey);
-        requestData.add("response", recaptchaResponse);
 
-        ResponseEntity<Map> recaptchaResponseEntity = restTemplate.postForEntity(recaptchaVerifyUrl, new HttpEntity<>(requestData), Map.class);
-        Map<String, Object> responseBody = recaptchaResponseEntity.getBody();
+        log.info("userId : " + userId);
+        log.info("userName : " + userName);
+        log.info("nickName : " + nickName);
+        log.info("password : " + password);
+        log.info("email : " + email);
 
-        log.info("responseBody : " + responseBody);
+//        // reCAPTCHA 검증
+//        URL url = new URL("https://www.google.com/recaptcha/api/siteverify");
+//        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+//        conn.setRequestMethod("POST");
+//        conn.setDoOutput(true);
+//
+//        String postParams = "secret=" + secretKey + "&response=" + response;
+//
+//        OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
+//        writer.write(postParams);
+//        writer.flush();
+//        writer.close();
+//
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+//        StringBuilder sb = new StringBuilder();
+//        String line;
+//        while ((line = reader.readLine()) != null) {
+//            sb.append(line);
+//        }
+//        reader.close();
+//
+//        // 응답 로그
+//        log.info("reCAPTCHA 검증 응답: " + sb.toString());
+//
+//        JSONObject jsonObject = new JSONObject(sb.toString());
+//        boolean success = jsonObject.getBoolean("success");
+//        if (!success) {
+//            // 검증 실패 시 추가 정보 로그
+//            String errorCodes = jsonObject.optString("error-codes", "없음");
+//            log.error("reCAPTCHA 검증 실패. 오류 코드: " + errorCodes);
+//
+//            msg = "reCAPTCHA 검증에 실패했습니다.";
+//            MsgDTO dto = MsgDTO.builder().result(0).msg(msg).build();
+//            log.info(this.getClass().getName() + ".insertUserInfo End!");
+//            return dto;
+//        }
 
-        if (responseBody != null && (Boolean) responseBody.get("success")) {
-            log.info("reCAPTCHA 검증 성공");
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userId(userId)
+                .userName(userName)
+                .nickName(nickName)
+                .password(EncryptUtil.encHashSHA256(password))
+                .email(EncryptUtil.encAES128CBC(email))
+                .build();
 
-            // reCAPTCHA 검증 성공 시 회원가입 처리
-            String userId = CmmUtil.nvl(request.getParameter("userId"));
-            String userName = CmmUtil.nvl(request.getParameter("userName"));
-            String nickName = CmmUtil.nvl(request.getParameter("nickName"));
-            String password = CmmUtil.nvl(request.getParameter("password"));
-            String email = CmmUtil.nvl(request.getParameter("email"));
+        int res = userInfoService.insertUserInfo(pDTO);
 
-            log.info("userId : " + userId);
-            log.info("userName : " + userName);
-            log.info("nickName : " + nickName);
-            log.info("password : " + password);
-            log.info("email : " + email);
+        log.info("회원가입 결과(res) : " + res);
 
-            UserInfoDTO pDTO = UserInfoDTO.builder()
-                    .userId(userId)
-                    .userName(userName)
-                    .nickName(nickName)
-                    .password(EncryptUtil.encHashSHA256(password))
-                    .email(EncryptUtil.encAES128CBC(email))
-                    .build();
+        if (res == 1) {
+            msg = "회원가입되었습니다.";
 
-            int res = userInfoService.insertUserInfo(pDTO);
-
-            log.info("회원가입 결과(res) : " + res);
-
-            if (res == 1) {
-                msg = "회원가입되었습니다.";
-
-            } else if (res == 2) {
-                msg = "이미 가입된 아이디입니다.";
-            } else {
-                msg = "오류로 인해 회원가입이 실패했습니다.";
-            }
-
+        } else if (res == 2) {
+            msg = "이미 가입된 아이디입니다.";
         } else {
-            log.info("reCAPTCHA 검증 실패");
-            msg = "reCAPTCHA 검증에 실패했습니다. 봇 활동이 의심됩니다.";
-            return MsgDTO.builder().result(0).msg(msg).build();
+            msg = "오류로 인해 회원가입이 실패했습니다.";
         }
 
-        MsgDTO dto = MsgDTO.builder().result(1).msg(msg).build();
+        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
 
         log.info(this.getClass().getName() + ".insertUserInfo End!");
 
         return dto;
     }
-
 
     @GetMapping(value = "login")
     public String login(HttpSession session) {
