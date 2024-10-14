@@ -5,6 +5,7 @@ import kopo.poly.chat.ChatHandler;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.service.IChatService;
 import kopo.poly.service.IUserInfoService;
+import kopo.poly.service.IWeatherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class ChatController {
 
     private final IUserInfoService userInfoService;
     private final IChatService chatService;
+    private final IWeatherService weatherService;
 
     /**
      * 채팅창 목록 조회 페이지

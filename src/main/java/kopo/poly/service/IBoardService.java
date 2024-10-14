@@ -81,4 +81,6 @@ public interface IBoardService {
      * NativeQuery 사용하여 내 게시글만 가져오기
      */
     List<BoardDTO> getUserNoticeListUsingNativeQuery(String userId);
+
+    Page<BoardDTO> searchByTitle(String title, int page, int size) throws Exception;
 }

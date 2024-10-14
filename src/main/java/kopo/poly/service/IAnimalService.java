@@ -1,6 +1,6 @@
 package kopo.poly.service;
 
-import kopo.poly.dto.AnimalDTO;
+import kopo.poly.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

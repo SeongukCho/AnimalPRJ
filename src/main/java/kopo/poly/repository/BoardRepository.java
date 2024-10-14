@@ -25,6 +25,9 @@ public interface BoardRepository extends JpaRepository<BoardEntity, Long> {
 
     Page<BoardEntity> findAllByOrderByBoardSeqDesc(Pageable pageable);
 
+    Page<BoardEntity> findByTitleContainingOrderByBoardSeqDesc(String keyword, Pageable pageable);
+
+
     /**
      * 게시판 상세 보기할 때, 조회수 증가하기
      *

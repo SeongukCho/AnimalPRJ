@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.service.IUserInfoService;
+import kopo.poly.service.IWeatherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -27,6 +28,7 @@ public class ImageController {
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final IUserInfoService userInfoService;
+    private final IWeatherService weatherService;
 
     /**
      * 프로필 사진 s3 버킷에 업로드

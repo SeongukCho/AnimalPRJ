@@ -334,4 +334,17 @@ public class BoardService implements IBoardService {
 
         return nList;
     }
+
+    @Override
+    public Page<BoardDTO> searchByTitle(String title, int page, int size) {
+        log.info(this.getClass().getName() + ".searchByTitle Start!");
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<BoardEntity> entityPage = boardRepository.findByTitleContainingOrderByBoardSeqDesc(title, pageable); // 키워드로 검색
+        Page<BoardDTO> dtoPage = entityPage.map(entity -> objectMapper.convertValue(entity, BoardDTO.class));
+
+        log.info(this.getClass().getName() + ".searchByTitle End!");
+
+        return dtoPage;
+    }
 }

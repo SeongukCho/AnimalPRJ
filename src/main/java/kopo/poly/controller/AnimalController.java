@@ -3,6 +3,7 @@ package kopo.poly.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.AnimalDTO;
+import kopo.poly.service.IWeatherService;
 import kopo.poly.service.impl.AnimalService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.List;
 public class AnimalController {
 
     private final AnimalService animalService;
+    private final IWeatherService weatherService;
 
     /*@GetMapping(value = "animalList")
     public List<AnimalDTO> getAnimalListAll(AnimalDTO pDTO,ModelMap model,
@@ -43,6 +45,7 @@ public class AnimalController {
 
         return rList;
     }*/
+
     @GetMapping(value = "animalList")
     public String getAnimalListAll(AnimalDTO pDTO, ModelMap model, HttpSession session,
                                    @RequestParam(defaultValue = "1") int page,
@@ -81,6 +84,46 @@ public class AnimalController {
         log.info(this.getClass().getName() + ".getAnimalListAllController End!");
 
         return "animal/animalList"; // 적절한 뷰 이름으로 변경
+    }
+
+    @GetMapping(value = "protectAnimal")
+    public String getProtectAnimal(AnimalDTO pDTO, ModelMap model, HttpSession session,
+                                   @RequestParam(defaultValue = "1") int page,
+                                   @RequestParam(defaultValue = "40") int size) throws Exception {
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        model.addAttribute("userId", userId);
+
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+        log.info("pageable : " + pageable);
+
+        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable, "protectAnimal");
+
+        List<AnimalDTO> rList = animalPage.getContent(); // 페이징된 데이터 리스트
+
+        log.info("rList : " + rList);
+        log.info("animalPage : " + animalPage);
+        log.info("animalPage.getTotalPages() : " + animalPage.getTotalPages());
+
+        model.addAttribute("rList", rList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+        model.addAttribute("totalPages", animalPage.getTotalPages());
+
+// 페이지 번호 범위 계산
+        int startPage = Math.max(1, page - 4);
+        int endPage = Math.min(animalPage.getTotalPages(), page + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+
+        log.info(this.getClass().getName() + ".getAnimalListAllController End!");
+
+        return "animal/protectAnimal"; // 적절한 뷰 이름으로 변경
     }
 
     @GetMapping(value = "noticeAnimal")
@@ -123,45 +166,7 @@ public class AnimalController {
         return "animal/noticeAnimal"; // 적절한 뷰 이름으로 변경
     }
 
-    @GetMapping(value = "protectAnimal")
-    public String getProtectAnimal(AnimalDTO pDTO, ModelMap model, HttpSession session,
-                                   @RequestParam(defaultValue = "1") int page,
-                                   @RequestParam(defaultValue = "40") int size) throws Exception {
 
-        log.info(this.getClass().getName() + ".getAnimalListAllController Start!");
-
-        String userId = (String) session.getAttribute("SS_USER_ID");
-
-        model.addAttribute("userId", userId);
-
-        Pageable pageable = PageRequest.of(page - 1, size);
-
-        log.info("pageable : " + pageable);
-
-        Page<AnimalDTO> animalPage = animalService.getAnimalListAll(pDTO, pageable, "protectAnimal");
-
-        List<AnimalDTO> rList = animalPage.getContent(); // 페이징된 데이터 리스트
-
-        log.info("rList : " + rList);
-        log.info("animalPage : " + animalPage);
-        log.info("animalPage.getTotalPages() : " + animalPage.getTotalPages());
-
-        model.addAttribute("rList", rList);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("size", size);
-        model.addAttribute("totalPages", animalPage.getTotalPages());
-
-// 페이지 번호 범위 계산
-        int startPage = Math.max(1, page - 4);
-        int endPage = Math.min(animalPage.getTotalPages(), page + 5);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-
-
-        log.info(this.getClass().getName() + ".getAnimalListAllController End!");
-
-        return "animal/protectAnimal"; // 적절한 뷰 이름으로 변경
-    }
 
     @Transactional
     @GetMapping

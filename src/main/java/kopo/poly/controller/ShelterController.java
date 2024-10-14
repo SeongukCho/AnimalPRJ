@@ -1,11 +1,9 @@
 package kopo.poly.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import kopo.poly.dto.AnimalDTO;
-import kopo.poly.dto.ShelterDTO;
+import kopo.poly.dto.ShelterInfoDTO;
+import kopo.poly.service.IWeatherService;
 import kopo.poly.service.impl.ShelterService;
-import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,9 +25,10 @@ import java.util.List;
 public class ShelterController {
 
     private final ShelterService shelterService;
+    private final IWeatherService weatherService;
 
     @GetMapping(value = "shelterList")
-    public String getShelterListAll(ShelterDTO pDTO, ModelMap model, HttpSession session,
+    public String getShelterListAll(ShelterInfoDTO pDTO, ModelMap model, HttpSession session,
                                     @RequestParam(defaultValue = "1") int page,
                                     @RequestParam(defaultValue = "20") int size) throws Exception {
 
@@ -43,9 +42,9 @@ public class ShelterController {
 
         log.info("pageable : " + pageable);
 
-        Page<ShelterDTO> shelterPage = shelterService.getShelterListAll(pDTO, pageable);
+        Page<ShelterInfoDTO> shelterPage = shelterService.getShelterListAll(pDTO, pageable);
 
-        List<ShelterDTO> rList = shelterPage.getContent(); // 페이징된 데이터 리스트
+        List<ShelterInfoDTO> rList = shelterPage.getContent(); // 페이징된 데이터 리스트
 
         log.info("rList : " + rList);
         log.info("shelterPage : " + shelterPage);
@@ -78,11 +77,11 @@ public class ShelterController {
 
         log.info("id : " + id);
 
-        ShelterDTO pDTO = ShelterDTO.builder()
+        ShelterInfoDTO pDTO = ShelterInfoDTO.builder()
                 .id(id)
                 .build();
 
-        ShelterDTO rDTO = shelterService.getShelterInfo(pDTO);
+        ShelterInfoDTO rDTO = shelterService.getShelterInfo(pDTO);
 
         model.addAttribute("rDTO", rDTO);
 

@@ -2,8 +2,7 @@ package kopo.poly.service.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kopo.poly.dto.AnimalDTO;
-import kopo.poly.dto.ShelterDTO;
+import kopo.poly.dto.ShelterInfoDTO;
 import kopo.poly.service.IShelterService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -31,7 +29,7 @@ import java.util.List;
 @Service
 public class ShelterService implements IShelterService {
 
-    @Value("${api.serviceKey}")
+    @Value("${api.decodingKey}")
     private String serviceKey;
 
     private final MongoTemplate mongodb;
@@ -81,11 +79,11 @@ public class ShelterService implements IShelterService {
             JsonNode rootNode = objectMapper.readTree(sb.toString());
             JsonNode itemsNode = rootNode.path("response").path("body").path("items").path("item");
 
-            List<ShelterDTO> shelterList = new ArrayList<>();
+            List<ShelterInfoDTO> shelterList = new ArrayList<>();
             if (itemsNode.isArray() && !itemsNode.isEmpty()) {
                 for (JsonNode itemNode : itemsNode) {
 
-                    ShelterDTO shelter = ShelterDTO.builder()
+                    ShelterInfoDTO shelter = ShelterInfoDTO.builder()
                             .careNm(itemNode.path("careNm").asText())
                             .orgNm(itemNode.path("orgNm").asText())
                             .divisionNm(itemNode.path("divisionNm").asText())
@@ -118,7 +116,7 @@ public class ShelterService implements IShelterService {
                     shelterList.add(shelter);
                 }
 
-                for (ShelterDTO shelter : shelterList) {
+                for (ShelterInfoDTO shelter : shelterList) {
                     mongodb.save(shelter);
                 }
             }
@@ -132,17 +130,17 @@ public class ShelterService implements IShelterService {
     }
 
     @Override
-    public Page<ShelterDTO> getShelterListAll(ShelterDTO pDTO, Pageable pageable) throws Exception {
+    public Page<ShelterInfoDTO> getShelterListAll(ShelterInfoDTO pDTO, Pageable pageable) throws Exception {
 
         log.info(this.getClass().getName() + ".getShelterList Start!");
 
         Query query = new Query().with(pageable).with(Sort.by(Sort.Order.desc("happenDt")));
 
-        List<ShelterDTO> shelterList = mongodb.find(query, ShelterDTO.class);
+        List<ShelterInfoDTO> shelterList = mongodb.find(query, ShelterInfoDTO.class);
 
         log.info("shelterList : " + shelterList);
 
-        long total = mongodb.count(query.skip(-1).limit(-1), ShelterDTO.class); // 전체 데이터 수를 가져옴
+        long total = mongodb.count(query.skip(-1).limit(-1), ShelterInfoDTO.class); // 전체 데이터 수를 가져옴
 
         log.info("total data : " + total);
 
@@ -152,7 +150,7 @@ public class ShelterService implements IShelterService {
     }
 
     @Override
-    public ShelterDTO getShelterInfo(ShelterDTO pDTO) throws Exception {
+    public ShelterInfoDTO getShelterInfo(ShelterInfoDTO pDTO) throws Exception {
 
         log.info(this.getClass().getName() + ".getShelterInfoService Start!");
 
@@ -161,7 +159,7 @@ public class ShelterService implements IShelterService {
         query.addCriteria(Criteria.where("id").is(pDTO.id()));
 
         // MongoDB에서 조회
-        ShelterDTO rDTO = mongodb.findOne(query, ShelterDTO.class);
+        ShelterInfoDTO rDTO = mongodb.findOne(query, ShelterInfoDTO.class);
         log.info("rDTO : " + rDTO);
 
         log.info(this.getClass().getName() + ".getShelterInfoService End!");

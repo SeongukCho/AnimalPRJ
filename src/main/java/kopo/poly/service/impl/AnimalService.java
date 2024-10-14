@@ -1,5 +1,7 @@
 package kopo.poly.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kopo.poly.dto.AnimalDTO;
 import kopo.poly.service.IAnimalService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -17,24 +22,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Criteria;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AnimalService implements IAnimalService {
 
-    @Value("${api.serviceKey}")
+    @Value("${api.decodingKey}")
     private String serviceKey;
 
     private final MongoTemplate mongodb;

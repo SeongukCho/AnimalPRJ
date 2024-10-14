@@ -36,6 +36,32 @@
             });
         });
 
+        $(document).ready(function () {
+
+            $('#btnSido').on("click", function () {
+                sido();
+            })
+        })
+
+        function sido() {
+
+            $.ajax({
+                url: '/api/sido',
+                type: "GET",
+                dataType: "JSON",
+                data: $('#f').serialize(),
+                success: function (json) {
+                    let orgCd = json.orgCd;
+                    let orgdownNm = json.orgdownNm;
+
+                    $("#sido").append("<div>");
+                    $("#sido").append("<div>" + orgCd + "</div>");
+                    $("#sido").append("<div>" + orgdownNm + "</div>");
+                    $("#sido").append("</div>");
+                }
+            })
+        }
+
         function removeBrackets(str) {
             return str.replace(/\[.*?\]\s*/, '');
         }
@@ -242,6 +268,12 @@
 
         </div>
         <br>
+        <form name="f" id="f">
+            <div class="btnBc" id="btnSido" type="button">시도</div>
+        </form>
+        <div id="sido">
+
+        </div>
         <br>
         <div class="flex flex-1 flex-col gap-2 undefined">
             <div class="openAnimation w-full h-full flex items-center justify-center">

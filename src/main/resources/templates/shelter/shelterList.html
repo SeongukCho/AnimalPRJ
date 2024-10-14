@@ -216,29 +216,29 @@
                 <ul>
                     <!-- First page link -->
                     <li th:if="${currentPage > 1}">
-                        <a th:href="@{/animal/animalList(page=1, size=${size})}">처음</a>
+                        <a th:href="@{/shelter/shelterList(page=1, size=${size})}">처음</a>
                     </li>
 
                     <!-- Previous page link -->
                     <li th:if="${currentPage > 1}">
-                        <a th:href="@{/animal/animalList(page=${currentPage - 1}, size=${size})}">이전</a>
+                        <a th:href="@{/shelter/shelterList(page=${currentPage - 1}, size=${size})}">이전</a>
                     </li>
 
                     <!-- Page number links -->
                     <li th:each="i : ${#numbers.sequence(startPage, endPage)}">
-                        <a th:href="@{/animal/animalList(page=${i}, size=${size})}"
+                        <a th:href="@{/shelter/shelterList(page=${i}, size=${size})}"
                            th:classappend="${i} == ${currentPage} ? 'active' : ''"
                            th:text="${i}"></a>
                     </li>
 
                     <!-- Next page link -->
                     <li th:if="${currentPage < totalPages}">
-                        <a th:href="@{/animal/animalList(page=${currentPage + 1}, size=${size})}">다음</a>
+                        <a th:href="@{/shelter/shelterList(page=${currentPage + 1}, size=${size})}">다음</a>
                     </li>
 
                     <!-- Last page link -->
                     <li th:if="${currentPage < totalPages}">
-                        <a th:href="@{/animal/animalList(page=${totalPages}, size=${size})}">마지막</a>
+                        <a th:href="@{/shelter/shelterList(page=${totalPages}, size=${size})}">마지막</a>
                     </li>
                 </ul>
             </div>

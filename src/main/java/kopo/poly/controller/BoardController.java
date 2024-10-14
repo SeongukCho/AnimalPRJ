@@ -6,9 +6,10 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.*;
-import kopo.poly.service.ICommentService;
 import kopo.poly.service.IBoardService;
+import kopo.poly.service.ICommentService;
 import kopo.poly.service.IUserInfoService;
+import kopo.poly.service.IWeatherService;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,14 +50,16 @@ public class BoardController {
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final IUserInfoService userInfoService;
+    private final IWeatherService weatherService;
 
     @Autowired
-    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService, IUserInfoService userInfoService) {
+    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService, IUserInfoService userInfoService, IWeatherService weatherService) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.boardService = boardService;
         this.commentService = commentService;
         this.userInfoService = userInfoService;
+        this.weatherService = weatherService;
     }
 
     /**
@@ -69,41 +72,27 @@ public class BoardController {
                             @RequestParam(defaultValue = "1") int page,
                             @RequestParam(defaultValue = "10") int size) throws Exception {
 
-        // 로그 찍기(추후 찍은 로그를 통해 이 함수에 접근했는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".boardList Start!");
 
         String userId = (String) session.getAttribute("SS_USER_ID");
-
         model.addAttribute("userId", userId);
 
-        // 로그인된 사용자 아이디는 Session에 저장함
-        // 교육용으로 아직 로그인을 구현하지 않았기 때문에 Session에 데이터를 저장하지 않았음
-        // 추후 로그인을 구현할 것으로 가정하고, 게시판 리스트 출력하는 함수에서 로그인 한 것처럼 Session 값을 생성함
-//        session.setAttribute("SESSION_USER_ID", "USER01");
-
-        // 페이징된 게시판 리스트 조회하기
         Page<BoardDTO> rList = boardService.getBoardList(page, size);
 
         log.info("rList : " + rList);
         log.info("rList.getTotalPages() : " + rList.getTotalPages());
 
-        // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rList", rList.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("size", size);
         model.addAttribute("totalPages", rList.getTotalPages());
 
-        // 페이지 번호 범위 계산
         int startPage = Math.max(1, page - 4);
         int endPage = Math.min(rList.getTotalPages(), page + 5);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
 
-        // 로그 찍기(추후 찍은 로그를 통해 이 함수 호출이 끝났는지 파악하기 용이하다.)
         log.info(this.getClass().getName() + ".boardList End!");
-
-        // 함수 처리가 끝나고 보여줄 HTML (Thymeleaf) 파일명
-        // templates/board/boardList.html
         return "board/boardList";
     }
 
@@ -115,7 +104,7 @@ public class BoardController {
      * GetMapping(value = "board/boardReg") =>  GET방식을 통해 접속되는 URL이 board/boardReg 경우 아래 함수를 실행함
      */
     @GetMapping(value = "boardReg")
-    public String BoardReg(HttpSession session,ModelMap model) {
+    public String BoardReg(HttpSession session, ModelMap model) {
 
         log.info(this.getClass().getName() + ".boardReg Start!");
 
@@ -206,7 +195,7 @@ public class BoardController {
      * 게시판 상세보기
      */
     @GetMapping(value = "boardInfo")
-    public String boardInfo(HttpServletRequest request,HttpSession session, ModelMap model) throws Exception {
+    public String boardInfo(HttpServletRequest request, HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".boardInfo Start!");
 
@@ -470,5 +459,37 @@ public class BoardController {
         log.info(this.getClass().getName() + ".myBoardList End!");
 
         return "board/myBoardList";
+    }
+
+    @GetMapping(value = "search")
+    public String searchByTitle(HttpSession session, ModelMap model,
+                                @RequestParam(defaultValue = "") String title,
+                                @RequestParam(defaultValue = "1") int page,
+                                @RequestParam(defaultValue = "10") int size) throws Exception {
+
+        log.info(this.getClass().getName() + ".searchByTitle Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        model.addAttribute("userId", userId);
+
+        Page<BoardDTO> rList = boardService.searchByTitle(title, page, size);
+
+        log.info("rList : " + rList);
+        log.info("rList.getTotalPages() : " + rList.getTotalPages());
+
+        model.addAttribute("title", title);
+        model.addAttribute("rList", rList.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("size", size);
+        model.addAttribute("totalPages", rList.getTotalPages());
+
+        int startPage = Math.max(1, page - 4);
+        int endPage = Math.min(rList.getTotalPages(), page + 5);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
+        log.info(this.getClass().getName() + ".searchByTitle End!");
+
+        return "board/boardSearch"; // 검색 결과를 보여줄 뷰 이름
     }
 }

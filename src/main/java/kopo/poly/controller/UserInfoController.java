@@ -5,26 +5,28 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import kopo.poly.dto.BoardDTO;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.UserInfoDTO;
 import kopo.poly.repository.UserInfoRepository;
-import kopo.poly.repository.entity.UserInfoEntity;
 import kopo.poly.service.IUserInfoService;
+import kopo.poly.service.impl.RecaptchaService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,6 +41,7 @@ public class UserInfoController {
     private final String bucketName;
     private final IUserInfoService userInfoService;
     private final UserInfoRepository userInfoRepository;
+    private final RecaptchaService recaptchaService;
 
 
     @GetMapping(value = "userRegForm")
@@ -292,45 +295,74 @@ public class UserInfoController {
 
         String msg;
 
-        String userId = CmmUtil.nvl(request.getParameter("userId"));
-        String userName = CmmUtil.nvl(request.getParameter("userName"));
-        String nickName = CmmUtil.nvl(request.getParameter("nickName"));
-        String password = CmmUtil.nvl(request.getParameter("password"));
-        String email = CmmUtil.nvl(request.getParameter("email"));
+        // 클라이언트에서 전송된 reCAPTCHA 토큰 수신
+        String recaptchaResponse = CmmUtil.nvl(request.getParameter("g-recaptcha-response"));
+        log.info("reCAPTCHA 응답 토큰 : " + recaptchaResponse);
 
-        log.info("userId : " + userId);
-        log.info("userName : " + userName);
-        log.info("nickName : " + nickName);
-        log.info("password : " + password);
-        log.info("email : " + email);
+        // reCAPTCHA 검증
+        String recaptchaSecretKey = "6LdCQ2AqAAAAAF2vdP7QO_rSjkt60JKEZJtXy3Tc";  // 구글 reCAPTCHA 비밀 키
+        String recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify";
 
-        UserInfoDTO pDTO = UserInfoDTO.builder()
-                .userId(userId)
-                .userName(userName)
-                .nickName(nickName)
-                .password(EncryptUtil.encHashSHA256(password))
-                .email(EncryptUtil.encAES128CBC(email))
-                .build();
+        RestTemplate restTemplate = new RestTemplate();
+        MultiValueMap<String, String> requestData = new LinkedMultiValueMap<>();
+        requestData.add("secret", recaptchaSecretKey);
+        requestData.add("response", recaptchaResponse);
 
-        int res = userInfoService.insertUserInfo(pDTO);
+        ResponseEntity<Map> recaptchaResponseEntity = restTemplate.postForEntity(recaptchaVerifyUrl, new HttpEntity<>(requestData), Map.class);
+        Map<String, Object> responseBody = recaptchaResponseEntity.getBody();
 
-        log.info("회원가입 결과(res) : " + res);
+        log.info("responseBody : " + responseBody);
 
-        if (res == 1) {
-            msg = "회원가입되었습니다.";
+        if (responseBody != null && (Boolean) responseBody.get("success")) {
+            log.info("reCAPTCHA 검증 성공");
 
-        } else if (res == 2) {
-            msg = "이미 가입된 아이디입니다.";
+            // reCAPTCHA 검증 성공 시 회원가입 처리
+            String userId = CmmUtil.nvl(request.getParameter("userId"));
+            String userName = CmmUtil.nvl(request.getParameter("userName"));
+            String nickName = CmmUtil.nvl(request.getParameter("nickName"));
+            String password = CmmUtil.nvl(request.getParameter("password"));
+            String email = CmmUtil.nvl(request.getParameter("email"));
+
+            log.info("userId : " + userId);
+            log.info("userName : " + userName);
+            log.info("nickName : " + nickName);
+            log.info("password : " + password);
+            log.info("email : " + email);
+
+            UserInfoDTO pDTO = UserInfoDTO.builder()
+                    .userId(userId)
+                    .userName(userName)
+                    .nickName(nickName)
+                    .password(EncryptUtil.encHashSHA256(password))
+                    .email(EncryptUtil.encAES128CBC(email))
+                    .build();
+
+            int res = userInfoService.insertUserInfo(pDTO);
+
+            log.info("회원가입 결과(res) : " + res);
+
+            if (res == 1) {
+                msg = "회원가입되었습니다.";
+
+            } else if (res == 2) {
+                msg = "이미 가입된 아이디입니다.";
+            } else {
+                msg = "오류로 인해 회원가입이 실패했습니다.";
+            }
+
         } else {
-            msg = "오류로 인해 회원가입이 실패했습니다.";
+            log.info("reCAPTCHA 검증 실패");
+            msg = "reCAPTCHA 검증에 실패했습니다. 봇 활동이 의심됩니다.";
+            return MsgDTO.builder().result(0).msg(msg).build();
         }
 
-        MsgDTO dto = MsgDTO.builder().result(res).msg(msg).build();
+        MsgDTO dto = MsgDTO.builder().result(1).msg(msg).build();
 
         log.info(this.getClass().getName() + ".insertUserInfo End!");
 
         return dto;
     }
+
 
     @GetMapping(value = "login")
     public String login(HttpSession session) {
