@@ -36,99 +36,94 @@
             });
         });
 
-        $(document).ready(function () {
+        // $(document).ready(function () {
+        //
+        //     $('#btnSido').on("click", function () {
+        //         sido();
+        //     })
+        // })
 
-            $('#btnSido').on("click", function () {
-                sido();
-            })
-        })
-
-        function sido() {
-
-            $.ajax({
-                url: '/api/sido',
-                type: "GET",
-                dataType: "JSON",
-                data: $('#f').serialize(),
-                success: function (json) {
-                    let orgCd = json.orgCd;
-                    let orgdownNm = json.orgdownNm;
-
-                    $("#sido").append("<div>");
-                    $("#sido").append("<div>" + orgCd + "</div>");
-                    $("#sido").append("<div>" + orgdownNm + "</div>");
-                    $("#sido").append("</div>");
-                }
-            })
-        }
+        // function sido() {
+        //
+        //     $.ajax({
+        //         url: '/api/sido',
+        //         type: "GET",
+        //         dataType: "JSON",
+        //         data: $('#f').serialize(),
+        //         success: function (json) {
+        //             let orgCd = json.orgCd;
+        //             let orgdownNm = json.orgdownNm;
+        //
+        //             $("#sido").append("<div>");
+        //             $("#sido").append("<div>" + orgCd + "</div>");
+        //             $("#sido").append("<div>" + orgdownNm + "</div>");
+        //             $("#sido").append("</div>");
+        //         }
+        //     })
+        // }
 
         function removeBrackets(str) {
             return str.replace(/\[.*?\]\s*/, '');
         }
 
-        function getSidoList() {
+        // function getSidoList() {
+        //
+        //     $.ajax({
+        //         url: '/api/sido',
+        //         type: 'GET',
+        //         data: $('#searchForm').serialize(),
+        //         success: function (data) {
+        //             sido = data; // 데이터를 전역 변수에 저장
+        //             totalEvents = sido.length; // 총 문화행사 수 설정
+        //             displayPage(1); // 첫 번째 페이지 표시
+        //             $('#loadingSpinner').hide(); // 로딩 이펙트 숨기기
+        //         },
+        //         error: function (error) {
+        //             console.log('Error:', error);
+        //         }
+        //     });
+        // }
 
-            $.ajax({
-                url: '/api/sido',
-                type: 'GET',
-                data: $('#searchForm').serialize(),
-                success: function (data) {
-                    sido = data; // 데이터를 전역 변수에 저장
-                    totalEvents = sido.length; // 총 문화행사 수 설정
-                    displayPage(1); // 첫 번째 페이지 표시
-                    $('#loadingSpinner').hide(); // 로딩 이펙트 숨기기
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
-            });
-        }
+        // function toggleCalendar() {
+        //     const calendar = document.getElementById('calendar');
+        //     if (calendar.classList.contains('hidden')) {
+        //         calendar.classList.remove('hidden');
+        //         setTimeout(() => {
+        //             calendar.classList.remove('opacity-0');
+        //             calendar.classList.add('opacity-1');
+        //             calendar.classList.add('translate-y-0');
+        //         }, 10);
+        //     } else {
+        //         calendar.classList.add('opacity-0');
+        //         calendar.classList.remove('opacity-1');
+        //         calendar.classList.remove('translate-y-0');
+        //         setTimeout(() => {
+        //             calendar.classList.add('hidden');
+        //         }, 300);
+        //     }
+        // }
 
-        function toggleCalendar() {
-            const calendar = document.getElementById('calendar');
-            if (calendar.classList.contains('hidden')) {
-                calendar.classList.remove('hidden');
-                setTimeout(() => {
-                    calendar.classList.remove('opacity-0');
-                    calendar.classList.add('opacity-1');
-                    calendar.classList.add('translate-y-0');
-                }, 10);
-            } else {
-                calendar.classList.add('opacity-0');
-                calendar.classList.remove('opacity-1');
-                calendar.classList.remove('translate-y-0');
-                setTimeout(() => {
-                    calendar.classList.add('hidden');
-                }, 300);
-            }
-        }
-
-        // 달력 내용을 동적으로 생성하는 함수
-        function generateCalendar() {
-            const calendar = document.getElementById('calendar');
-            const today = new Date();
-            const month = today.getMonth();
-            const year = today.getFullYear();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            let calendarHtml = '<div class="flex items-center space-x-1.5 border border-gray-300 dark:border-gray-700 rounded-md px-2 py-1.5">';
-            calendarHtml += '<div class="flex flex-1 items-center space-x-1.5"><div class="w-1/2"><button type="button" class="w-full tracking-wide dark:text-white/70 dark:hover:bg-white/10 dark:focus:bg-white/10 transition-all duration-300 px-3 py-[0.55rem] uppercase hover:bg-gray-100 rounded-md focus:ring-1 focus:ring-blue-500/50 focus:bg-blue-100/50">6월</button></div><div class="w-1/2"><button type="button" class="w-full tracking-wide dark:text-white/70 dark:hover:bg-white/10 dark:focus:bg-white/10 transition-all duration-300 px-3 py-[0.55rem] uppercase hover:bg-gray-100 rounded-md focus:ring-1 focus:ring-blue-500/50 focus:bg-blue-100/50">2024</button></div></div></div>';
-            calendarHtml += '<div class="px-0.5 sm:px-2 mt-0.5 min-h-[285px]"><div class="grid grid-cols-7 border-b border-gray-300 dark:border-gray-700 py-2"><div class="tracking-wide text-gray-500 text-center">일</div><div class="tracking-wide text-gray-500 text-center">월</div><div class="tracking-wide text-gray-500 text-center">화</div><div class="tracking-wide text-gray-500 text-center">수</div><div class="tracking-wide text-gray-500 text-center">목</div><div class="tracking-wide text-gray-500 text-center">금</div><div class="tracking-wide text-gray-500 text-center">토</div></div>';
-            calendarHtml += '<div class="grid grid-cols-7 gap-y-0.5 my-1">';
-            for (let i = 1; i <= daysInMonth; i++) {
-                calendarHtml += `<button type="button" class="flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10">${i}</button>`;
-            }
-            calendarHtml += '</div></div>';
-            calendar.innerHTML = calendarHtml;
-        }
-
-        document.addEventListener('DOMContentLoaded', generateCalendar);
+        // // 달력 내용을 동적으로 생성하는 함수
+        // function generateCalendar() {
+        //     const calendar = document.getElementById('calendar');
+        //     const today = new Date();
+        //     const month = today.getMonth();
+        //     const year = today.getFullYear();
+        //     const daysInMonth = new Date(year, month + 1, 0).getDate();
+        //     let calendarHtml = '<div class="flex items-center space-x-1.5 border border-gray-300 dark:border-gray-700 rounded-md px-2 py-1.5">';
+        //     calendarHtml += '<div class="flex flex-1 items-center space-x-1.5"><div class="w-1/2"><button type="button" class="w-full tracking-wide dark:text-white/70 dark:hover:bg-white/10 dark:focus:bg-white/10 transition-all duration-300 px-3 py-[0.55rem] uppercase hover:bg-gray-100 rounded-md focus:ring-1 focus:ring-blue-500/50 focus:bg-blue-100/50">6월</button></div><div class="w-1/2"><button type="button" class="w-full tracking-wide dark:text-white/70 dark:hover:bg-white/10 dark:focus:bg-white/10 transition-all duration-300 px-3 py-[0.55rem] uppercase hover:bg-gray-100 rounded-md focus:ring-1 focus:ring-blue-500/50 focus:bg-blue-100/50">2024</button></div></div></div>';
+        //     calendarHtml += '<div class="px-0.5 sm:px-2 mt-0.5 min-h-[285px]"><div class="grid grid-cols-7 border-b border-gray-300 dark:border-gray-700 py-2"><div class="tracking-wide text-gray-500 text-center">일</div><div class="tracking-wide text-gray-500 text-center">월</div><div class="tracking-wide text-gray-500 text-center">화</div><div class="tracking-wide text-gray-500 text-center">수</div><div class="tracking-wide text-gray-500 text-center">목</div><div class="tracking-wide text-gray-500 text-center">금</div><div class="tracking-wide text-gray-500 text-center">토</div></div>';
+        //     calendarHtml += '<div class="grid grid-cols-7 gap-y-0.5 my-1">';
+        //     for (let i = 1; i <= daysInMonth; i++) {
+        //         calendarHtml += `<button type="button" class="flex items-center justify-center w-12 h-12 lg:w-10 lg:h-10">${i}</button>`;
+        //     }
+        //     calendarHtml += '</div></div>';
+        //     calendar.innerHTML = calendarHtml;
+        // }
+        //
+        // document.addEventListener('DOMContentLoaded', generateCalendar);
 
     </script>
-    <style>
-        .hidden {
-            display: none;
-        }
-    </style>
 </head>
 <body>
 <div id="wrapper">
@@ -175,7 +170,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_NAME} + '님!'"></p>
                 <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
@@ -268,12 +263,6 @@
 
         </div>
         <br>
-        <form name="f" id="f">
-            <div class="btnBc" id="btnSido" type="button">시도</div>
-        </form>
-        <div id="sido">
-
-        </div>
         <br>
         <div class="flex flex-1 flex-col gap-2 undefined">
             <div class="openAnimation w-full h-full flex items-center justify-center">
@@ -395,61 +384,61 @@
     <!--End of container-->
 </section>
 <script>
-    // 이벤트 리스너를 추가하는 함수
-    function addFilterButtonListeners() {
-        const buttons = document.querySelectorAll('.filter-button');
-        buttons.forEach(button => {
-            button.addEventListener('click', function () {
-                const apiEndpoint = this.getAttribute('data-api');
-                const requestData = {}; // 필요한 데이터를 여기에 추가
-                fetch(apiEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(requestData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                        // 데이터 처리
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-            });
-        });
-    }
-
-    // 적용 버튼 이벤트 리스너
-    document.getElementById('applyButton').addEventListener('click', function () {
-        // 여기에 적용 API 호출을 추가
-    });
-
-    // 초기화 버튼 이벤트 리스너
-    document.getElementById('resetButton').addEventListener('click', function () {
-        // 여기에 초기화 API 호출을 추가
-    });
-
-    // 필터 버튼 리스너 추가
-    addFilterButtonListeners();
-
-    document.addEventListener("DOMContentLoaded", function() {
-        const dogBtn = document.getElementById("dogBtn");
-        const catBtn = document.getElementById("catBtn");
-        const otherBtn = document.getElementById("otherBtn");
-        const allBtn = document.getElementById("allBtn");
-
-        dogBtn.addEventListener("click", function() {
-            catBtn.classList.add("hidden");
-            otherBtn.classList.add("hidden");
-        });
-
-        allBtn.addEventListener("click", function() {
-            catBtn.classList.remove("hidden");
-            otherBtn.classList.remove("hidden");
-        });
-    });
+    // // 이벤트 리스너를 추가하는 함수
+    // function addFilterButtonListeners() {
+    //     const buttons = document.querySelectorAll('.filter-button');
+    //     buttons.forEach(button => {
+    //         button.addEventListener('click', function () {
+    //             const apiEndpoint = this.getAttribute('data-api');
+    //             const requestData = {}; // 필요한 데이터를 여기에 추가
+    //             fetch(apiEndpoint, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify(requestData)
+    //             })
+    //                 .then(response => response.json())
+    //                 .then(data => {
+    //                     console.log('Success:', data);
+    //                     // 데이터 처리
+    //                 })
+    //                 .catch((error) => {
+    //                     console.error('Error:', error);
+    //                 });
+    //         });
+    //     });
+    // }
+    //
+    // // 적용 버튼 이벤트 리스너
+    // document.getElementById('applyButton').addEventListener('click', function () {
+    //     // 여기에 적용 API 호출을 추가
+    // });
+    //
+    // // 초기화 버튼 이벤트 리스너
+    // document.getElementById('resetButton').addEventListener('click', function () {
+    //     // 여기에 초기화 API 호출을 추가
+    // });
+    //
+    // // 필터 버튼 리스너 추가
+    // addFilterButtonListeners();
+    //
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     const dogBtn = document.getElementById("dogBtn");
+    //     const catBtn = document.getElementById("catBtn");
+    //     const otherBtn = document.getElementById("otherBtn");
+    //     const allBtn = document.getElementById("allBtn");
+    //
+    //     dogBtn.addEventListener("click", function() {
+    //         catBtn.classList.add("hidden");
+    //         otherBtn.classList.add("hidden");
+    //     });
+    //
+    //     allBtn.addEventListener("click", function() {
+    //         catBtn.classList.remove("hidden");
+    //         otherBtn.classList.remove("hidden");
+    //     });
+    // });
 </script>
 </body>
 </html>

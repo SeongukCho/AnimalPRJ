@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="/css/ui_content.css">
     <link rel="stylesheet" href="/css/comment.css">
 
+
     <script th:inline="javascript">
         /*<![CDATA[*/
         const session_user_id = [[${session.SS_USER_ID}]]; // Controller에서 받은 세션에 저장된 값
@@ -35,7 +36,7 @@
             let userId = '[[${userId}]]'; // 서버에서 전달된 사용자 ID
             let myPage = document.querySelectorAll(".myPage");
 
-            myPage.forEach(function(link) {
+            myPage.forEach(function (link) {
                 link.href = "/user/myPage/" + userId;
             });
         });
@@ -311,6 +312,43 @@
             location.reload();
         }
 
+        function doLike(boardSeq) {
+
+
+            // Ajax 호출해서 좋아요 추가하기
+            $.ajax({
+                    url: "/board/doLike",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: {"boardSeq": boardSeq}, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success:
+                        function (json) { // /board/doLike 호출이 성공했다면..
+                            alert(json.msg); // 메시지 띄우기
+                            location.reload();
+                        }
+                }
+            )
+
+        }
+
+        function unLike(boardSeq) {
+
+            // Ajax 호출해서 글 삭제하기
+            $.ajax({
+                    url: "/board/unLike",
+                    type: "post", // 전송방식은 Post
+                    dataType: "JSON", // 전송 결과는 JSON으로 받기
+                    data: {"boardSeq": boardSeq}, // form 태그 내 input 등 객체를 자동으로 전송할 형태로 변경하기
+                    success:
+                        function (json) { // /board/unLike 호출이 성공했다면..
+                            alert(json.msg); // 메시지 띄우기
+                            location.reload();
+                        }
+                }
+            )
+
+        }
+
     </script>
 </head>
 <body>
@@ -358,7 +396,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_NAME} + '님!'"></p>
                 <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
@@ -468,6 +506,14 @@
                     </div>
                     <div class="contents" style="white-space: pre-wrap;">
                         <p>[[${rDTO.contents}]]</p>
+                    </div>
+                    <div th:if="${session.SS_USER_ID}">
+                        <div class="like" style="text-align: center" th:if="${likeDTO.existsYn()}=='Y'">
+                            <img src="/img/unlike.png" alt="Liked" width="50" height="50" th:onclick="unLike([[${rDTO.boardSeq}]])" />
+                        </div>
+                        <div class="like" style="text-align: center" th:unless="${likeDTO.existsYn()}=='Y'">
+                            <img src="/img/like.png" alt="Like" width="50" height="50" th:onclick="doLike([[${rDTO.boardSeq}]])" />
+                        </div>
                     </div>
                 </div>
                 <ul id="comments-list" class="comments-list">

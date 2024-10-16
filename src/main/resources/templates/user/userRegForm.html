@@ -288,10 +288,8 @@
                 success: function(response) {
                     // 성공적으로 검증된 경우
                     submitUserInfo(form); // 사용자 정보를 제출하는 메서드
-                    console.log(response);
                 },
                 error: function(xhr, status, error) {
-                    console.log(token);
                     console.error('reCAPTCHA 검증 실패:', error);
                 }
             });
@@ -368,7 +366,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_NAME} + '님!'"></p>
                 <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>

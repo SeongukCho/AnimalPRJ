@@ -47,6 +47,16 @@
             $("#btnLogin").on("click", function () {
                 doLogin(f);
             });
+
+            // 네이버 로그인
+            $("#btnNaverLogin").on("click", function () {
+                location.href = "https://nid.naver.com/oauth2.0/authorize?" +
+                    "response_type=code&" +
+                    "client_id=SD1abBr4htfEgv_XfQzj&" +
+                    "redirect_uri=https://petmily.shop/auth/naver/callback&" +
+                    // "redirect_uri=http://localhost:11000/auth/naver/callback&" +
+                    "state=petmily"
+            })
         })
 
         function doLogin(f) {
@@ -132,7 +142,7 @@
                 </ul>
             </div>
             <div class="topGlob" th:if="${session.SS_USER_ID != null}">
-                <p th:text="'안녕하세요, ' + ${session.SS_USER_ID} + '님!'"></p>
+                <p th:text="'안녕하세요, ' + ${session.SS_USER_NAME} + '님!'"></p>
                 <a href="#" class="myPage">마이페이지</a>
                 &nbsp;&nbsp;
                 <a href="/user/logout">로그아웃</a>
@@ -242,6 +252,8 @@
                                 <input type="password" id="password" name="password" autocomplete="off" class="logTxt"
                                        maxlength="30" placeholder="비밀번호">
                                 <input type="submit" id="btnLogin" class="btn" value="로그인">
+                                <br><br>
+                                <button type="button" id="btnNaverLogin" style="width: 400px;height: 50px"><img src="/img/naver_login.png" alt="네이버로그인" style="width: 100%;height: 100%;"></button>
                                 <ul>
                                     <li><a href="/user/searchUserId">아이디 찾기</a></li>
                                     <li><a href="/user/searchPassword">비밀번호 찾기</a></li>
@@ -272,6 +284,7 @@
     </div>
     <!--End of container-->
 </section>
+
 </body>
 
 </html>
