@@ -50,6 +50,30 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
+    public String getUserIdExist(final String userId) throws Exception {
+
+        log.info("service 아이디 중복 실행");
+
+        String existsYn;
+
+        log.info("userId : " + userId);
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+        if (rEntity.isPresent()) {
+            existsYn = "N";
+
+        } else {
+            existsYn = "Y";
+
+        }
+
+        log.info("service 아이디 중복확인 종료");
+
+        return existsYn;
+    }
+
+    @Override
     public UserInfoDTO getNickNameExists(UserInfoDTO pDTO) throws Exception {
         log.info(this.getClass().getName() + ".getNickNameExists Start!");
 
@@ -87,12 +111,14 @@ public class UserInfoService implements IUserInfoService {
 
             String userName = rEntity.get().getUserName();
             String nickName = rEntity.get().getNickName();
+            String password = rEntity.get().getPassword();
             String email = EncryptUtil.decAES128CBC(rEntity.get().getEmail());
             String regDt = rEntity.get().getRegDt();
             String profilePath = rEntity.get().getProfilePath();
 
             log.info("userId : " + userId);
             log.info("userName : " + userName);
+            log.info("password : " + password);
             log.info("nickName : " + nickName);
             log.info("email : " + email);
             log.info("regDt : " + regDt);
@@ -101,6 +127,7 @@ public class UserInfoService implements IUserInfoService {
                     .userId(userId)
                     .userName(userName)
                     .nickName(nickName)
+                    .password(password)
                     .email(email)
                     .regDt(regDt)
                     .existsYn("Y")
@@ -169,9 +196,48 @@ public class UserInfoService implements IUserInfoService {
     }
 
     @Override
+    public int insertSocialUser(String userId, String password, String email, String nickname, String userName) throws Exception {
+
+        log.info("service 회원가입 실행");
+
+        int res = 0;
+
+        // 아이디 중복확인
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+        if (rEntity. isPresent()) {
+            res = 2;
+
+        } else {
+
+            UserInfoEntity pEntity = UserInfoEntity.builder()
+                    .userId(userId)
+                    .password(password)
+                    .email(EncryptUtil.encAES128CBC(email))
+                    .nickName(nickname)
+                    .userName(userName)
+                    .build();
+
+            userInfoRepository.save(pEntity);
+
+            rEntity = userInfoRepository.findByUserId(userId);
+
+            if (rEntity.isPresent()) {
+                res = 1;
+
+            }
+
+        }
+
+        log.info("service 회원가입 종료");
+
+        return res;
+    }
+
+    @Override
     public int getUserLogin(UserInfoDTO pDTO) throws Exception {
 
-        log.info(this.getClass().getName() + ".getUserLogin Start!");
+        log.info(this.getClass().getName() + ".getUserLoginCheck Start!");
 
         int res = 0;
 
@@ -517,8 +583,58 @@ public class UserInfoService implements IUserInfoService {
 
         log.info(this.getClass().getName() + ".withDrawProc Service Start!");
 
-        userInfoRepository.deleteById(pDTO.userId());
+        userInfoRepository.deleteById(String.valueOf(pDTO.userSeq()));
 
         log.info(this.getClass().getName() + ".withDrawProc Service End!");
+    }
+
+    @Override
+    public UserInfoDTO getUserSeq(String userId) throws Exception {
+
+        UserInfoDTO rDTO;
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+        if (rEntity.isPresent()) {
+            long userSeq = rEntity.get().getUserSeq();
+            log.info("userSeq : " + userSeq);
+
+            rDTO = UserInfoDTO.builder()
+                    .userSeq(userSeq)
+                    .build();
+
+        } else {
+            log.info("userSeq is not found");
+
+            rDTO = UserInfoDTO.builder().existsYn("N").build();
+        }
+
+        return rDTO;
+    }
+
+    @Override
+    public UserInfoDTO getNickName(String userId) throws Exception {
+
+        UserInfoDTO rDTO;
+
+        Optional<UserInfoEntity> rEntity = userInfoRepository.findByUserId(userId);
+
+        log.info("rEntity : " + rEntity);
+
+        if (rEntity.isPresent()) {
+            String nickName = rEntity.get().getNickName();
+            log.info("nickName : " + nickName);
+
+            rDTO = UserInfoDTO.builder()
+                    .nickName(nickName)
+                    .build();
+
+        } else {
+            log.info("nickName is not found");
+
+            rDTO = UserInfoDTO.builder().existsYn("N").build();
+        }
+
+        return rDTO;
     }
 }

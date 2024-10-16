@@ -19,6 +19,11 @@ import java.io.Serializable;
 public class UserInfoEntity implements Serializable {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_seq")
+    private Long userSeq;
+
+    @NonNull
     @Column(name = "user_id")
     private String userId;
 

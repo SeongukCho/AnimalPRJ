@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.MsgDTO;
 import kopo.poly.dto.UserInfoDTO;
+import kopo.poly.dto.WeatherDTO;
 import kopo.poly.repository.UserInfoRepository;
+import kopo.poly.service.INaverService;
 import kopo.poly.service.IUserInfoService;
+import kopo.poly.service.IWeatherService;
 import kopo.poly.service.impl.RecaptchaService;
 import kopo.poly.util.CmmUtil;
 import kopo.poly.util.EncryptUtil;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -38,6 +42,8 @@ public class UserInfoController {
     private final IUserInfoService userInfoService;
     private final UserInfoRepository userInfoRepository;
     private final RecaptchaService recaptchaService;
+    private final IWeatherService weatherService;
+    private final INaverService naverService;
 
     @Value("${v3.secretKey}")
     private String secretKey;
@@ -170,7 +176,7 @@ public class UserInfoController {
     }
 
     @GetMapping(value = "changePassword")
-    public String changePassword(HttpSession session,ModelMap model) throws Exception{
+    public String changePassword(HttpSession session, ModelMap model) throws Exception {
 
         log.info(this.getClass().getName() + ".changePassword Controller Start!");
 
@@ -193,13 +199,13 @@ public class UserInfoController {
 
         log.info(this.getClass().getName() + ".ChangePasswordProc Start!");
 
-        String userId = CmmUtil.nvl((String)session.getAttribute("SS_USER_ID"));
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
         String img;
 
         String msg = ""; // 웹에 보여줄 메세지
         int result = 0;
 
-        if(userId.length() > 0) { //정상접근
+        if (userId.length() > 0) { //정상접근
 
             String password = CmmUtil.nvl(request.getParameter("password")); //신규 비밀번호
 
@@ -213,7 +219,7 @@ public class UserInfoController {
             int res = userInfoService.updatePassword(pDTO);
 
 
-            if(res > 0) {
+            if (res > 0) {
 
                 msg = "비밀번호가 재설정되었습니다.";
                 result = 0;
@@ -300,53 +306,12 @@ public class UserInfoController {
         String password = CmmUtil.nvl(request.getParameter("password"));
         String email = CmmUtil.nvl(request.getParameter("email"));
 
-//        String response = request.getParameter("g-recaptcha-response");
-//
-//        log.info("g-recaptcha-response : " + response); // reCAPTCHA 응답 로그
-
 
         log.info("userId : " + userId);
         log.info("userName : " + userName);
         log.info("nickName : " + nickName);
         log.info("password : " + password);
         log.info("email : " + email);
-
-//        // reCAPTCHA 검증
-//        URL url = new URL("https://www.google.com/recaptcha/api/siteverify");
-//        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-//        conn.setRequestMethod("POST");
-//        conn.setDoOutput(true);
-//
-//        String postParams = "secret=" + secretKey + "&response=" + response;
-//
-//        OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-//        writer.write(postParams);
-//        writer.flush();
-//        writer.close();
-//
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//        StringBuilder sb = new StringBuilder();
-//        String line;
-//        while ((line = reader.readLine()) != null) {
-//            sb.append(line);
-//        }
-//        reader.close();
-//
-//        // 응답 로그
-//        log.info("reCAPTCHA 검증 응답: " + sb.toString());
-//
-//        JSONObject jsonObject = new JSONObject(sb.toString());
-//        boolean success = jsonObject.getBoolean("success");
-//        if (!success) {
-//            // 검증 실패 시 추가 정보 로그
-//            String errorCodes = jsonObject.optString("error-codes", "없음");
-//            log.error("reCAPTCHA 검증 실패. 오류 코드: " + errorCodes);
-//
-//            msg = "reCAPTCHA 검증에 실패했습니다.";
-//            MsgDTO dto = MsgDTO.builder().result(0).msg(msg).build();
-//            log.info(this.getClass().getName() + ".insertUserInfo End!");
-//            return dto;
-//        }
 
         UserInfoDTO pDTO = UserInfoDTO.builder()
                 .userId(userId)
@@ -429,9 +394,16 @@ public class UserInfoController {
                 .userId(userId)
                 .password(EncryptUtil.encHashSHA256(password)).build();
 
+        UserInfoDTO nickDTO = userInfoService.getNickName(userId);
+
+        String nickName = nickDTO.nickName();
+
         int res = userInfoService.getUserLogin(pDTO);
+
         UserInfoDTO rDTO = Optional.ofNullable(userInfoService.getUserIdExists(pDTO))
                 .orElseGet(() -> UserInfoDTO.builder().build());
+
+        log.info("rDTO : " + rDTO);
 
         log.info("res : " + res);
 
@@ -439,10 +411,10 @@ public class UserInfoController {
 
             msg = "로그인 성공!";
             session.setAttribute("SS_USER_ID", userId);
-            session.setAttribute("SS_USER_NAME", rDTO.nickName());
+            session.setAttribute("SS_USER_NAME", nickName);
 
-            log.info("SS_USER_ID : " + rDTO.userId());
-            log.info("SS_USER_NAME : " + rDTO.userName());
+            log.info("SS_USER_ID : " + userId);
+            log.info("SS_USER_NAME : " + nickName);
 
         } else {
             msg = "아이디와 비밀번호가 올바르지 않습니다.";
@@ -455,12 +427,16 @@ public class UserInfoController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request) {
+    public String logout(HttpServletRequest request, ModelMap model) throws Exception {
         log.info(this.getClass().getName() + ".logout Start!");
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate(); // 세션 무효화
         }
+
+        WeatherDTO wDTO = weatherService.getWeatherInfo();
+
+        model.addAttribute("wDTO", wDTO);
 
         log.info(this.getClass().getName() + ".logout End!");
 
@@ -707,19 +683,45 @@ public class UserInfoController {
     @GetMapping(value = "withDrawProc")
     public ResponseEntity<?> withDrawProc(HttpSession session) throws Exception {
 
-        log.info(this.getClass().getName() + ".user/deleteUserProc Start!");
+        log.info(this.getClass().getName() + ".user/withDrawProc Start!");
 
-        String userId = (String) session.getAttribute("SS_USER_ID");
+        String userId = CmmUtil.nvl((String) session.getAttribute("SS_USER_ID"));
+
+        UserInfoDTO seqDTO = userInfoService.getUserSeq(userId);
+        long userSeq = seqDTO.userSeq();
+
         log.info("userId : " + userId);
+        log.info("userSeq : " + userSeq);
 
         UserInfoDTO userInfo = userInfoService.getUserInfo(userId);
 
-        if (userInfo != null && userInfo.profilePath() != null && !userInfo.profilePath().isEmpty()) {
-            try {
-                // 프로필 이미지 경로에서 파일 이름 추출
-                String fileName = userInfo.profilePath().substring(userInfo.profilePath().lastIndexOf("/") + 1);
+        if (userInfo == null) {
+            log.error("UserInfo not found for userId: " + userId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        }
 
-                // S3에서 파일 삭제
+        // Naver 계정일 경우
+        if (userId.matches("naver_(.*)")) {
+
+            log.info("네이버 로그인 계정 토큰 삭제 로직");
+            log.info("userId : " + userId);
+            log.info("password : " + userInfoService.getUserInfo(userId).password());
+
+            naverService.deleteToken(
+                    EncryptUtil.decAES128CBC(
+                            userInfoService.getUserInfo(userId).password()
+                    )
+            );
+
+            log.info("delete accessToken Success");
+
+        }
+
+
+        // 프로필 이미지 삭제 로직
+        if (userInfo.profilePath() != null && !userInfo.profilePath().isEmpty()) {
+            try {
+                String fileName = userInfo.profilePath().substring(userInfo.profilePath().lastIndexOf("/") + 1);
                 s3Client.deleteObject(bucketName, "profiles/" + fileName);
                 log.info("S3 버킷에서 파일 삭제 성공: " + fileName);
             } catch (Exception e) {
@@ -727,14 +729,22 @@ public class UserInfoController {
             }
         }
 
-        UserInfoDTO pDTO = UserInfoDTO.builder().userId(userId).build();
 
-        // 회원가입 서비스 호출하여 결과 받기
+        UserInfoDTO pDTO = UserInfoDTO.builder()
+                .userSeq(userSeq)
+                .userId(userId)
+                .userName(userInfo.userName())
+                .nickName(userInfo.nickName())
+                .build();
+
+        log.info("pDTO : " + pDTO);
+
+        // 회원탈퇴 로직 호출하여 결과 받기
         userInfoService.withDrawProc(pDTO);
 
         session.invalidate();
 
-        log.info(this.getClass().getName() + ".user/deleteUserProc End!");
+        log.info(this.getClass().getName() + ".user/withDrawProc End!");
 
         return ResponseEntity.ok().body("회원탈퇴 성공!");
     }

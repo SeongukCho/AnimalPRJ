@@ -9,6 +9,10 @@ import lombok.Builder;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public record UserInfoDTO(
+
+
+        Long userSeq,
+
         @NotBlank(message = "아이디는 필수 입력 사항입니다.")
         @Size(min = 4, max = 16, message = "아이디는 최소 4글자에서 16글자까지 입력가능합니다.")
         String userId, // 회원 아이디
@@ -31,9 +35,12 @@ public record UserInfoDTO(
 
         String regDt, // 등록 일시
 
+
         int authNumber,
         String existsYn, // 회원아이디 존재여부
         String profilePath // 프로필 사진 경로
+
+
 
 ) {
 }
