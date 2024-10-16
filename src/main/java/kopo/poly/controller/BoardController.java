@@ -6,10 +6,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kopo.poly.dto.*;
-import kopo.poly.service.IBoardService;
-import kopo.poly.service.ICommentService;
-import kopo.poly.service.IUserInfoService;
-import kopo.poly.service.IWeatherService;
+import kopo.poly.service.*;
 import kopo.poly.util.CmmUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,17 +44,19 @@ public class BoardController {
     // @RequiredArgsConstructor 를 통해 메모리에 올라간 서비스 객체를 Controller에서 사용할 수 있게 주입함
     private final IBoardService boardService;
     private final ICommentService commentService;
+    private final ILikeService likeService;
     private final AmazonS3 s3Client;
     private final String bucketName;
     private final IUserInfoService userInfoService;
     private final IWeatherService weatherService;
 
     @Autowired
-    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService, IUserInfoService userInfoService, IWeatherService weatherService) {
+    public BoardController(AmazonS3 s3Client, String bucketName, IBoardService boardService, ICommentService commentService, ILikeService likeService, IUserInfoService userInfoService, IWeatherService weatherService) {
         this.s3Client = s3Client;
         this.bucketName = bucketName;
         this.boardService = boardService;
         this.commentService = commentService;
+        this.likeService = likeService;
         this.userInfoService = userInfoService;
         this.weatherService = weatherService;
     }
@@ -200,6 +199,13 @@ public class BoardController {
         log.info(this.getClass().getName() + ".boardInfo Start!");
 
         String userId = (String) session.getAttribute("SS_USER_ID");
+        UserInfoDTO seqDTO = null;
+
+        if (userId != null) {
+            seqDTO = userInfoService.getUserSeq(userId);
+        }
+
+        long userSeq = (seqDTO != null && seqDTO.userSeq() != null) ? seqDTO.userSeq() : 0; // 로그인하지 않은 경우 userSeq는 0으로 설정
 
         model.addAttribute("userId", userId);
 
@@ -223,6 +229,11 @@ public class BoardController {
                 .boardSeq(Long.parseLong(nSeq))
                 .build();
 
+        LikeDTO lDTO = LikeDTO.builder()
+                .boardSeq(Long.parseLong(nSeq))
+                .userSeq(userSeq)
+                .build();
+
         // 게시판 상세정보 가져오기
         // Java 8부터 제공되는 Optional 활용하여 NPE(Null Pointer Exception) 처리
         BoardDTO rDTO = Optional.ofNullable(boardService.getBoardInfo(pDTO, true))
@@ -234,10 +245,14 @@ public class BoardController {
         List<CommentDTO> cList = Optional.ofNullable(commentService.getCommentList(cDTO))
                 .orElseGet(() -> new ArrayList<>());
 
+        LikeDTO likeDTO = Optional.ofNullable(likeService.likeExists(lDTO))
+                .orElseGet(() -> LikeDTO.builder().build());
+
         // 조회된 리스트 결과값 넣어주기
         model.addAttribute("rDTO", rDTO);
         model.addAttribute("iList", iList);
         model.addAttribute("cList", cList);
+        model.addAttribute("likeDTO", likeDTO);
 
         log.info(this.getClass().getName() + ".boardInfo End!");
 
@@ -491,5 +506,72 @@ public class BoardController {
         log.info(this.getClass().getName() + ".searchByTitle End!");
 
         return "board/boardSearch"; // 검색 결과를 보여줄 뷰 이름
+    }
+
+    /*
+     * 좋아요
+     */
+
+    @ResponseBody
+    @PostMapping(value = "doLike")
+    public MsgDTO addLike(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".doLike Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+        UserInfoDTO seqDTO = userInfoService.getUserSeq(userId);
+        long userSeq = seqDTO.userSeq();
+        long boardSeq = Long.parseLong(CmmUtil.nvl(request.getParameter("boardSeq")));
+
+        log.info("userSeq : " + userSeq);
+
+        log.info("boardSeq : " + boardSeq);
+
+        LikeDTO pDTO = LikeDTO.builder()
+                .userSeq(userSeq)
+                .boardSeq(boardSeq)
+                .build();
+
+        likeService.insertLike(pDTO);
+
+        MsgDTO rDTO = MsgDTO.builder()
+                .msg("좋아요 하였습니다.")
+                .build();
+
+        log.info(this.getClass().getName() + ".addLike End!");
+
+        return rDTO;
+    }
+
+    @ResponseBody
+    @PostMapping(value = "unLike")
+    public MsgDTO deleteLike(HttpServletRequest request, HttpSession session) throws Exception {
+
+        log.info(this.getClass().getName() + ".deleteLike Start!");
+
+        String userId = (String) session.getAttribute("SS_USER_ID");
+
+        UserInfoDTO seqDTO = userInfoService.getUserSeq(userId);
+        long userSeq = seqDTO.userSeq();
+
+        long boardSeq = Long.parseLong(CmmUtil.nvl(request.getParameter("boardSeq")));
+
+        log.info("userSeq : " + userSeq);
+        log.info("boardSeq : " + boardSeq);
+
+        LikeDTO pDTO = LikeDTO.builder()
+                .userSeq(userSeq)
+                .boardSeq(boardSeq)
+                .build();
+
+        likeService.deleteLike(pDTO);
+
+        MsgDTO rDTO = MsgDTO.builder()
+                .msg("좋아요를 취소하였습니다.")
+                .build();
+
+        log.info(this.getClass().getName() + ".deleteLike End!");
+
+        return rDTO;
     }
 }

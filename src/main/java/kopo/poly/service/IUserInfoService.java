@@ -15,6 +15,12 @@ public interface IUserInfoService {
 
     int insertUserInfo(UserInfoDTO pDTO) throws Exception;
 
+    int insertSocialUser(String userId,
+                         String password,
+                         String email,
+                         String nickname,
+                         String userName) throws Exception;
+
     int getUserLogin(UserInfoDTO pDTO) throws Exception;
 
     UserInfoDTO sendEmailAuth(UserInfoDTO pDTO) throws Exception;
@@ -23,6 +29,12 @@ public interface IUserInfoService {
 
     // 아이디, 비밀번호 찾기에 활용
     int searchUserIdOrPasswordPro(UserInfoDTO pDTO) throws Exception;
+
+    UserInfoDTO getUserSeq(String userId) throws Exception;
+
+    UserInfoDTO getNickName(String userId) throws Exception;
+
+    String getUserIdExist(String userId) throws Exception;
 
     /**
      * 비밀번호 변경
